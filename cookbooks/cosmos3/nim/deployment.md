@@ -4,12 +4,11 @@ SPDX-License-Identifier: OpenMDW-1.1 -->
 # Deploy the Cosmos3 Certified NIM
 
 Use this page to authenticate to NGC, choose a model, launch Generator or
-Reasoner, and verify the selected service. The commands pin the current 2.2.0
+Reasoner, and verify the selected service. The commands pin the current 2.3.0
 pre-release evaluation image. It is not a public release. Use the
 [Support matrix](support-matrix.md) to choose a compatible evaluation
-configuration. The support matrix also records newer source-derived selection
-policy that has not been validated against this pinned image. For an active
-container, `/v1/manifest` is the authority for available profiles.
+configuration. For an active container, `/v1/manifest` is the authority for
+available profiles.
 
 ## How selection works
 
@@ -95,7 +94,7 @@ the key in source control.
 Pin and pull the current release-candidate image:
 
 ```bash
-export NIM_IMAGE='nvcr.io/nvstaging/nim/cosmos3:2.2.0-rc.20260805164511-12ca3dacb921e392'
+export NIM_IMAGE='nvcr.io/nvstaging/nim/cosmos3:2.3.0-rc.20260810141900-caff275a56cdb4fe'
 docker pull "$NIM_IMAGE"
 ```
 

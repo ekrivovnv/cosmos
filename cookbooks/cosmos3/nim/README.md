@@ -12,11 +12,11 @@ contains two runtimes, but each container runs only one:
   Completions and, when enabled, the Responses API.
 
 > **Pre-release documentation:** Deployment commands pin the current evaluation
-> image, while reference pages explicitly label newer source-derived contracts
-> that have not been validated in that image. Inspect the running image's
-> manifest and OpenAPI before use. The public image, final system requirements,
-> supported configurations, and release URLs are not yet available. Do not use
-> the evaluation documentation as a public support commitment.
+> image, while reference pages identify source-derived contracts. Inspect the
+> running image's manifest and OpenAPI before use. The public image, final system
+> requirements, supported configurations, and release URLs are not yet
+> available. Do not use the evaluation documentation as a public support
+> commitment.
 
 ## Choose what to run
 

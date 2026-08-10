@@ -208,8 +208,6 @@ The request uses `store=false`. Current source applies
 `chat_template_kwargs.enable_thinking=false` to Responses create requests, so an
 ordinary answer is returned as a message item and exposed by the OpenAI client
 through `response.output_text` rather than appearing only as a reasoning item.
-This normalization has not been validated against the evaluation image pinned
-in `deployment.md`; an empty `output_text` can indicate an older image.
 
 Persisted retrieval, cancellation, background responses, and
 `previous_response_id` require response storage, which is disabled by default.
@@ -389,7 +387,6 @@ final answers; do not depend on `<think>` blocks or hidden chain-of-thought.
 | HTTP 422 | Media validation or preprocessing commonly failed | Check data URL, media ordering, prompt media limits, and selected-image format support |
 | Chat Completions route 404 | `NIM_URL` reaches Generator or the route is absent from the selected image | Inspect `/v1/metadata`, start Reasoner, and verify the live OpenAPI document |
 | Empty/no choices | Backend did not return a normal Chat Completion | Preserve response/log details and check the selected Reasoner profile |
-| Empty Responses `output_text` | The image can predate current-source Responses normalization or returned no message item | Preserve the raw response, inspect its output item types, and use Chat Completions or a validated newer image |
 | Responses route 404 | The deployment disabled Responses, the selected image does not expose it, or `NIM_URL` reaches Generator | Verify metadata first; then use Chat Completions or inspect `NIM_DISABLE_RESPONSES_ROUTE` and live OpenAPI |
 | Context or KV-cache failure | Request/media exceeded runtime limits | Reduce media sampling, token budget, concurrency, or adjust operator limits carefully |
 

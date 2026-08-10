@@ -7,10 +7,9 @@ Use this page to match a model to precision, GPU compute capability, GPU count,
 per-device VRAM, and system-memory requirements.
 
 > **Pre-release status:** The tables below reflect the current source profile
-> and selection policy. They have not been validated against the evaluation
-> image pinned in `deployment.md`, which can contain an older profile catalog.
-> Confirm the available configurations in `/v1/manifest` for the exact image
-> you run. Final supported configurations will be published with the release.
+> and selection policy. Confirm the available configurations in `/v1/manifest`
+> for the exact evaluation image you run. Final supported configurations will
+> be published with the release.
 
 ## Choose a model
 

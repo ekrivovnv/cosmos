@@ -40,12 +40,11 @@ against the NIM contract rather than copying another backend's adapter.
 
 ## Active release maintenance
 
-- Deployment currently uses a versioned Cosmos3 2.2 staging RC, not a final
-  release identity. Current source contains profile, Reasoner, and DFlash
-  contracts newer than that pinned image. Label those claims source-derived and
-  require the exact image manifest or live behavior before presenting them as
-  available in the evaluation image. Before public release, `deployment.md`
-  owns the exact evaluation image reference; update it on every RC bump.
+- Deployment currently uses a versioned Cosmos3 2.3 staging RC, not a final
+  release identity. Label source-derived claims correctly and require the exact
+  image manifest or live behavior before presenting them as validated in the
+  evaluation image. Before public release, `deployment.md` owns the exact
+  evaluation image reference; update it on every RC bump.
 - Never replace an RC reference with `latest`.
 - The final public image, release version/date, catalog URL, and model-card URL
   remain release-owned until approved.
@@ -53,7 +52,7 @@ against the NIM contract rather than copying another backend's adapter.
   page explicit about availability and omit exact chart commands until the
   repository, version, and schema are available.
 
-## Current source-only changes
+## Current source-derived contracts
 
 The public pages track these current-source contracts while keeping their image
 validation boundary visible:
