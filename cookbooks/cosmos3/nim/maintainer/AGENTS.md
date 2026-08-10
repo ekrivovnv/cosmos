@@ -35,8 +35,8 @@ maintainer instructions take precedence over the customer-assistant guidance in
 
 - Establish the public documentation root (`..`) as the working directory
   before path-sensitive commands. Keep the one-time pinned environment setup in
-  `prerequisites.md`;
-  task pages link to that setup instead of repeating it. Run pinned examples as
+  `prerequisites.md`; task pages link to that setup instead of repeating it. Run
+  pinned examples as
   `uv run python examples/...`.
 - Use `python3` for direct host-side standard-library commands and `python` only
   inside the uv project environment. Python Markdown fence labels remain
@@ -79,11 +79,13 @@ editor files in the same change whenever their guidance would otherwise become
 stale:
 
 - page additions, removals, or responsibility changes update
-  `references/page-ownership.md`;
+  `.agents/skills/cosmos3-nim-docs-maintainer/references/page-ownership.md`;
 - command conventions or durable editing rules update this file and, when
   procedural, `SKILL.md`;
 - source-contract and validation-workflow changes update `SKILL.md`;
 - RC/release status and resolved or new release gates update
-  `references/evidence-and-release-gates.md`; and
-- dependency policy changes update this file, `pyproject.toml`, `uv.lock`, and
-  the relevant public guides together.
+  `.agents/skills/cosmos3-nim-docs-maintainer/references/evidence-and-release-gates.md`;
+- customer workflow, task routing, or operational-safety changes update
+  `../AGENTS.md` and `../.agents/skills/cosmos3-nim-user/SKILL.md`; and
+- dependency policy changes update this file, `../pyproject.toml`, `../uv.lock`,
+  and the relevant public guides together.

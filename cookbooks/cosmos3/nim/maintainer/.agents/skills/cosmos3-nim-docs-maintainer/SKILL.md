@@ -90,7 +90,9 @@ between unreleased development contracts.
 ## 5. Synchronize editor guidance
 
 Every public documentation or example change must review `AGENTS.md`, this
-skill, and both reference files. Update them in the same change when needed:
+skill, and both reference files. Review the customer-assistant instructions and
+skill when a change affects customer routing, commands, or safety. Update them
+in the same change when needed:
 
 | Change | Editor file to update |
 | --- | --- |
@@ -98,6 +100,7 @@ skill, and both reference files. Update them in the same change when needed:
 | Durable command, dependency, security, or style rule changed | `AGENTS.md` and, if procedural, `SKILL.md` |
 | Source authority or editing/validation workflow changed | `SKILL.md` |
 | RC/release status, validation boundary, or open gate changed | `references/evidence-and-release-gates.md` |
+| Customer workflow, task routing, command, or operational-safety behavior changed | `../AGENTS.md` and `../.agents/skills/cosmos3-nim-user/SKILL.md` |
 
 A wording-only correction normally requires review but no editor-file edit.
 The final handoff should state whether editor guidance changed or remained
