@@ -144,6 +144,7 @@ structured cases under the same ignored output directory.
 - [Deployment](deployment.md)
 - [Configuration](configuration.md)
 - [Support matrix](support-matrix.md)
+- [Deploy with Helm](helm.md)
 - [Bring your own checkpoint](bring-your-own-checkpoint.md)
 
 ### Use the APIs
@@ -158,6 +159,8 @@ structured cases under the same ignored output directory.
 ### Operate
 
 - [Operations and troubleshooting](operations.md)
+- [Release notes](release-notes.md)
+- [Acknowledgements](acknowledgements.md)
 
 ## Safety, license, and notices
 
@@ -167,5 +170,6 @@ content-policy and face-privacy protections; see
 
 This cookbook is licensed under the repository
 [LICENSE](../../../LICENSE). The running NIM exposes bundled product license
-information at `/v1/license`. The public NGC model card, product terms, and
-image-specific third-party notices will be linked when the NIM is released.
+information at `/v1/license`. The public NGC model card and product terms will
+be linked when the NIM is released. See
+[Acknowledgements](acknowledgements.md) for third-party notice status.

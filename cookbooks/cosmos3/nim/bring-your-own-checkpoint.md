@@ -6,9 +6,9 @@ SPDX-License-Identifier: OpenMDW-1.1 -->
 Use this page to replace the selected Generator or Reasoner checkpoint while
 preserving the Certified NIM server, profile selection, and runtime contract.
 
-> BYOC support is still being finalized for the public release. Use
-> `NIM_MODEL_PATH` for pre-release evaluation and confirm checkpoint
-> compatibility with the selected image.
+> Set `NIM_MODEL_PATH` to replace the bundled Generator or Reasoner checkpoint.
+> At startup, the NIM validates the checkpoint layout, inferred model properties,
+> and compatibility with the selected configuration before serving requests.
 
 ## Supported boundary
 

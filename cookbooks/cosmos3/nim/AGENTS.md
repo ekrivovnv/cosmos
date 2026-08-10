@@ -47,10 +47,13 @@ For substantive documentation work, load
   as not yet available in prose or tables, not as runnable placeholders.
 - Never use `latest` for the NIM image. Before public release, keep the exact
   evaluation image reference in `deployment.md`.
-- Do not publish Helm instructions, release notes, or acknowledgement
-  inventories before approved release artifacts exist.
-- Do not document migration from development-only API forms. Until the first
-  public release, document only the current request and configuration contract.
+- Do not invent Helm commands, chart names, versions, or values before an
+  approved chart is published. Keep the Helm page explicit about availability.
+- Keep release notes user-facing and concise. Until the first public release,
+  document only the initial unified release and the current request and
+  configuration contract, not development migration history.
+- Keep acknowledgement status visible without inventing an inventory before the
+  image-specific notices are approved.
 
 ## Editing and validation
 

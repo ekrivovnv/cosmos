@@ -71,8 +71,8 @@ Nano-DROID currently has BF16 profiles only.
 ## Before you deploy
 
 Verify the host against [Prerequisites](prerequisites.md) and choose a
-compatible configuration from the [Support matrix](support-matrix.md).
-A supported Cosmos3 Helm chart is not available for this pre-release version.
+compatible configuration from the [Support matrix](support-matrix.md). For
+Kubernetes availability and requirements, see [Deploy with Helm](helm.md).
 
 ## Authenticate to NGC
 

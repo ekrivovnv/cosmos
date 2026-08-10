@@ -301,6 +301,10 @@ Task-specific validation belongs to [Generation](generation.md),
 | Container name already in use | A previous example container still exists | Inspect its logs if startup failed, then remove it with `docker rm -f cosmos3-generator` or `docker rm -f cosmos3-reasoner` |
 | Wrong-runtime 404 | `NIM_URL` reaches Generator for a Reasoner request, or Reasoner for `/v1/infer` | Inspect `/v1/metadata`, then start the intended runtime or correct the URL |
 | `/dev/shm` or resource error | Shared memory/ulimits are too small | Apply the documented `--shm-size` and ulimits |
+| Kubernetes Pod stays Pending | GPU request, scheduling constraints, or quota cannot be satisfied | Inspect Pod events and match the GPU count to an available configuration in the [support matrix](support-matrix.md) |
+| Kubernetes volume mount fails | PVC, access mode, ownership, or storage class is incompatible | Inspect Pod and PVC events; verify that the cache mount is writable |
+| Kubernetes startup probe fails | Cold startup exceeds the probe budget or startup has failed | Increase the startup budget and inspect container logs, cache, and NGC access |
+| Helm values are rejected or ignored | Values do not match the published Cosmos3 chart version | Use the chart version and schema linked from [Deploy with Helm](helm.md) |
 
 ### Generator and media
 
