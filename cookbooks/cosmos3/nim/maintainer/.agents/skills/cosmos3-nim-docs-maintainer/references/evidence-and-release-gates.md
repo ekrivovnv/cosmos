@@ -48,9 +48,11 @@ against the NIM contract rather than copying another backend's adapter.
 - Never replace an RC reference with `latest`.
 - The final public image, release version/date, catalog URL, and model-card URL
   remain release-owned until approved.
-- No Cosmos3 Certified NIM Helm chart is published yet. Keep the public Helm
-  page explicit about availability and omit exact chart commands until the
-  repository, version, and schema are available.
+- The current evaluation chart reference is
+  `nvstaging/nim/nim-wfm:1.3.0`. The public chart URL is TBD and must replace
+  the staging reference when approved. Keep the public Helm page explicit about
+  this boundary and omit pull/install commands and values until the public URL,
+  schema, and workflow are approved.
 
 ## Current source-derived contracts
 
@@ -92,7 +94,8 @@ refine entries when evidence changes:
 - prompt-upsampling integration behavior in the selected image;
 - DFlash draft override, KV-cache, and advanced configuration behavior in the
   selected image;
-- final Helm chart identity, values, and monitoring integration;
+- public Helm chart URL to replace the staging reference, plus approved values,
+  installation workflow, and monitoring integration;
 - approved reasoning-trace wording; and
 - approved acknowledgements and product license/model-card links for the exact
   release.

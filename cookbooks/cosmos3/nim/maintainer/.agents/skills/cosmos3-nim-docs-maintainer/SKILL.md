@@ -85,10 +85,12 @@ values to fill an unresolved release fact.
   update all affected commands and prerequisite text in the same change.
 
 For a pre-release image bump, update `NIM_IMAGE` in `deployment.md`. Do not use
-`latest`. Keep Helm guidance conceptual until an approved chart exists, keep
-acknowledgement inventory visibly unavailable until approved notices exist, and
-keep release notes limited to the initial unified release rather than migrations
-between unreleased development contracts.
+`latest`. Keep the exact approved staging Helm reference in `helm.md`, but keep
+pull/install guidance conceptual until the public chart URL, schema, and
+workflow are approved. Replace the staging reference when that public release
+artifact is available. Keep acknowledgement inventory visibly unavailable until
+approved notices exist, and keep release notes limited to the initial unified
+release rather than migrations between unreleased development contracts.
 
 ## 5. Synchronize editor guidance
 

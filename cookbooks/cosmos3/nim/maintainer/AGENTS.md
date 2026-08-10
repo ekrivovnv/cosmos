@@ -51,8 +51,10 @@ maintainer instructions take precedence over the customer-assistant guidance in
   as not yet available in prose or tables, not as runnable placeholders.
 - Never use `latest` for the NIM image. Before public release, keep the exact
   evaluation image reference in `deployment.md`.
-- Do not invent Helm commands, chart names, versions, or values before an
-  approved chart is published. Keep the Helm page explicit about availability.
+- Keep the approved staging Helm reference exact, but do not invent pull/install
+  commands, values, schema details, or a public URL. The public chart URL is TBD;
+  replace the staging reference when the approved public release artifact is
+  available and keep the Helm page explicit about that boundary.
 - Keep release notes user-facing and concise. Until the first public release,
   document only the initial unified release and the current request and
   configuration contract, not development migration history.
