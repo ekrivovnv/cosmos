@@ -165,36 +165,11 @@ Do not use readiness as request progress: readiness reports whether the backend
 can serve, not how far an individual request has advanced. Avoid blind retries,
 which can submit duplicate expensive work.
 
-## Measure request latency
-
 Complete the pinned [client environment
-setup](prerequisites.md#initialize-the-example-environment) before collecting
-request timings. The elapsed time of an entire `uv run python examples/...`
-command includes local process startup, media loading and base64 encoding, the
-HTTP request, response decoding, and output-file writes. If the environment was
-not initialized first, it can also include environment creation. Do not report
-that total as model or service latency.
-
-Label each measurement according to its boundary:
-
-- **End-to-end command time** covers the complete user invocation, including
-  client preparation and output handling.
-- **Client-observed request time** starts immediately before the HTTP or SDK
-  call and ends after the response body arrives; it includes network and
-  protocol overhead in addition to server work.
-- **Service-side latency** comes from a validated server metric or correlated
-  server logs and excludes local client work according to that metric's
-  definition.
-- **Startup time** covers artifact download, materialization, engine build,
-  model load, and warmup before readiness and must not be mixed with request
-  latency.
-
-For a reproducible comparison, record the exact image, runtime, model variant,
-precision, profile, GPU model/count, offload state, request fields, concurrency,
-and whether each sample is cold or warm. Keep the payload fixed, separate any
-warmup run, collect multiple measured samples, and report the distribution and
-sample count instead of one wall-clock observation. Report media preparation
-and decoding separately when they materially affect end-to-end time.
+setup](prerequisites.md#initialize-the-example-environment) before running an
+example. The elapsed time of `uv run python examples/...` includes local client
+startup, media preparation, response decoding, and output-file writes, so do
+not interpret the complete command time as NIM inference latency.
 
 No expected latency or throughput range is published until it has been
 validated for a release image and reference configuration. A timeout setting or

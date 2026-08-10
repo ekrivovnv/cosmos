@@ -21,7 +21,7 @@ minimum needed for a complete workflow and link to the owner.
 | `reasoning.md` | Reasoner Chat Completions and Responses, media, sampling, structured output, and task-runner behavior |
 | `action.md` | Forward dynamics, policy, inverse dynamics, Nano-DROID, action shapes/domains, and responses |
 | `transfer.md` | Transfer controls, precomputed/derived forms, defaults, combinations, chunking, and admission behavior |
-| `operations.md` | Health, management endpoints, generic errors, metrics, logs, performance measurement methodology, guardrails, diagnostics, and troubleshooting |
+| `operations.md` | Health, management endpoints, generic errors, metrics, logs, guardrails, diagnostics, and troubleshooting |
 | `acknowledgements.md` | Approved third-party notices for the exact released image only |
 | `examples/` | Complete editable client requests, primary response handling, media helpers, and generated outputs |
 | `pyproject.toml` and `uv.lock` | Reproducible Python client environment for all examples |
