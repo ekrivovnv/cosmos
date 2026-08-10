@@ -41,10 +41,10 @@ against the NIM contract rather than copying another backend's adapter.
 ## Active release maintenance
 
 - Deployment currently uses a versioned Cosmos3 2.3 staging RC, not a final
-  release identity. Label source-derived claims correctly and require the exact
-  image manifest or live behavior before presenting them as validated in the
-  evaluation image. Before public release, `deployment.md` owns the exact
-  evaluation image reference; update it on every RC bump.
+  release identity. Record source-derived evidence in maintainer files only and
+  require the exact image manifest or live behavior before presenting claims as
+  validated in the evaluation image. Before public release, `deployment.md`
+  owns the exact evaluation image reference; update it on every RC bump.
 - Never replace an RC reference with `latest`.
 - The final public image, release version/date, catalog URL, and model-card URL
   remain release-owned until approved.
@@ -56,8 +56,10 @@ against the NIM contract rather than copying another backend's adapter.
 
 ## Current source-derived contracts
 
-The public pages track these current-source contracts while keeping their image
-validation boundary visible:
+Track evidence provenance in this maintainer reference. Public pages state the
+corresponding product behavior directly without mentioning source-code
+provenance, and direct users to runtime interfaces where availability must be
+confirmed:
 
 - Generator BF16 compute capability 8.0, updated Super VRAM/Transfer floors,
   and Reasoner Super BF16 TP2 at 73 GiB/device;

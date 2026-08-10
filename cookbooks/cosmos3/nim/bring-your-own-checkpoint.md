@@ -93,9 +93,9 @@ profile artifact download after source resolution.
 
 When `NIM_USE_DFLASH=1`, a Nano Reasoner needs a draft artifact containing
 `config.json` and `model.safetensors`. The selected profile can provide it under
-the primary model workspace. Current source also accepts a separate read-only
-local draft through `NIM_DFLASH_MODEL_PATH`; the draft does not need the target
-model's tokenizer or processor files:
+the primary model workspace. A separate read-only local draft can be supplied
+through `NIM_DFLASH_MODEL_PATH`; the draft does not need the target model's
+tokenizer or processor files:
 
 ```text
 /byoc/cosmos3-dflash/

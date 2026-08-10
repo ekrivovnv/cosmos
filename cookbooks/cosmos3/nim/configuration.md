@@ -38,7 +38,7 @@ GPUs. A normal deployment does not need a profile ID.
 | Name | Default | Use |
 | --- | --- | --- |
 | `NIM_MODEL_PATH` | Empty | Generator: absolute local directory. Reasoner: absolute local directory or `hf://owner/repository[:revision]` |
-| `NIM_DFLASH_MODEL_PATH` | Empty | Current source, Nano Reasoner only: independently override the DFlash draft with an absolute local directory |
+| `NIM_DFLASH_MODEL_PATH` | Empty | Nano Reasoner only: independently override the DFlash draft with an absolute local directory |
 | `NIM_DISABLE_MODEL_DOWNLOAD` | `false` | Disable profile download for a completely local Reasoner override; incompatible with Reasoner `hf://` and rejected for Generator |
 | `HF_TOKEN` | Empty | Authenticate to a private Reasoner Hugging Face repository |
 
@@ -153,10 +153,10 @@ absolute local path, not an `hf://` source. `NIM_DFLASH_CONFIG` requires
 `NIM_USE_DFLASH=1` and cannot set the reserved `method` or `model` keys.
 
 The BF16 KV-cache option is intended to improve DFlash acceptance length and
-provide the current-source Blackwell path, but it uses more KV-cache memory.
-Treat the independent draft path, BF16 KV cache, and `NIM_DFLASH_CONFIG` as
-source-derived advanced controls; measure memory, correctness, latency, and
-throughput on the exact image before production use.
+provide a compatible Blackwell path, but it uses more KV-cache memory. Treat the
+independent draft path, BF16 KV cache, and `NIM_DFLASH_CONFIG` as advanced
+controls; measure memory, correctness, latency, and throughput on the exact
+image before production use.
 
 ### Context and scheduling
 

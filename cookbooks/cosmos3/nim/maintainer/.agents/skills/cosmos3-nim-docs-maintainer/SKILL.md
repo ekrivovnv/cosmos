@@ -52,6 +52,10 @@ surface in the handoff.
 
 ## 3. Label the evidence correctly
 
+Classify each changed claim for maintainer records. Keep the classification
+internal: customer-facing pages state product behavior directly and never say
+that the documentation or a behavior claim is based on source code.
+
 Classify each changed claim as:
 
 - **Source-derived:** established by current implementation, models, profiles,

@@ -28,8 +28,9 @@ profile that avoids offload, and makes effective use of the available GPUs. On
 an integrated GPU with unified host/device memory, selection reserves host
 memory and uses resident Generator model and guardrail profiles. Startup fails
 if the chosen model cannot run on the host. See [Support
-matrix](support-matrix.md#gpu-architecture-and-topology) for the source-derived
-memory and shared-memory rules, then confirm them in the exact image manifest.
+matrix](support-matrix.md#gpu-architecture-and-topology) for the memory and
+shared-memory rules, then confirm the selected profile in the exact image
+manifest.
 
 ### Select a Generator model
 
@@ -235,11 +236,11 @@ See [Configuration](configuration.md#advanced-profile-controls) for details.
 | `-e NGC_API_KEY` | Pass the exported NGC credential |
 | `-v ...:/opt/nim/.cache` | Persist model artifacts |
 
-GPU counts, compute-capability gates, VRAM floors, and current-source
-system-memory floors are summarized in the [configuration
-matrix](support-matrix.md). Current source uses 16 GiB for resident Generator
-and Reasoner profiles, 64 GiB for Nano offload, and 150 GiB for Super offload.
-Docker or Kubernetes memory limits count as the available system memory.
+GPU counts, compute-capability gates, VRAM floors, and system-memory floors are
+summarized in the [configuration matrix](support-matrix.md). Resident Generator
+and Reasoner profiles require 16 GiB, Nano offload profiles require 64 GiB, and
+Super offload profiles require 150 GiB. Docker or Kubernetes memory limits
+count as the available system memory.
 Confirm that the selected row and its tags are present in the target image
 before deployment.
 

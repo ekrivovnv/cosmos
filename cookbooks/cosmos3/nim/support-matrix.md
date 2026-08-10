@@ -6,10 +6,10 @@ SPDX-License-Identifier: OpenMDW-1.1 -->
 Use this page to match a model to precision, GPU compute capability, GPU count,
 per-device VRAM, and system-memory requirements.
 
-> **Pre-release status:** The tables below reflect the current source profile
-> and selection policy. Confirm the available configurations in `/v1/manifest`
-> for the exact evaluation image you run. Final supported configurations will
-> be published with the release.
+> **Pre-release status:** The tables below list the current evaluation
+> configurations and selection requirements. Confirm the available
+> configurations in `/v1/manifest` for the exact evaluation image you run.
+> Final supported configurations will be published with the release.
 
 ## Choose a model
 
@@ -94,13 +94,12 @@ a GPU SKU allowlist: the device must expose at least 31 binary GiB to the
 runtime and meet the precision's compute-capability requirement. The RTX 5090
 does not meet the 35-GiB Transfer minimum for these configurations.
 
-The current source emits a system-memory floor for every profile and filters
-incompatible profiles before final selection. Resident Generator profiles use a
-16-GiB selector floor, Nano offload profiles use 64 GiB, and all Super offload
-profiles use 150 GiB. These are source selection criteria, not final general
-host-RAM requirements; the release-wide CPU and RAM requirements remain
-unresolved. The NIM checks a container memory limit before host physical
-memory.
+The NIM applies a system-memory floor to every profile and filters incompatible
+profiles before final selection. Resident Generator profiles use a 16-GiB
+selection floor, Nano offload profiles use 64 GiB, and all Super offload
+profiles use 150 GiB. These profile floors are not final general host-RAM
+requirements; the release-wide CPU and RAM requirements remain unresolved. The
+NIM checks a container memory limit before host physical memory.
 
 Leave offload and guardrail residency on automatic selection unless a specific
 configuration has been validated for the deployment.

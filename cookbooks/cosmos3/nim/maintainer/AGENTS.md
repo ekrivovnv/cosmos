@@ -20,7 +20,10 @@ maintainer instructions take precedence over the customer-assistant guidance in
   image when available. Historical documentation is a coverage source, not an
   authority for current names, defaults, commands, or support claims.
 - Distinguish source-derived, RC/release-validated, historical, and unresolved
-  claims. Do not silently fill release-owned gaps from memory or old releases.
+  claims in maintainer records. Keep that provenance internal: customer-facing
+  pages state documented product behavior directly and never say that guidance
+  is based on source code. Do not silently fill release-owned gaps from memory
+  or old releases.
 - Treat timeout ceilings, individual observations, and end-to-end client command
   times as distinct from validated service latency. Publish expected
   performance only with an approved release image, reference configuration, and

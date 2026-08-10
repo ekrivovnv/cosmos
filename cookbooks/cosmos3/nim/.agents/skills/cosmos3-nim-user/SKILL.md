@@ -70,8 +70,8 @@ For hardware guidance:
 - never add VRAM across devices;
 - use the Transfer minimum when Transfer must be served;
 - treat named GPUs as examples, not as an allowlist;
-- distinguish source-derived table rows from the active image and use
-  `/v1/manifest` for that image's available profiles;
+- use `/v1/manifest` for the active image's available profiles and the support
+  matrix for documented requirements;
 - use the current RTX 5090 guidance and thresholds in `support-matrix.md` to
   distinguish ordinary generation from Transfer eligibility; and
 - leave requirements described as not yet available unresolved.

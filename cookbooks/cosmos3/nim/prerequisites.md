@@ -30,7 +30,7 @@ Plan for:
 | CPU architecture | Not yet available |
 | GPU compute capability | Generator: BF16 `>=8.0`, FP8 `>=8.9`; Reasoner: BF16 `>=8.0`, FP8 `>=8.9`, NVFP4 `>=10.0` |
 | GPU count and per-device VRAM | See the [Generator](support-matrix.md#generator-configurations) and [Reasoner](support-matrix.md#reasoner-configurations) tables |
-| Host RAM | General minimum not yet available; current source selection floors are 16 GiB for resident/Reasoner profiles, 64 GiB for Nano offload, and 150 GiB for Super offload |
+| Host RAM | General minimum not yet available; profile-selection floors are 16 GiB for resident/Reasoner profiles, 64 GiB for Nano offload, and 150 GiB for Super offload |
 | Free disk | Not yet available |
 | Container shared memory | Not yet available |
 
@@ -43,8 +43,8 @@ If the deployment must serve Transfer, provision each GPU against the
 Reasoner requires GPUs with the same compute capability. Use homogeneous GPUs
 for either runtime because mixed-GPU support is not established. The profile
 selector evaluates the smallest per-device memory total and effective system
-RAM exposed to the container. Confirm these source-derived rules against the
-exact image's manifest before deployment.
+RAM exposed to the container. Confirm the selected configuration in the exact
+image's manifest before deployment.
 
 On an integrated GPU where device and host share one memory pool, the selector
 withholds 16 GiB for the host by default before comparing the remaining shared
@@ -52,14 +52,13 @@ memory with profile floors. Generator selection uses resident model and
 resident guardrail profiles on these systems; CPU-offload profiles do not
 reduce shared-memory use.
 
-Lower-VRAM profiles can keep model weights in system memory. In current source,
-resident Generator and Reasoner profiles carry a 16-GiB selection floor, Nano
-model/layer-offload profiles carry 64 GiB, and Super model/layer-offload
-profiles carry 150 GiB. The NIM checks a container memory limit before host
-physical memory, so a lower Docker or Kubernetes limit can make an otherwise
-capable host incompatible. These source selector floors do not resolve the
-release-wide host-RAM requirement for the container, runtime, materialized
-artifacts, and workload.
+Lower-VRAM profiles can keep model weights in system memory. Resident Generator
+and Reasoner profiles carry a 16-GiB selection floor, Nano model/layer-offload
+profiles carry 64 GiB, and Super model/layer-offload profiles carry 150 GiB. The
+NIM checks a container memory limit before host physical memory, so a lower
+Docker or Kubernetes limit can make an otherwise capable host incompatible.
+These profile-selection floors do not resolve the release-wide host-RAM
+requirement for the container, runtime, materialized artifacts, and workload.
 
 ## Software requirements
 
