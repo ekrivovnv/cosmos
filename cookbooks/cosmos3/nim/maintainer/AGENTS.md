@@ -1,14 +1,17 @@
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 SPDX-License-Identifier: OpenMDW-1.1 -->
 
-# Cosmos3 Certified NIM documentation instructions
+# Cosmos3 Certified NIM maintainer instructions
 
-These instructions apply to the public documentation, Python examples, and
-supporting metadata in this directory. Start the documentation editor from
-`cookbooks/cosmos3/nim` so this file and the project skill are discovered.
+These instructions apply when maintaining the public documentation, Python
+examples, and supporting metadata one directory above this folder. Open
+`cookbooks/cosmos3/nim/maintainer` in the documentation editor so this file and
+the maintainer skill are discovered. The public documentation root is `..`.
 
 For substantive documentation work, load
-`.agents/skills/cosmos3-nim-docs/SKILL.md` and its references.
+`.agents/skills/cosmos3-nim-docs-maintainer/SKILL.md` and its references. These
+maintainer instructions take precedence over the customer-assistant guidance in
+`../AGENTS.md` when editing the documentation.
 
 ## Evidence and scope
 
@@ -30,8 +33,9 @@ For substantive documentation work, load
 
 ## Runnable examples and dependencies
 
-- Establish this directory as the working directory before path-sensitive
-  commands. Keep the one-time pinned environment setup in `prerequisites.md`;
+- Establish the public documentation root (`..`) as the working directory
+  before path-sensitive commands. Keep the one-time pinned environment setup in
+  `prerequisites.md`;
   task pages link to that setup instead of repeating it. Run pinned examples as
   `uv run python examples/...`.
 - Use `python3` for direct host-side standard-library commands and `python` only
@@ -69,9 +73,10 @@ For substantive documentation work, load
 ## Keep editor guidance current
 
 Every documentation change must review this `AGENTS.md` and
-`.agents/skills/cosmos3-nim-docs/` for affected instructions, page ownership,
-source references, validation steps, and release gates. Update the editor files
-in the same change whenever their guidance would otherwise become stale:
+`.agents/skills/cosmos3-nim-docs-maintainer/` for affected instructions, page
+ownership, source references, validation steps, and release gates. Update the
+editor files in the same change whenever their guidance would otherwise become
+stale:
 
 - page additions, removals, or responsibility changes update
   `references/page-ownership.md`;

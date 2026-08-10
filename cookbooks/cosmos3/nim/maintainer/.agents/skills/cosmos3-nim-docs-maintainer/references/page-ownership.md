@@ -3,8 +3,9 @@ SPDX-License-Identifier: OpenMDW-1.1 -->
 
 # Canonical page ownership
 
-Use one canonical owner for each fact class. Other pages may include the
-minimum needed for a complete workflow and link to the owner.
+Use one canonical owner for each fact class. Paths in this table are relative
+to the public documentation root (`..` from the maintainer folder). Other pages
+may include the minimum needed for a complete workflow and link to the owner.
 
 | Artifact | Canonical responsibility |
 | --- | --- |
