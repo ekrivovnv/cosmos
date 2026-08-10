@@ -43,12 +43,14 @@ For substantive documentation work, load
 - Declare required client tools, minimum versions, and installation instructions
   before first use. Keep client tools separate from NIM host/container
   requirements.
-- Every fenced command must use a usable value. Keep unresolved release values
-  in prose or tables, not runnable blocks.
-- Never use `latest` for the NIM image. On every RC bump, update the exact image
-  reference in both `deployment.md` and `release-notes.md`.
-- Do not invent Helm commands, chart names, versions, or values before an
-  approved chart is published.
+- Every fenced command must use a usable value. State unresolved release values
+  as not yet available in prose or tables, not as runnable placeholders.
+- Never use `latest` for the NIM image. Before public release, keep the exact
+  evaluation image reference in `deployment.md`.
+- Do not publish Helm instructions, release notes, or acknowledgement
+  inventories before approved release artifacts exist.
+- Do not document migration from development-only API forms. Until the first
+  public release, document only the current request and configuration contract.
 
 ## Editing and validation
 

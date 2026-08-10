@@ -9,12 +9,10 @@ minimum needed for a complete workflow and link to the owner.
 | Artifact | Canonical responsibility |
 | --- | --- |
 | `README.md` | Product scope, selected Generator/Reasoner runtime model, capability index, quick starts, and guide navigation |
-| `release-notes.md` | RC/release image identity, versions, compatibility changes, known limitations, and upgrade guidance |
 | `prerequisites.md` | Host hardware/software, client tooling and pinned environment initialization, storage, shared memory, NGC/network access, and setup verification |
 | `deployment.md` | NGC login, exact image, cache, Docker launch flags, selectors, ports, readiness, and shutdown |
 | `configuration.md` | Shared, Generator, Reasoner, profile-selection, and prompt-upsampling environment variables |
 | `support-matrix.md` | Model, precision, GPU, VRAM, profile, offload, and media/codec compatibility with evidence status |
-| `helm.md` | Kubernetes prerequisites and concepts; exact chart commands only after chart publication |
 | `bring-your-own-checkpoint.md` | Generator and Reasoner checkpoint sources, layouts, mounts/downloads, validation, launch, and failures |
 | `api-reference.md` | Runtime routing, common Generator envelope and response, strict JSON behavior, and live schema inspection |
 | `generation.md` | T2I, T2V, I2V, V2V, frame/resolution/media rules, prompt upsampling, decoding, and generation failures |
@@ -22,7 +20,6 @@ minimum needed for a complete workflow and link to the owner.
 | `action.md` | Forward dynamics, policy, inverse dynamics, Nano-DROID, action shapes/domains, and responses |
 | `transfer.md` | Transfer controls, precomputed/derived forms, defaults, combinations, chunking, and admission behavior |
 | `operations.md` | Health, management endpoints, generic errors, metrics, logs, guardrails, diagnostics, and troubleshooting |
-| `acknowledgements.md` | Approved third-party notices for the exact released image only |
 | `examples/` | Complete editable client requests, primary response handling, media helpers, and generated outputs |
 | `pyproject.toml` and `uv.lock` | Reproducible Python client environment for all examples |
 
@@ -38,10 +35,9 @@ minimum needed for a complete workflow and link to the owner.
   profile matrices.
 - `operations.md` owns generic diagnosis. Task guides own task-specific failure
   rows.
-- `release-notes.md` and `deployment.md` deliberately repeat the exact RC image
-  and must be updated together.
-- Public pages link to `acknowledgements.md`; they do not reproduce mutable
-  notice inventories or legal text.
+- Before public release, `deployment.md` owns the exact evaluation image.
+  Release notes, Helm instructions, and acknowledgement inventories are added
+  only when their approved artifacts exist.
 
 ## Integration surfaces
 
