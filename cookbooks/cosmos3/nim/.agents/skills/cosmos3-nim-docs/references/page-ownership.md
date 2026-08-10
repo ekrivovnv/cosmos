@@ -10,7 +10,7 @@ minimum needed for a complete workflow and link to the owner.
 | --- | --- |
 | `README.md` | Product scope, selected Generator/Reasoner runtime model, capability index, quick starts, and guide navigation |
 | `release-notes.md` | RC/release image identity, versions, compatibility changes, known limitations, and upgrade guidance |
-| `prerequisites.md` | Host hardware/software, client tooling, storage, shared memory, NGC/network access, and setup verification |
+| `prerequisites.md` | Host hardware/software, client tooling and pinned environment initialization, storage, shared memory, NGC/network access, and setup verification |
 | `deployment.md` | NGC login, exact image, cache, Docker launch flags, selectors, ports, readiness, and shutdown |
 | `configuration.md` | Shared, Generator, Reasoner, profile-selection, and prompt-upsampling environment variables |
 | `support-matrix.md` | Model, precision, GPU, VRAM, profile, offload, and media/codec compatibility with evidence status |
@@ -21,7 +21,7 @@ minimum needed for a complete workflow and link to the owner.
 | `reasoning.md` | Reasoner Chat Completions and Responses, media, sampling, structured output, and task-runner behavior |
 | `action.md` | Forward dynamics, policy, inverse dynamics, Nano-DROID, action shapes/domains, and responses |
 | `transfer.md` | Transfer controls, precomputed/derived forms, defaults, combinations, chunking, and admission behavior |
-| `operations.md` | Health, management endpoints, generic errors, metrics, logs, guardrails, diagnostics, and troubleshooting |
+| `operations.md` | Health, management endpoints, generic errors, metrics, logs, performance measurement methodology, guardrails, diagnostics, and troubleshooting |
 | `acknowledgements.md` | Approved third-party notices for the exact released image only |
 | `examples/` | Complete editable client requests, primary response handling, media helpers, and generated outputs |
 | `pyproject.toml` and `uv.lock` | Reproducible Python client environment for all examples |

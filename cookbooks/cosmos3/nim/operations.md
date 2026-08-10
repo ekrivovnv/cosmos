@@ -138,6 +138,68 @@ scrape_configs:
 The final Helm `ServiceMonitor`/OpenTelemetry values and any recommended Grafana
 dashboard are **TBD (release-dependent)**.
 
+## Long-running requests
+
+Generator `/v1/infer` requests are synchronous. The client receives the image
+or video response only after inference and response serialization complete, so
+a connection can remain open without a response body while work is active. A
+quiet connection by itself does not prove that the request is hung.
+
+The cookbook clients set a 30-minute HTTP request timeout. The Generator backend
+also has a separately configurable queue-plus-execution timeout whose current
+source default is 30 minutes; see
+[`NIM_TRITON_REQUEST_TIMEOUT`](configuration.md#generator-configuration).
+Both values are timeout ceilings, not expected latency or a service-level
+objective.
+
+Before retrying a quiet request:
+
+1. confirm that the client connection is still open and has not reported an
+   HTTP or network error;
+2. follow the active container logs and correlate them with the request start;
+3. inspect approved GPU telemetry and runtime metrics for activity; and
+4. wait for the configured client or backend timeout unless the logs identify a
+   failure that requires intervention.
+
+Do not use readiness as request progress: readiness reports whether the backend
+can serve, not how far an individual request has advanced. Avoid blind retries,
+which can submit duplicate expensive work.
+
+## Measure request latency
+
+Complete the pinned [client environment
+setup](prerequisites.md#initialize-the-example-environment) before collecting
+request timings. The elapsed time of an entire `uv run python examples/...`
+command includes local process startup, media loading and base64 encoding, the
+HTTP request, response decoding, and output-file writes. If the environment was
+not initialized first, it can also include environment creation. Do not report
+that total as model or service latency.
+
+Label each measurement according to its boundary:
+
+- **End-to-end command time** covers the complete user invocation, including
+  client preparation and output handling.
+- **Client-observed request time** starts immediately before the HTTP or SDK
+  call and ends after the response body arrives; it includes network and
+  protocol overhead in addition to server work.
+- **Service-side latency** comes from a validated server metric or correlated
+  server logs and excludes local client work according to that metric's
+  definition.
+- **Startup time** covers artifact download, materialization, engine build,
+  model load, and warmup before readiness and must not be mixed with request
+  latency.
+
+For a reproducible comparison, record the exact image, runtime, model variant,
+precision, profile, GPU model/count, offload state, request fields, concurrency,
+and whether each sample is cold or warm. Keep the payload fixed, separate any
+warmup run, collect multiple measured samples, and report the distribution and
+sample count instead of one wall-clock observation. Report media preparation
+and decoding separately when they materially affect end-to-end time.
+
+No expected latency or throughput range is published until it has been
+validated for a release image and reference configuration. A timeout setting or
+a single observed run is not a performance commitment.
+
 ## Guardrails
 
 Generator profiles run input/output guardrails controlled by operator
@@ -288,7 +350,7 @@ Task-specific validation belongs to [Generation](generation.md),
 | HTTP 422, frame or resolution | Request violates T2I/video cadence rules or supplies `num_frames` for Action | Recompute with the task tables; Action derives frames from its chunk size |
 | Content-policy 422 | Text or generated frames triggered guardrails | Rephrase and review content; disable only under approved diagnostic policy |
 | Backend 500/OOM | Profile fit or runtime workload exceeded available memory | Reduce workload/concurrency, choose Nano/offload, or use a larger supported GPU; retain logs |
-| Request/client timeout | Image or video generation exceeded client/backend timeout | Use a long client timeout, inspect server progress, and tune only after measurement |
+| Request/client timeout | Image or video generation exceeded client/backend timeout | Use the documented timeout ceiling, inspect NIM logs and runtime metrics, and tune only after measurement |
 | MP4 will not play | Player lacks VP9-in-MP4 support | Use `mpv`/`ffplay` or re-encode to H.264 |
 
 ### Action and transfer
