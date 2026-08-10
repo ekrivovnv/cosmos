@@ -171,10 +171,6 @@ example. The elapsed time of `uv run python examples/...` includes local client
 startup, media preparation, response decoding, and output-file writes, so do
 not interpret the complete command time as NIM inference latency.
 
-No expected latency or throughput range is published until it has been
-validated for a release image and reference configuration. A timeout setting or
-a single observed run is not a performance commitment.
-
 ## Guardrails
 
 Generator profiles run input/output guardrails controlled by operator
