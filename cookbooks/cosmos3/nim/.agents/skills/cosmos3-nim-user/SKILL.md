@@ -69,8 +69,7 @@ For hardware guidance:
 - evaluate every participating device against the per-device floor;
 - never add VRAM across devices;
 - use the Transfer minimum when Transfer must be served;
-- treat named GPUs as examples, not as an allowlist, while honoring explicit
-  runtime exclusions in `support-matrix.md`;
+- treat named GPUs as examples, not as an allowlist;
 - distinguish source-derived table rows from the active image and use
   `/v1/manifest` for that image's available profiles;
 - use the current RTX 5090 guidance and thresholds in `support-matrix.md` to

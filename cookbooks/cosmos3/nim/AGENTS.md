@@ -34,8 +34,7 @@ For guided customer workflows, load
   choosing a request. Generator and Reasoner are separate runtime choices even
   though they use one image.
 - Use `/v1/manifest` and the support matrix for configuration checks. Do not add
-  VRAM across devices or treat an example GPU as an allowlist; honor any
-  explicit runtime exclusion documented in the support matrix.
+  VRAM across devices or treat an example GPU as an allowlist.
 - Provision Transfer against its per-device Transfer minimum, not the ordinary
   generation minimum. Never recommend `NIM_ALLOW_UNSAFE_TRANSFER=1` as a normal
   setting.

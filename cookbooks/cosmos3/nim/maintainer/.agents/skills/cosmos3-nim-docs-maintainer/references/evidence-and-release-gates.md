@@ -58,8 +58,7 @@ The public pages track these current-source contracts while keeping their image
 validation boundary visible:
 
 - Generator BF16 compute capability 8.0, updated Super VRAM/Transfer floors,
-  Reasoner Super BF16 TP2 at 73 GiB/device, and an explicit Reasoner RTX 4090
-  exclusion;
+  and Reasoner Super BF16 TP2 at 73 GiB/device;
 - effective system-memory selection floors of 16 GiB for resident Generator and
   Reasoner profiles, 64 GiB for Nano offload, and 150 GiB for Super offload;
 - Reasoner guided-decoding enforcement and Responses create normalization;
@@ -77,9 +76,8 @@ Review this list on every substantive documentation update and remove, add, or
 refine entries when evidence changes:
 
 - final public image identity and release URLs;
-- released profile rows, including current-source compute capability, explicit
-  GPU exclusions, VRAM, Transfer, effective system-memory boundaries, and
-  driver/toolkit floors;
+- released profile rows, including current-source compute capability, VRAM,
+  Transfer, effective system-memory boundaries, and driver/toolkit floors;
 - general CPU architecture, RAM, disk, and shared-memory requirements;
 - exact supported image formats, video containers/codecs, URL fetching, and
   VP9-in-MP4 playback observations;

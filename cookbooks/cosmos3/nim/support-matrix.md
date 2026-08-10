@@ -37,9 +37,8 @@ support `NIM_USE_DFLASH=1`.
 
 ## GPU architecture and topology
 
-Compatibility primarily uses CUDA compute capability rather than a GPU SKU
-allowlist. The current source policy also excludes the NVIDIA GeForce RTX 4090
-from Reasoner profile selection:
+Compatibility uses CUDA compute capability, per-device VRAM, and effective
+system RAM rather than a GPU SKU allowlist:
 
 | Runtime | Precision | Minimum compute capability |
 | --- | --- | ---: |
@@ -52,10 +51,8 @@ from Reasoner profile selection:
 Active Generator profiles use BF16 or FP8; there is no active Generator NVFP4
 row.
 
-Reasoner requires all visible GPUs to have the same compute capability and
-withholds Reasoner profiles when any visible device is an RTX 4090. This is an
-explicit source-policy exclusion, not a general GPU allowlist. Generator
-eligibility is calculated from the least-capable GPU and the smallest
+Reasoner requires all visible GPUs to have the same compute capability.
+Generator eligibility is calculated from the least-capable GPU and the smallest
 per-device memory total. Use homogeneous GPUs for either runtime; mixed-GPU
 configurations are not supported for pre-release evaluation.
 

@@ -40,11 +40,10 @@ If the deployment must serve Transfer, provision each GPU against the
 [Generator configurations](support-matrix.md#generator-configurations), not the
 **Generation minimum VRAM/device** value.
 
-Reasoner requires GPUs with the same compute capability and the current source
-policy excludes the NVIDIA GeForce RTX 4090 from Reasoner selection. Use
-homogeneous GPUs for either runtime because mixed-GPU support is not
-established. The profile selector evaluates the smallest per-device memory
-total exposed to the container. Confirm these source-derived rules against the
+Reasoner requires GPUs with the same compute capability. Use homogeneous GPUs
+for either runtime because mixed-GPU support is not established. The profile
+selector evaluates the smallest per-device memory total and effective system
+RAM exposed to the container. Confirm these source-derived rules against the
 exact image's manifest before deployment.
 
 On an integrated GPU where device and host share one memory pool, the selector
