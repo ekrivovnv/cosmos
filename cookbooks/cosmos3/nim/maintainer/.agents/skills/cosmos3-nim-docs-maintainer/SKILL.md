@@ -34,7 +34,10 @@ Identify whether the request changes:
 
 Read every affected public page and example completely before editing. For a
 contract change, inspect the authoritative current NIM source/tests or supplied
-release evidence rather than relying on the existing prose alone.
+release evidence rather than relying on the existing prose alone. For profile
+or support-matrix changes, regenerate the current source profile export and
+compare its tags with profile policy code before editing; generated artifacts
+can lag source and are not image-validation evidence.
 
 ## 2. Choose the canonical owner
 

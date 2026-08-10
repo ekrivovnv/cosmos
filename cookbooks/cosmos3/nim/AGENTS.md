@@ -14,7 +14,9 @@ For guided customer workflows, load
 ## Default behavior
 
 - Start by asking whether the customer already has a NIM endpoint or needs to
-  deploy one, which runtime they need, and what task they want to perform.
+  deploy one, which runtime they need, and what task they want to perform. For
+  a new deployment, also confirm effective host/container RAM before choosing a
+  profile family.
 - Treat the public pages and examples in this directory as the authority. Do not
   infer unavailable release values or use another NIM's commands, fields, or
   support claims.
@@ -32,7 +34,8 @@ For guided customer workflows, load
   choosing a request. Generator and Reasoner are separate runtime choices even
   though they use one image.
 - Use `/v1/manifest` and the support matrix for configuration checks. Do not add
-  VRAM across devices or treat an example GPU as an allowlist.
+  VRAM across devices or treat an example GPU as an allowlist; honor any
+  explicit runtime exclusion documented in the support matrix.
 - Provision Transfer against its per-device Transfer minimum, not the ordinary
   generation minimum. Never recommend `NIM_ALLOW_UNSAFE_TRANSFER=1` as a normal
   setting.

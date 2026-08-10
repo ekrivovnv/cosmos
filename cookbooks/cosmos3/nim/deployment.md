@@ -7,7 +7,9 @@ Use this page to authenticate to NGC, choose a model, launch Generator or
 Reasoner, and verify the selected service. The commands pin the current 2.2.0
 pre-release evaluation image. It is not a public release. Use the
 [Support matrix](support-matrix.md) to choose a compatible evaluation
-configuration.
+configuration. The support matrix also records newer source-derived selection
+policy that has not been validated against this pinned image. For an active
+container, `/v1/manifest` is the authority for available profiles.
 
 ## How selection works
 
@@ -22,12 +24,13 @@ Users normally select a runtime and model, not a profile ID:
 
 A profile is the resolved deployment configuration: model artifacts,
 precision, GPU layout, and any required GPU/system-memory residency policy.
-Automatic selection prefers a compatible profile that avoids offload and makes
-effective use of the available GPUs. On an integrated GPU with unified
-host/device memory, selection reserves host memory and uses resident Generator
-model and guardrail profiles. Startup fails if the chosen model cannot run on
-the host. See [Support matrix](support-matrix.md#gpu-architecture-and-topology)
-for the shared-memory rule.
+Automatic selection filters on effective system memory, prefers a compatible
+profile that avoids offload, and makes effective use of the available GPUs. On
+an integrated GPU with unified host/device memory, selection reserves host
+memory and uses resident Generator model and guardrail profiles. Startup fails
+if the chosen model cannot run on the host. See [Support
+matrix](support-matrix.md#gpu-architecture-and-topology) for the source-derived
+memory and shared-memory rules, then confirm them in the exact image manifest.
 
 ### Select a Generator model
 
@@ -233,11 +236,13 @@ See [Configuration](configuration.md#advanced-profile-controls) for details.
 | `-e NGC_API_KEY` | Pass the exported NGC credential |
 | `-v ...:/opt/nim/.cache` | Persist model artifacts |
 
-GPU counts, compute-capability gates, and VRAM floors are summarized in the
-[configuration matrix](support-matrix.md). Super-family BF16 model- and
-layer-offload configurations require 150 GiB of effective system memory. Docker
-or Kubernetes memory limits count as the available system memory. Confirm that
-the selected row is present in the target image before deployment.
+GPU counts, compute-capability gates, VRAM floors, and current-source
+system-memory floors are summarized in the [configuration
+matrix](support-matrix.md). Current source uses 16 GiB for resident Generator
+and Reasoner profiles, 64 GiB for Nano offload, and 150 GiB for Super offload.
+Docker or Kubernetes memory limits count as the available system memory.
+Confirm that the selected row and its tags are present in the target image
+before deployment.
 
 ## Next steps
 

@@ -204,16 +204,25 @@ The Responses create route is enabled unless the deployment sets
 uv run python examples/reasoner_responses.py
 ```
 
-The request uses `store=false`. Persisted retrieval, cancellation, background
-responses, and `previous_response_id` require response storage, which is
-disabled by default. Use Chat Completions for video requests in this pre-release
-version.
+The request uses `store=false`. Current source applies
+`chat_template_kwargs.enable_thinking=false` to Responses create requests, so an
+ordinary answer is returned as a message item and exposed by the OpenAI client
+through `response.output_text` rather than appearing only as a reasoning item.
+This normalization has not been validated against the evaluation image pinned
+in `deployment.md`; an empty `output_text` can indicate an older image.
+
+Persisted retrieval, cancellation, background responses, and
+`previous_response_id` require response storage, which is disabled by default.
+Use Chat Completions for video requests in this pre-release version.
 
 ## Reasoning, instructions, and tool calls
 
 Chat requests default to `chat_template_kwargs.enable_thinking=false`, so
-ordinary untagged output remains in `message.content`. To enable thinking and
-request parsed reasoning, pass the controls through `extra_body`:
+ordinary untagged output remains in `message.content`. Current source applies
+the same chat-template default to Responses requests, while leaving
+Responses-specific sampling and structured-output field names unchanged. To
+enable thinking and request parsed reasoning in Chat Completions, pass the
+controls through `extra_body`:
 
 ```python
 extra_body = {
@@ -257,11 +266,13 @@ depending on reasoning or tool-call fields.
 Set `NIM_USE_DFLASH=1` at launch to enable DFlash speculative decoding for a
 Nano Reasoner. The request routes and payloads do not change. Startup rejects
 the option for Generator and Super Reasoner, or when the required draft
-artifact is unavailable.
+artifact is unavailable. Current source also supports an independent local
+draft path, a BF16 KV-cache option, and advanced JSON configuration.
 
-Treat DFlash as an advanced performance option. Compare latency, throughput,
-and output quality on representative requests before production use. See
-[Reasoner configuration](configuration.md#speculative-decoding).
+Treat DFlash as an advanced performance option. Compare memory, latency,
+throughput, correctness, and output quality on representative requests before
+production use. See [Reasoner configuration](configuration.md#speculative-decoding)
+and [Reasoner checkpoint](bring-your-own-checkpoint.md#reasoner-checkpoint).
 
 ## Advanced sampling and request extensions
 
@@ -318,6 +329,11 @@ client code:
 }
 ```
 
+Current source normalizes the standard `response_format` shape and explicitly
+enables guided-decoding enforcement for Reasoner output, including output seen
+by the reasoning parser. This is source-derived behavior; validate it against
+the exact image before making it a production dependency.
+
 The runnable task catalog uses JSON schemas for temporal localization, 2D
 grounding, and 2D trajectory proposals. It parses `message.content` with the
 standard JSON parser and then validates semantic invariants that a schema alone
@@ -373,6 +389,7 @@ final answers; do not depend on `<think>` blocks or hidden chain-of-thought.
 | HTTP 422 | Media validation or preprocessing commonly failed | Check data URL, media ordering, prompt media limits, and selected-image format support |
 | Chat Completions route 404 | `NIM_URL` reaches Generator or the route is absent from the selected image | Inspect `/v1/metadata`, start Reasoner, and verify the live OpenAPI document |
 | Empty/no choices | Backend did not return a normal Chat Completion | Preserve response/log details and check the selected Reasoner profile |
+| Empty Responses `output_text` | The image can predate current-source Responses normalization or returned no message item | Preserve the raw response, inspect its output item types, and use Chat Completions or a validated newer image |
 | Responses route 404 | The deployment disabled Responses, the selected image does not expose it, or `NIM_URL` reaches Generator | Verify metadata first; then use Chat Completions or inspect `NIM_DISABLE_RESPONSES_ROUTE` and live OpenAPI |
 | Context or KV-cache failure | Request/media exceeded runtime limits | Reduce media sampling, token budget, concurrency, or adjust operator limits carefully |
 

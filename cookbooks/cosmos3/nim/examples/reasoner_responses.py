@@ -38,7 +38,15 @@ def main() -> None:
         max_output_tokens=4096,
         store=False,
     )
-    print(response.output_text)
+    output_text = response.output_text or ""
+    if not output_text.strip():
+        output_types = [item.type for item in response.output]
+        raise RuntimeError(
+            "Responses API returned no output_text; "
+            f"output item types were {output_types}. "
+            "The active image may predate current-source Responses normalization."
+        )
+    print(output_text)
 
 
 if __name__ == "__main__":
