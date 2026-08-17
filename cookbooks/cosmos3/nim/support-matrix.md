@@ -81,11 +81,11 @@ only to the general-purpose `nano` and `super` variants.
 | Variant group | Precision | Model offload | Guardrails during diffusion | GPUs | Generation minimum VRAM/device | Minimum effective system RAM | Transfer minimum VRAM/device |
 | --- | --- | --- | --- | ---: | ---: | ---: | ---: |
 | `nano` | BF16 | None | Resident | 1, 2, 4, 8 | 58 GiB | 16 GiB | 64 GiB |
-| `nano` | BF16 | Layer | Automatic offload | 1 | 31 GiB | 64 GiB | 35 GiB |
+| `nano` | BF16 | Layer | Offloaded | 1 | 31 GiB | 64 GiB | 35 GiB |
 | `nano` | FP8 | None | Resident | 1, 2, 4, 8 | 44 GiB | 16 GiB | 50 GiB |
 | `nano` | FP8 | Model | Resident | 1 | 38 GiB | 64 GiB | 44 GiB |
 | `nano` | FP8 | Layer | Resident | 1 | 32 GiB | 64 GiB | 38 GiB |
-| `nano` | FP8 | Layer | Automatic offload | 1 | 31 GiB | 64 GiB | 35 GiB |
+| `nano` | FP8 | Layer | Offloaded | 1 | 31 GiB | 64 GiB | 35 GiB |
 | `nano-droid` | BF16 | None | Resident | 1, 2, 4, 8 | 58 GiB | 16 GiB | N/A |
 | Super family | BF16 | None | Resident | 1, 2, 4, 8 | 150 GiB | 16 GiB | Base `super`: 160 GiB |
 | Super family | BF16 | Model | Resident | 1 | 93 GiB | 150 GiB | Base `super`: 99 GiB |

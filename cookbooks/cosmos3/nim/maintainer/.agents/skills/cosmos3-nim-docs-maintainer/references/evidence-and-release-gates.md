@@ -100,10 +100,20 @@ total and 81,081 MiB free):
 - `NGC_API_KEY` and checkpoint overrides were absent inside the container, and
   `/opt/nim/.cache` was absent both before and after the two selector runs.
 
+The same image manifest contains 115 Generator profiles. Normalizing away
+profile IDs, performance scenario, and repeated GPU topology produces 37
+variant-specific hardware rows: six each for the five Super-family variants,
+six for Nano, and one for Nano-DROID. The public table collapses the five
+identical Super-family sets into six shared rows, so its 13 rows cover every
+active Generator profile without retaining a documentation-only row. Transfer
+minimums also match each applicable installed generation floor plus Transfer
+overhead.
+
 The image was launched through Slurm/Pyxis because the documentation host could
-not access its Docker daemon. This validates the selector invocation and
-no-model-download boundary inside the exact image, not the documented Docker
-wrapper, profile fallback cases, cold start, readiness, or inference.
+not access its Docker daemon. This validates the selector invocation, embedded
+manifest and Transfer-policy reconciliation, and no-model-download boundary
+inside the exact image, not the documented Docker wrapper, profile fallback
+cases, cold start, readiness, or inference.
 
 ## Open release gates
 
