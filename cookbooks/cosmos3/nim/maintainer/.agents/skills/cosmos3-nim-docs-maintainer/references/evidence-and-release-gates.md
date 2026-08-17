@@ -87,7 +87,9 @@ implementation or be presented as an approved image manifest.
 ## Current RC-validated contracts
 
 The pre-download selector was run from the exact evaluation image pinned in
-`deployment.md` on one NVIDIA H100 PCIe (compute capability 9.0, 81,559 MiB
+`deployment.md` (manifest digest
+`sha256:40fc1382a557fe22e60e4ddaae5c4be6b187431786e610208b5b3d5261dc5ce2`)
+on one NVIDIA H100 PCIe (compute capability 9.0, 81,559 MiB
 total and 81,081 MiB free):
 
 - Nano Generator selected an FP8, one-GPU profile with `offload=none` at the
