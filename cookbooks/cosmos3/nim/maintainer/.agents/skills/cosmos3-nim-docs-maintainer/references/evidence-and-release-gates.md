@@ -84,6 +84,25 @@ Regenerate the source profile export before reconciling tables. Generated
 artifacts can lag profile policy source and must not silently override current
 implementation or be presented as an approved image manifest.
 
+## Current RC-validated contracts
+
+The pre-download selector was run from the exact evaluation image pinned in
+`deployment.md` on one NVIDIA H100 PCIe (compute capability 9.0, 81,559 MiB
+total and 81,081 MiB free):
+
+- Nano Generator selected an FP8, one-GPU profile with `offload=none` at the
+  44-GiB VRAM and 16-GiB effective-system-memory floors, with Transfer
+  admission enabled.
+- Nano Reasoner selected an FP8, one-GPU profile at the 23.1-GiB VRAM and
+  16-GiB effective-system-memory floors.
+- `NGC_API_KEY` and checkpoint overrides were absent inside the container, and
+  `/opt/nim/.cache` was absent both before and after the two selector runs.
+
+The image was launched through Slurm/Pyxis because the documentation host could
+not access its Docker daemon. This validates the selector invocation and
+no-model-download boundary inside the exact image, not the documented Docker
+wrapper, profile fallback cases, cold start, readiness, or inference.
+
 ## Open release gates
 
 Review this list on every substantive documentation update and remove, add, or
