@@ -123,9 +123,7 @@ docker run --rm \
     set -e
     output=/tmp/cosmos3-preflight.env
     /opt/nim/.venv/bin/python -m profile_selection.startup --output "$output"
-    . "$output"
-    printf "Compatible candidate: profile=%s backend=%s\n" \
-      "$NIM_MODEL_PROFILE" "$BACKEND_TYPE"
+    printf "Profile preflight passed.\n"
   '
 ```
 
