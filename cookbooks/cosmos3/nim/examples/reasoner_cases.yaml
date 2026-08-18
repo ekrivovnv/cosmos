@@ -4,7 +4,7 @@
 version: 1
 validated_baseline:
   model_variant: super
-  precision: fp8
+  precision: bf16
   dflash: false
   video_pruning_rate: 0.0
   note: All catalog API and format paths have been observed on this target-only, unpruned-video baseline; task quality still requires case-specific review.
@@ -13,6 +13,13 @@ defaults:
   video_fps: 4.0
   reasoning_enabled: false
   thinking_token_budget: 512
+  sampling:
+    temperature: 0.7
+    top_p: 0.8
+    presence_penalty: 0.0
+  request_extensions:
+    top_k: 20
+    repetition_penalty: 1.0
 
 cases:
   image_caption:
@@ -140,7 +147,13 @@ cases:
       The task is to put flower into the red bottle. Generate a plan consisting
       of subtasks for accomplish the task.
     sampling:
+      temperature: 0.0
+      top_p: 0.8
+      presence_penalty: 0.0
       seed: 0
+    request_extensions:
+      top_k: 20
+      repetition_penalty: 1.0
     output:
       kind: text
     review:

@@ -131,6 +131,10 @@ def load_catalog(path: Path = CATALOG_PATH) -> dict[str, Any]:
     cases = catalog.get("cases")
     if not isinstance(defaults, dict) or not isinstance(baseline, dict):
         raise TypeError("Reasoner catalog defaults and validated_baseline must be mappings")
+    if not isinstance(defaults.get("sampling"), dict) or not isinstance(
+        defaults.get("request_extensions"), dict
+    ):
+        raise TypeError("Reasoner catalog sampling defaults must be mappings")
     if not isinstance(cases, dict) or not cases:
         raise TypeError("Reasoner catalog cases must be a non-empty mapping")
 
@@ -223,10 +227,12 @@ def build_request(
             }
         ],
         "max_tokens": DEFAULTS["max_tokens"],
+        **DEFAULTS["sampling"],
         **spec.get("sampling", {}),
     }
 
-    extra_body: dict[str, Any] = dict(spec.get("request_extensions", {}))
+    extra_body: dict[str, Any] = dict(DEFAULTS["request_extensions"])
+    extra_body.update(spec.get("request_extensions", {}))
     if media_type == "video":
         extra_body["media_io_kwargs"] = {
             "video": {"fps": float(DEFAULTS["video_fps"])}
@@ -712,8 +718,9 @@ def main() -> None:
         model = client.models.list().data[0].id
         if "super" not in model.lower():
             print(
-                "Warning: this catalog's documented baseline is Super FP8 with "
-                f"DFlash, but the endpoint serves {model!r}.",
+                "Warning: this catalog's documented baseline is Super BF16 "
+                "target-only with video pruning disabled, but the endpoint "
+                f"serves {model!r}.",
                 file=sys.stderr,
             )
         failures: list[tuple[str, str]] = []

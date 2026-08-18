@@ -117,10 +117,10 @@ uv run python examples/reasoner.py --case all
 The runner checks `/v1/metadata` before model discovery and fails with an
 actionable message if `NIM_URL` reaches a Generator runtime.
 
-### Super FP8 example baseline
+### Super BF16 example baseline
 
 Use the [Reasoner launch](deployment.md#launch-reasoner), which selects Super
-FP8 and sets both controls at container startup:
+BF16 and sets both controls at container startup:
 
 ```text
 NIM_USE_DFLASH=0
@@ -128,18 +128,32 @@ NIM_VIDEO_PRUNING_RATE=0
 ```
 
 This runs target-only decoding and disables video-token pruning. It is the
-documented baseline for the task catalog. The one-GPU Super FP8 configuration
+documented baseline for the task catalog. The one-GPU Super BF16 configuration
 requires the hardware floor in the
 [support matrix](support-matrix.md#reasoner-configurations).
 After readiness, verify the selected model and profile through `/v1/metadata`
 and `/v1/manifest` before running the examples.
 
-All 18 catalog cases have completed API and format validation against the pinned
-evaluation image on this baseline. Task-level quality remains case-specific and
-must be reviewed against the qualitative criteria recorded with each case. The
-runner warns rather than fails when the endpoint serves another Reasoner variant
-so the catalog remains usable for comparison; do not present a Nano result as a
-Super-validated example.
+Every catalog request explicitly sends `temperature=0.7`, `top_p=0.8`,
+`top_k=20`, `presence_penalty=0`, and `repetition_penalty=1` unless a case
+records an override. These values match the effective Super checkpoint and raw
+vLLM example defaults instead of relying on server-side default injection.
+
+The `robot_planning` case overrides temperature and adds a fixed seed for its
+controlled parity request: `temperature=0`, `top_p=0.8`, `top_k=20`,
+`presence_penalty=0`, `repetition_penalty=1`, and `seed=0`. Greedy decoding
+removes sampled numeric variation across the NIM and raw vLLM deployments. In a
+controlled comparison, both paths returned the same five-subtask answer. This
+establishes request and deterministic-output parity for that case, not that the
+answer satisfies every application-specific planning requirement.
+
+The catalog cases have completed API and format validation against the pinned
+evaluation image on the documented target-only, unpruned-video configuration.
+Task-level quality remains case-specific and must be reviewed against the
+qualitative criteria recorded with each case. The runner warns rather than
+fails when the endpoint serves another Reasoner variant so the catalog remains
+usable for comparison; do not present a Nano result as a Super-validated
+example.
 
 ### Artifacts and validation boundaries
 
@@ -308,7 +322,7 @@ depending on reasoning or tool-call fields.
 
 Nano and Super Reasoner use their bundled DFlash speculative-decoding drafts by
 default. The request routes and payloads do not change. The task catalog's
-Super FP8 baseline explicitly sets `NIM_USE_DFLASH=0` and runs the selected
+Super BF16 baseline explicitly sets `NIM_USE_DFLASH=0` and runs the selected
 target model without DFlash.
 Startup rejects DFlash for Generator or when the required variant-specific
 draft artifact is unavailable. An independent local draft path, a

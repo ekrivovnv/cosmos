@@ -150,7 +150,7 @@ next action, marked-subject description, and flower trajectory remained
 incomplete or semantically inaccurate. This validates the target-only catalog
 transport and format paths, not general task quality or performance.
 
-The target-only, thinking-disabled profile was then rerun with
+The target-only, thinking-disabled FP8 profile was then rerun with
 `NIM_VIDEO_PRUNING_RATE=0`. All 18 cases again completed with
 `finish_reason=stop`, and all seven structured cases passed local format
 validation. Fourteen qualitative checklists passed. The video caption improved
@@ -158,7 +158,20 @@ materially but stopped at preparation to place the white box rather than
 explicitly completing placement. Assisted-task next action, marked-subject
 description, and flower trajectory remained inaccurate. Disabling pruning
 restored the complete first temporal timeline and the expected smart-charger
-next action; this unpruned-video configuration is the public catalog baseline.
+next action; this result motivated keeping pruning disabled in the catalog
+baseline.
+
+The exact image was then launched on one NVIDIA B200 as Super BF16 target-only,
+with thinking and video pruning disabled. All 18 catalog cases completed with
+`finish_reason=stop`, and all seven structured cases passed format validation.
+The BF16 run corrected the flower-trajectory result seen with FP8; video caption,
+assisted-task next action, and marked-subject description remained incomplete.
+The `robot_planning` case explicitly sent `temperature=0`, `top_p=0.8`,
+`top_k=20`, `presence_penalty=0`, `repetition_penalty=1`, and `seed=0`. Its
+five-subtask response was byte-for-byte identical to the controlled raw-vLLM
+Super BF16 response, but both omitted an explicit flower release and arm
+retreat. This validates deterministic parity for that request, not sampled
+parity, complete task semantics, general model quality, or performance.
 
 Two live correctness findings remain internal release gates:
 
@@ -200,8 +213,9 @@ refine entries when evidence changes:
 - quantized Generator linear-backend behavior in the selected image;
 - public Helm chart URL to replace the staging reference, plus approved values,
   installation workflow, and monitoring integration;
-- qualitative resolution and revalidation of the four incomplete Super FP8
-  target-only, unpruned-video catalog cases identified above, plus evaluation of
+- qualitative resolution and revalidation of the Super BF16 target-only gaps:
+  incomplete video caption, assisted-task next action, marked-subject
+  description, and robot-planning release/retreat semantics; plus evaluation of
   default VidCom2 output quality on the video catalog;
 - native reasoning-parser separation of reasoning from non-empty final content,
   plus approved reasoning-trace wording; and
