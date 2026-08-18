@@ -120,9 +120,17 @@ actionable message if `NIM_URL` reaches a Generator runtime.
 ### Super FP8 example baseline
 
 Use the [Reasoner launch](deployment.md#launch-reasoner), which selects Super
-FP8 target-only and disables video-token pruning. This is the documented
-baseline for the task catalog. The one-GPU Super FP8 configuration requires the
-hardware floor in the [support matrix](support-matrix.md#reasoner-configurations).
+FP8 and sets both controls at container startup:
+
+```text
+NIM_USE_DFLASH=0
+NIM_VIDEO_PRUNING_RATE=0
+```
+
+This runs target-only decoding and disables video-token pruning. It is the
+documented baseline for the task catalog. The one-GPU Super FP8 configuration
+requires the hardware floor in the
+[support matrix](support-matrix.md#reasoner-configurations).
 After readiness, verify the selected model and profile through `/v1/metadata`
 and `/v1/manifest` before running the examples.
 
