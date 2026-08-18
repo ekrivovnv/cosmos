@@ -34,9 +34,10 @@ For guided customer workflows, load
 - Set or confirm `NIM_URL`, check readiness, and inspect `/v1/metadata` before
   choosing a request. Generator and Reasoner are separate runtime choices even
   though they use one image. For the Reasoner task catalog, use the documented
-  Super FP8 baseline with its bundled DFlash draft and verify the selected
-  profile before running requests. Use `examples/reasoner.py --list-cases` and
-  `--describe <case> --format json` for endpoint-independent task discovery.
+  Super FP8 target-only baseline, leave thinking disabled, and verify the
+  selected profile before running requests. Use
+  `examples/reasoner.py --list-cases` and `--describe <case> --format json` for
+  endpoint-independent task discovery.
 - Use `examples/inspect_profile.py` to match `/v1/metadata` to the embedded YAML
   from `/v1/manifest`, and use the published support-matrix floors for
   configuration checks. Evaluate both total and currently free VRAM per

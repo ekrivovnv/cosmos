@@ -191,7 +191,8 @@ def case_reasoning(spec: dict[str, Any], override: bool | None) -> bool:
     if override is not None:
         return override
     reasoning = spec.get("reasoning", {})
-    return bool(reasoning.get("enabled", False)) if isinstance(reasoning, dict) else False
+    default = bool(DEFAULTS.get("reasoning_enabled", False))
+    return bool(reasoning.get("enabled", default)) if isinstance(reasoning, dict) else default
 
 
 def build_request(
@@ -613,7 +614,9 @@ def run_case(
         _write_json(output_dir / "output.json", structured)
         annotate_spatial_output(spec, structured, output_dir / "annotated.png")
 
-    reasoning = getattr(message, "reasoning_content", None)
+    reasoning = getattr(message, "reasoning", None)
+    if not isinstance(reasoning, str) or not reasoning.strip():
+        reasoning = getattr(message, "reasoning_content", None)
     if isinstance(reasoning, str) and reasoning.strip():
         (output_dir / "reasoning.txt").write_text(
             reasoning.rstrip() + "\n", encoding="utf-8"
@@ -661,19 +664,19 @@ def build_parser() -> argparse.ArgumentParser:
         "--reasoning",
         dest="reasoning",
         action="store_true",
-        help="Enable parsed reasoning for every selected case.",
+        help="Experimentally request parsed reasoning for every selected case.",
     )
     reasoning.add_argument(
         "--no-reasoning",
         dest="reasoning",
         action="store_false",
-        help="Disable reasoning even when the catalog enables it for a case.",
+        help="Keep reasoning disabled for every selected case.",
     )
     parser.set_defaults(reasoning=None)
     parser.add_argument(
         "--thinking-token-budget",
         type=int,
-        help="Override the catalog thinking-token budget for reasoning-enabled cases.",
+        help="Override the thinking-token budget for an experimental reasoning request.",
     )
     return parser
 

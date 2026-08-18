@@ -84,8 +84,8 @@ confirmed:
   configuration;
 - quantized Generator linear-backend selection;
 - the NIM API adaptation for the 18-case Reasoner catalog, including data-URL
-  media, request-level video sampling, parsed reasoning controls, standard JSON
-  Schema output, and local structural validators; and
+  media, request-level video sampling, thinking-disabled final-answer handling,
+  standard JSON Schema output, and local structural validators; and
 - runtime-aware metadata, health responses, and wrong-runtime diagnostics.
 
 Regenerate the source profile export before reconciling tables. Generated
@@ -139,6 +139,28 @@ covering movement to the flower, grasp, pickup, movement to the red bottle, and
 placement. This validates that one request and configuration, not a stable JSON
 format, other seeds, other tasks, general Reasoner quality, or performance.
 
+The same image and one-B200 Super FP8 profile were then run target-only with
+thinking disabled. All 18 catalog cases completed API and format validation,
+including JSON parsing, timestamp/box/point invariants, and spatial artifact
+generation. Qualitative review passed 12 case-specific checklists. The video
+caption, first temporal-localization case, robotics next action, assisted-task
+next action, marked-subject description, and flower trajectory remained
+incomplete or semantically inaccurate. This validates the target-only catalog
+transport and format paths, not general task quality or performance.
+
+Two live correctness findings remain internal release gates:
+
+- With native reasoning controls enabled, both DFlash and target-only returned
+  `finish_reason=stop` with `message.content=null` and placed the complete text
+  or structured answer in `message.reasoning`. This reproduced with 512- and
+  2048-token reasoning budgets, so the catalog keeps thinking disabled.
+- For a fixed-seed 2D grounding request, DFlash produced invalid coordinates.
+  In the follow-up control, DFlash passed 0/10 greedy requests at
+  `temperature=0` and 4/20 sampled seeds; target-only passed 10/10 and 20/20,
+  respectively. Failures included reversed corners, dropped digits,
+  out-of-range values, and malformed JSON. The public catalog therefore uses
+  the target-only baseline without describing this unresolved release finding.
+
 ## Open release gates
 
 Review this list on every substantive documentation update and remove, add, or
@@ -161,14 +183,15 @@ refine entries when evidence changes:
 - current-free-VRAM fallback, Reasoner utilization clamping, and discrete-GPU
   NVML startup behavior in the selected image;
 - default-on Nano/Super DFlash, draft override, KV-cache, and advanced
-  configuration behavior in the selected image;
+  configuration behavior in the selected image, including resolution of the
+  Super FP8 spatial-output correctness finding recorded above;
 - quantized Generator linear-backend behavior in the selected image;
 - public Helm chart URL to replace the staging reference, plus approved values,
   installation workflow, and monitoring integration;
-- live Super FP8 review of the Reasoner catalog cases other than the separately
-  validated `robot_planning` request, including structured-output enforcement,
-  spatial annotations, and task-level output quality;
-- approved reasoning-trace wording; and
+- qualitative resolution and revalidation of the six Super FP8 target-only
+  catalog cases identified above;
+- native reasoning-parser separation of reasoning from non-empty final content,
+  plus approved reasoning-trace wording; and
 - approved acknowledgements and product license/model-card links for the exact
   release.
 

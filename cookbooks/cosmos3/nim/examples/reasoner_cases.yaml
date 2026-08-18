@@ -5,11 +5,12 @@ version: 1
 validated_baseline:
   model_variant: super
   precision: fp8
-  dflash: true
-  note: Robot planning has been observed on this baseline; validate other cases on the active release before making quality claims.
+  dflash: false
+  note: All catalog API and format paths have been observed on this target-only baseline; task quality still requires case-specific review.
 defaults:
   max_tokens: 4096
   video_fps: 4.0
+  reasoning_enabled: false
   thinking_token_budget: 512
 
 cases:
@@ -108,8 +109,6 @@ cases:
       type: video
       asset: robotics_next_action.mp4
     prompt: What can be the next immediate action?
-    reasoning:
-      enabled: true
     output:
       kind: text
     review:
@@ -157,8 +156,6 @@ cases:
       exchanges the black ink cartridge of the printer." In the video, the agent
       is following one step of that task: "place old ink_cartridge." What should
       be the next action of the agent?
-    reasoning:
-      enabled: true
     output:
       kind: text
     review:
@@ -171,8 +168,6 @@ cases:
       type: video
       asset: common_sense_reasoning.mp4
     prompt: Can the countertop support the weight of the juicers?
-    reasoning:
-      enabled: true
     output:
       kind: text
     review:
@@ -225,8 +220,6 @@ cases:
       approach, grasp, lift, transport to the right, placement, and retraction.
       Use coordinates normalized independently from 0 to 1000, with the origin
       at the top-left.
-    reasoning:
-      enabled: true
     sampling:
       temperature: 0.6
       top_p: 0.95
@@ -255,8 +248,6 @@ cases:
       approach, grasp, lift, transport to the bottle, placement, and retraction.
       Use coordinates normalized independently from 0 to 1000, with the origin
       at the top-left.
-    reasoning:
-      enabled: true
     sampling:
       temperature: 0.6
       top_p: 0.95
@@ -283,8 +274,6 @@ cases:
       The video depicts the observation from the vehicle's camera. Identify the
       objects in the scene that are critical for safe navigation and state the
       required driving response.
-    reasoning:
-      enabled: true
     sampling:
       temperature: 0.6
       top_p: 0.95

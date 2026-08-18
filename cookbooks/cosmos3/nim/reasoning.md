@@ -64,11 +64,11 @@ do not hard-code a model ID from another image or deployment.
 
 The endpoint-independent catalog in
 [`examples/reasoner_cases.yaml`](examples/reasoner_cases.yaml) defines the
-media, prompt, sampling, output contract, reasoning mode, and qualitative review
-criteria for every Reasoner example. The Python runner keeps the NIM-specific
-API adaptation in one place: it sends local media as data URLs, uses
-`media_io_kwargs` for video sampling, discovers the served model, requests
-parsed reasoning when a case enables it, and uses JSON Schema rather than
+media, prompt, sampling, output contract, thinking setting, and qualitative
+review criteria for every Reasoner example. The Python runner keeps the
+NIM-specific API adaptation in one place: it sends local media as data URLs,
+uses `media_io_kwargs` for video sampling, discovers the served model, keeps
+thinking disabled for the catalog baseline, and uses JSON Schema rather than
 regular expressions for structured final answers.
 
 List or inspect cases without a running endpoint:
@@ -100,10 +100,11 @@ uv run python examples/reasoner.py --case image_caption
 ```
 
 The `--case` option belongs to this cookbook runner, not the NIM API. Every
-video case requests 4 FPS sampling. Cases that need explicit reasoning enable
-the NIM reasoning fields in the catalog instead of adding `<think>` formatting
-to the prompt. Use `--reasoning` or `--no-reasoning` only to override that case
-setting for an experiment.
+video case requests 4 FPS sampling. All catalog cases leave thinking disabled
+and consume the final answer from `message.content`; tasks such as planning,
+next-action prediction, and Action CoT do not require a parsed reasoning trace.
+The `--reasoning` option is reserved for an explicit API experiment and is not
+part of the catalog baseline.
 
 Running `--case all` sends all 18 requests sequentially and can take substantial
 time and resources. Use it for deliberate catalog validation, not as a first
@@ -119,18 +120,17 @@ actionable message if `NIM_URL` reaches a Generator runtime.
 ### Super FP8 example baseline
 
 Use the [Reasoner launch](deployment.md#launch-reasoner), which selects Super
-FP8 and explicitly enables its bundled DFlash draft. This is the documented
-baseline for the task catalog. The one-GPU Super FP8 configuration requires the
+FP8 target-only. This is the documented baseline for the task catalog. The
+one-GPU Super FP8 configuration requires the
 hardware floor in the [support matrix](support-matrix.md#reasoner-configurations).
 After readiness, verify the selected model and profile through `/v1/metadata`
 and `/v1/manifest` before running the examples.
 
-The `robot_planning` request has been observed against the pinned evaluation
-image on this baseline. The expanded catalog and its NIM request construction
-are statically validated, but the other cases still require live review on the
-selected image before their output quality can be characterized. The runner
-warns rather than fails when the endpoint serves another Reasoner variant so
-the catalog remains usable for comparison; do not present a Nano result as a
+All 18 catalog cases have completed API and format validation against the pinned
+evaluation image on this baseline. Task-level quality remains case-specific and
+must be reviewed against the qualitative criteria recorded with each case. The
+runner warns rather than fails when the endpoint serves another Reasoner variant
+so the catalog remains usable for comparison; do not present a Nano result as a
 Super-validated example.
 
 ### Artifacts and validation boundaries
@@ -144,7 +144,7 @@ For each run, the script prints the final answer and writes an ignored
 - `output.txt`: final `message.content`;
 - `output.json`: parsed output, written only after JSON and semantic format
   checks pass for a structured case;
-- `reasoning.txt`: parsed reasoning when requested and returned;
+- `reasoning.txt`: optional reasoning data from an explicit API experiment;
 - `validation.json`: separate API, format, and qualitative-review status;
 - `annotated.png`: validated normalized boxes or trajectories overlaid on image
   cases that have spatial output; and
@@ -271,44 +271,21 @@ Persisted retrieval, cancellation, background responses, and
 `previous_response_id` require response storage, which is disabled by default.
 Use Chat Completions for video requests in this pre-release version.
 
-## Reasoning, instructions, and tool calls
+## Final answers, instructions, and tool calls
 
-Chat requests default to `chat_template_kwargs.enable_thinking=false`, so
-ordinary untagged output remains in `message.content`. Responses requests use
-the same chat-template and sampling defaults while retaining their
-Responses-specific token-limit and structured-output field names. To enable
-thinking and request parsed reasoning in Chat Completions, pass the controls
-through `extra_body`:
+The task catalog uses `chat_template_kwargs.enable_thinking=false`, which is the
+service default, and consumes ordinary final answers from `message.content`.
+It does not add prompt-authored `<think>` formatting instructions or require a
+reasoning field. Responses requests use the same chat-template and sampling
+defaults while retaining their Responses-specific token-limit and
+structured-output field names.
 
-```python
-extra_body = {
-    "chat_template_kwargs": {"enable_thinking": True},
-    "include_reasoning": True,
-    "thinking_token_budget": 512,
-}
-```
+Reasoning traces are not a stable machine-readable explanation and should not
+be required by downstream logic. If evaluating optional reasoning fields
+outside the catalog baseline, first inspect the running NIM's `/openapi.json`
+and the installed OpenAI client response model.
 
-Pass that object as `extra_body=extra_body` in a normal Chat Completions call,
-or run a task with explicit reasoning:
-
-```bash
-uv run python examples/reasoner.py \
-  --case robotics_next_action \
-  --reasoning \
-  --thinking-token-budget 512
-```
-
-For Chat Completions, `include_reasoning` must be a JSON boolean. Catalog cases
-that correspond to reasoning-oriented examples enable these fields through the
-`reasoning` entry in `examples/reasoner_cases.yaml`; other cases retain the
-service default. The task runner does not add prompt-authored `<think>`
-formatting instructions. When the response includes parsed reasoning, it saves
-the dedicated `reasoning_content` field separately and keeps the final answer
-in `message.content`; it never parses `<think>` tags. Reasoning text is not a
-stable machine-readable explanation and should not be required by downstream
-logic.
-
-Both API styles map a `developer` turn to a `system` instruction. Chat
+Both API styles map a `developer` turn to a system instruction. Chat
 Completions also:
 
 - enables standard OpenAI tool definitions and automatic tool choice with the
@@ -322,8 +299,9 @@ depending on reasoning or tool-call fields.
 ## Reasoner DFlash
 
 Nano and Super Reasoner use their bundled DFlash speculative-decoding drafts by
-default. The request routes and payloads do not change. Set
-`NIM_USE_DFLASH=0` at launch to run the selected target model without DFlash.
+default. The request routes and payloads do not change. The task catalog's
+Super FP8 baseline explicitly sets `NIM_USE_DFLASH=0` and runs the selected
+target model without DFlash.
 Startup rejects DFlash for Generator or when the required variant-specific
 draft artifact is unavailable. An independent local draft path, a
 hardware-derived BF16 KV-cache default, and advanced JSON configuration are
