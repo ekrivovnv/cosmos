@@ -72,6 +72,70 @@ resident, so only rows with **Model offload = None** and **Guardrails =
 Resident** are eligible. Reasoner floors are also compared with the remaining
 shared-memory total.
 
+## Tested GPU inventory
+
+The following GPU SKUs are configured for official NIM testing. They are
+grouped by GPU architecture and sorted by nominal GPU memory within each group.
+
+Inventory membership does not mean that every runtime, model, precision, GPU
+count, offload mode, and task is tested or available on that SKU. Use the
+configuration tables below to find a candidate, and confirm that the exact
+image manifest contains a matching profile. A GPU outside this inventory can
+still be compatible when it meets the compute-capability and memory floors.
+
+### Blackwell Ultra
+
+| GPU SKU | Nominal GPU memory |
+| --- | ---: |
+| `NVIDIA-GB300-WS` | 252 GB HBM3e |
+| `NVIDIA-B300-SXM6-AC` | 288 GB HBM3e |
+| `NVIDIA-GB300` | 288 GB HBM3e |
+
+### Blackwell
+
+| GPU SKU | Nominal GPU memory |
+| --- | ---: |
+| `NVIDIA-GeForce-RTX-5090` | 32 GB GDDR7 |
+| `NVIDIA-RTX-PRO-4500-Blackwell-Server-Edition` | 32 GB GDDR7 |
+| `NVIDIA-RTX-PRO-6000-Blackwell-Server-Edition` | 96 GB GDDR7 |
+| `NVIDIA-RTX-PRO-6000-Blackwell-Workstation-Edition` | 96 GB GDDR7 |
+| `NVIDIA-B200` | 192 GB HBM3e |
+| `NVIDIA-GB200` | 192 GB HBM3e |
+
+### Hopper and Grace Hopper
+
+| GPU SKU | Nominal GPU memory |
+| --- | ---: |
+| `NVIDIA-H100-80GB-HBM3` | 80 GB HBM3 |
+| `NVIDIA-H100-PCIe` | 80 GB HBM3 |
+| `NVIDIA-H100-NVL` | 94 GB HBM3 |
+| `NVIDIA-GH200-480GB` | 96 GB HBM3 |
+| `NVIDIA-H20` | 96 GB HBM3 |
+| `NVIDIA-H200` | 141 GB HBM3e |
+| `NVIDIA-H200-NVL` | 141 GB HBM3e |
+| `NVIDIA-GH200-144G-HBM3e` | 144 GB HBM3e |
+
+### Ada Lovelace
+
+| GPU SKU | Nominal GPU memory |
+| --- | ---: |
+| `NVIDIA-L4` | 24 GB GDDR6 |
+| `NVIDIA-L20` | 48 GB GDDR6 |
+| `NVIDIA-L40S` | 48 GB GDDR6 |
+| `NVIDIA-RTX-6000-Ada-Generation` | 48 GB GDDR6 |
+
+### Ampere
+
+| GPU SKU | Nominal GPU memory |
+| --- | ---: |
+| `NVIDIA-A100-SXM4-40GB` | 40 GB HBM2e |
+| `NVIDIA-A100-SXM4-80GB` | 80 GB HBM2e |
+
+Nominal memory is shown only to order this inventory. Profile selection uses
+the per-device binary-GiB floors below and the memory reported by the running
+system. For Grace Hopper, the table shows HBM GPU memory; the `480GB` in
+`NVIDIA-GH200-480GB` identifies CPU memory and is not GPU VRAM.
+
 ## Generator configurations
 
 The **Super family** in this table means `super`, `super-t2i`,
