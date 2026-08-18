@@ -120,8 +120,8 @@ actionable message if `NIM_URL` reaches a Generator runtime.
 ### Super FP8 example baseline
 
 Use the [Reasoner launch](deployment.md#launch-reasoner), which selects Super
-FP8 target-only. This is the documented baseline for the task catalog. The
-one-GPU Super FP8 configuration requires the
+FP8 target-only and disables video-token pruning. This is the documented
+baseline for the task catalog. The one-GPU Super FP8 configuration requires the
 hardware floor in the [support matrix](support-matrix.md#reasoner-configurations).
 After readiness, verify the selected model and profile through `/v1/metadata`
 and `/v1/manifest` before running the examples.
@@ -329,9 +329,9 @@ The service supplies these values when omitted:
 When the operator leaves the image and video limits unset, the NIM does not
 override the runtime's modality limits. Use request-level `media_io_kwargs` for
 workload-specific video sampling; the example requests 4 FPS. Video-token
-pruning defaults to a `0.6` rate with `vidcom2`; set the operator rate to `0` to
-disable it. Operator-wide media limits, preprocessing, and pruning are
-documented under
+pruning defaults to a `0.6` rate with `vidcom2`; the catalog baseline sets the
+operator rate to `0` and disables it. Operator-wide media limits, preprocessing,
+and pruning are documented under
 [Reasoner configuration](configuration.md#reasoner-configuration). Verify
 additional request fields against the active `/openapi.json`.
 

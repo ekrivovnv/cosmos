@@ -84,8 +84,9 @@ confirmed:
   configuration;
 - quantized Generator linear-backend selection;
 - the NIM API adaptation for the 18-case Reasoner catalog, including data-URL
-  media, request-level video sampling, thinking-disabled final-answer handling,
-  standard JSON Schema output, and local structural validators; and
+  media, request-level 4-FPS video sampling, an unpruned-video baseline,
+  thinking-disabled final-answer handling, standard JSON Schema output, and
+  local structural validators; and
 - runtime-aware metadata, health responses, and wrong-runtime diagnostics.
 
 Regenerate the source profile export before reconciling tables. Generated
@@ -140,13 +141,24 @@ placement. This validates that one request and configuration, not a stable JSON
 format, other seeds, other tasks, general Reasoner quality, or performance.
 
 The same image and one-B200 Super FP8 profile were then run target-only with
-thinking disabled. All 18 catalog cases completed API and format validation,
+thinking disabled and the default VidCom2 pruning rate of 0.6. All 18 catalog
+cases completed API and format validation,
 including JSON parsing, timestamp/box/point invariants, and spatial artifact
 generation. Qualitative review passed 12 case-specific checklists. The video
 caption, first temporal-localization case, robotics next action, assisted-task
 next action, marked-subject description, and flower trajectory remained
 incomplete or semantically inaccurate. This validates the target-only catalog
 transport and format paths, not general task quality or performance.
+
+The target-only, thinking-disabled profile was then rerun with
+`NIM_VIDEO_PRUNING_RATE=0`. All 18 cases again completed with
+`finish_reason=stop`, and all seven structured cases passed local format
+validation. Fourteen qualitative checklists passed. The video caption improved
+materially but stopped at preparation to place the white box rather than
+explicitly completing placement. Assisted-task next action, marked-subject
+description, and flower trajectory remained inaccurate. Disabling pruning
+restored the complete first temporal timeline and the expected smart-charger
+next action; this unpruned-video configuration is the public catalog baseline.
 
 Two live correctness findings remain internal release gates:
 
@@ -188,8 +200,9 @@ refine entries when evidence changes:
 - quantized Generator linear-backend behavior in the selected image;
 - public Helm chart URL to replace the staging reference, plus approved values,
   installation workflow, and monitoring integration;
-- qualitative resolution and revalidation of the six Super FP8 target-only
-  catalog cases identified above;
+- qualitative resolution and revalidation of the four incomplete Super FP8
+  target-only, unpruned-video catalog cases identified above, plus evaluation of
+  default VidCom2 output quality on the video catalog;
 - native reasoning-parser separation of reasoning from non-empty final content,
   plus approved reasoning-trace wording; and
 - approved acknowledgements and product license/model-card links for the exact

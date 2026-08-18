@@ -117,7 +117,8 @@ running `uv run python examples/...`. Do not add ad hoc dependencies. For
 Reasoner, use `examples/reasoner.py --list-cases` or the JSON `--describe`
 mode to select from the complete catalog without contacting an endpoint. Then
 follow `reasoning.md`, use the documented Super FP8 target-only baseline with
-thinking disabled, and confirm the selected profile before treating output as
+both video-token pruning and thinking disabled, and confirm the selected profile
+before treating output as
 representative of that baseline. Keep API/format validation separate from the
 catalog's qualitative review criteria.
 

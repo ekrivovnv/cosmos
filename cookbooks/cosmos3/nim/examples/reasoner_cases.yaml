@@ -6,7 +6,8 @@ validated_baseline:
   model_variant: super
   precision: fp8
   dflash: false
-  note: All catalog API and format paths have been observed on this target-only baseline; task quality still requires case-specific review.
+  video_pruning_rate: 0.0
+  note: All catalog API and format paths have been observed on this target-only, unpruned-video baseline; task quality still requires case-specific review.
 defaults:
   max_tokens: 4096
   video_fps: 4.0
