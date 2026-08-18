@@ -120,7 +120,6 @@ still be compatible when it meets the compute-capability and memory floors.
 
 | GPU | Nominal GPU memory |
 | --- | ---: |
-| L4 | 24 GB GDDR6 |
 | L20 | 48 GB GDDR6 |
 | L40S | 48 GB GDDR6 |
 | RTX 6000 Ada Generation | 48 GB GDDR6 |
