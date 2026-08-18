@@ -82,7 +82,10 @@ confirmed:
 - default-on Nano and Super DFlash drafts, independent local draft overrides,
   hardware-derived BF16 KV-cache selection, and advanced DFlash JSON
   configuration;
-- quantized Generator linear-backend selection; and
+- quantized Generator linear-backend selection;
+- the NIM API adaptation for the 18-case Reasoner catalog, including data-URL
+  media, request-level video sampling, parsed reasoning controls, standard JSON
+  Schema output, and local structural validators; and
 - runtime-aware metadata, health responses, and wrong-runtime diagnostics.
 
 Regenerate the source profile export before reconciling tables. Generated
@@ -162,6 +165,9 @@ refine entries when evidence changes:
 - quantized Generator linear-backend behavior in the selected image;
 - public Helm chart URL to replace the staging reference, plus approved values,
   installation workflow, and monitoring integration;
+- live Super FP8 review of the Reasoner catalog cases other than the separately
+  validated `robot_planning` request, including structured-output enforcement,
+  spatial annotations, and task-level output quality;
 - approved reasoning-trace wording; and
 - approved acknowledgements and product license/model-card links for the exact
   release.

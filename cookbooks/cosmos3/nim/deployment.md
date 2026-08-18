@@ -227,7 +227,11 @@ Generator above, remove it before reusing host port `8000`:
 docker rm -f cosmos3-generator
 ```
 
-Then launch the Super FP8 Reasoner with its bundled DFlash draft:
+Then launch the Super FP8 Reasoner with its bundled DFlash draft. This
+one-GPU configuration requires compute capability 8.9 or newer, at least 67 GiB
+of total and currently usable VRAM after the Reasoner reserve, and 16 GiB of
+effective system memory; see the
+[Reasoner configurations](support-matrix.md#reasoner-configurations):
 
 ```bash
 docker run -d --name cosmos3-reasoner \
