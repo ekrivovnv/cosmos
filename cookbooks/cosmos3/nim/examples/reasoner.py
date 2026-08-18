@@ -96,8 +96,8 @@ CASES: dict[str, dict[str, Any]] = {
         "media_type": "image",
         "asset": "robot_planning.png",
         "prompt": (
-            "The task is to put the flower into the red bottle. Generate a plan "
-            "of ordered subtasks to accomplish the task."
+            "The task is to put flower into the red bottle. Generate a plan "
+            "consisting of subtasks for accomplish the task."
         ),
         "sampling": {"seed": 0},
     },

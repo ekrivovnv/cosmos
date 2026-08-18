@@ -128,6 +128,14 @@ validated against these live responses. This establishes the
 management-endpoint join and helper output for this Nano Reasoner configuration,
 not Generator, inference behavior, or performance.
 
+The exact image was launched separately on one NVIDIA B200 as Super FP8
+Reasoner with its bundled DFlash draft explicitly enabled. The committed
+`robot_planning` case used the shared `robot_planning.png` fixture, original
+Reasoner-notebook prompt, and seed 0. It completed with a five-subtask response
+covering movement to the flower, grasp, pickup, movement to the red bottle, and
+placement. This validates that one request and configuration, not a stable JSON
+format, other seeds, other tasks, general Reasoner quality, or performance.
+
 ## Open release gates
 
 Review this list on every substantive documentation update and remove, add, or

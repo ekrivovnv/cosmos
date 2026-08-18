@@ -71,7 +71,7 @@ structured-output cases:
 | `video_caption` | `video_caption.mp4` | Detailed text caption |
 | `temporal_localization` | `temporal_localization_1.mp4` | Validated JSON event intervals |
 | `robotics_next_action` | `robotics_next_action.mp4` | Concise proposed next action |
-| `robot_planning` | `robot_planning.png` | Ordered text plan |
+| `robot_planning` | `robot_planning.png` | Plan consisting of subtasks |
 | `grounding_2d` | `grounding_2d.png` | Validated JSON bounding boxes |
 | `trajectory_2d` | `action_cot_trajectory.png` | Validated JSON image points |
 | `physical_plausibility` | `physical_plausibility.mp4` | Possible/impossible assessment |
@@ -86,11 +86,26 @@ uv run python examples/reasoner.py --case image_caption
 The Reasoner scripts check `/v1/metadata` before model discovery and fail with
 an actionable message if `NIM_URL` reaches a Generator runtime.
 
+### Robot planning with Super FP8 and DFlash
+
+Use the [Reasoner launch](deployment.md#launch-reasoner), which selects Super
+FP8 and explicitly enables its bundled DFlash draft. After readiness, verify the
+selected model and profile through `/v1/metadata` and `/v1/manifest`, then run:
+
+```bash
+uv run python examples/reasoner.py --case robot_planning
+```
+
+This case uses the same `robot_planning.png` fixture and prompt as the general
+Cosmos3 Reasoner notebook. Its response is unconstrained text and can be a
+numbered list, prose, or model-authored JSON. Use `response_format` and validate
+the result when an application requires a machine-readable sequence.
+
 The `--case` option belongs to this cookbook runner, not the NIM API. Substitute
 any other exact case name from the table. Every video case requests 4 FPS
 sampling. Task quality can differ between Nano and Super; these cases
-demonstrate the API and output
-contract rather than guaranteeing a particular answer.
+demonstrate the API and output contract rather than guaranteeing a particular
+answer.
 
 For each run, the script prints the final answer and writes an ignored
 `examples/outputs/reasoner_<case>/` directory containing:

@@ -227,7 +227,7 @@ Generator above, remove it before reusing host port `8000`:
 docker rm -f cosmos3-generator
 ```
 
-Then launch the Reasoner:
+Then launch the Super FP8 Reasoner with its bundled DFlash draft:
 
 ```bash
 docker run -d --name cosmos3-reasoner \
@@ -239,15 +239,20 @@ docker run -d --name cosmos3-reasoner \
   -p 8000:8000 \
   -e NGC_API_KEY \
   -e NIM_MODEL_TYPE=reasoner \
-  -e NIM_MODEL_VARIANT=nano \
+  -e NIM_MODEL_VARIANT=super \
+  -e NIM_PRECISION=fp8 \
+  -e NIM_USE_DFLASH=1 \
   -v "$LOCAL_NIM_CACHE:/opt/nim/.cache" \
   "$NIM_IMAGE"
 ```
 
-The command starts the Reasoner in the background. Follow startup logs with
-`docker logs -f cosmos3-reasoner`; press Ctrl+C to stop following logs without
-stopping the container. Expose all GPUs required by the selected Reasoner
-configuration.
+The command pins Super FP8 and makes the default-on DFlash setting explicit so
+the example configuration is reproducible. It starts the Reasoner in the
+background. Follow startup logs with `docker logs -f cosmos3-reasoner`; press
+Ctrl+C to stop following logs without stopping the container. Expose all GPUs
+required by the selected Reasoner configuration. To use another compatible
+Reasoner configuration, change the model and precision selectors together and
+revalidate representative requests.
 
 Both runtimes listen on container HTTP port `8000`; the Docker mapping chooses
 the host port. To run both containers concurrently, publish one on another

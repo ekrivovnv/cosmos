@@ -113,7 +113,10 @@ new transport or translating another backend's request:
 | Custom checkpoint | Either | `bring-your-own-checkpoint.md` | Follow the runtime-specific launch flow |
 
 Initialize the pinned client environment through `prerequisites.md` before
-running `uv run python examples/...`. Do not add ad hoc dependencies.
+running `uv run python examples/...`. Do not add ad hoc dependencies. For the
+`robot_planning` case, follow `reasoning.md` and use the documented Super FP8
+Reasoner configuration with its bundled DFlash draft; confirm the selected
+profile before treating the output as representative of that example.
 
 ## 5. Troubleshoot safely
 
