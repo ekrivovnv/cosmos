@@ -121,8 +121,10 @@ video-token pruning and NIM-native thinking disabled, preserve the
 catalog's exact vLLM user-prompt text and explicit sampling controls, and
 confirm the selected profile before treating output as representative of that
 baseline. Literal `<think>` instructions in a parity prompt are visible user
-text, not the native reasoning control. Keep API/format validation separate
-from the catalog's qualitative review criteria.
+text, not the native thinking control. For a free-form backend-parity request,
+use `examples/reasoner.py --vllm-compatible`; it preserves the prompts and
+sampling while retaining NIM data-URL and `media_io_kwargs` transport. Keep
+API/format validation separate from the catalog's qualitative review criteria.
 
 ## 5. Troubleshoot safely
 

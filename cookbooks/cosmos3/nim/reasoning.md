@@ -282,6 +282,38 @@ Data URLs are the portable baseline. During pre-release evaluation, do not rely
 on public HTTP(S) media fetching or formats beyond the included fixtures. A
 `file://` URL on the client does not identify a file inside the NIM container.
 
+## Use the vLLM request pattern with NIM
+
+The NIM accepts the same OpenAI-compatible messages, prompts, model discovery,
+and sampling controls used by the vLLM Reasoner examples. Two transport
+adaptations are required because the NIM runs in its own container:
+
+- send local images and videos as data URLs, or mount the media at a path visible
+  inside the container; and
+- replace the vLLM notebook's
+  `extra_body={"mm_processor_kwargs": {"fps": 4, "do_sample_frames": True}}`
+  with NIM's
+  `extra_body={"media_io_kwargs": {"video": {"fps": 4.0}}}`.
+
+For a structured catalog case, the default runner additionally sends
+`response_format` so the NIM can enforce the JSON schema. To reproduce the
+vLLM notebook's free-form response contract instead, omit that field with the
+runner's compatibility mode:
+
+```bash
+uv run python examples/reasoner.py \\
+  --case trajectory_2d \\
+  --vllm-compatible
+```
+
+In compatibility mode, the runner preserves the catalog's vLLM prompt and
+sampling controls, sends NIM-compatible media transport, and consumes the
+answer from `message.content` without local structured-output validation. A
+literal `<think>` block may therefore be visible in the returned content, as it
+is in the vLLM examples. This aligns request and response shape; it does not
+promise identical generated text, coordinates, temporal boundaries, or task
+quality across backends.
+
 ## Use the Responses API
 
 The Responses create route is enabled unless the deployment sets

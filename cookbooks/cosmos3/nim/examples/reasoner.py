@@ -212,6 +212,7 @@ def build_request(
     *,
     enable_thinking: bool | None = None,
     thinking_token_budget: int | None = None,
+    enforce_structured_output: bool = True,
 ) -> dict[str, Any]:
     """Build one NIM Chat Completions request from the declarative catalog."""
     case = resolve_case(case)
@@ -257,7 +258,7 @@ def build_request(
         request["extra_body"] = extra_body
 
     structured = response_format(spec)
-    if structured is not None:
+    if structured is not None and enforce_structured_output:
         request["response_format"] = structured
     return request
 
@@ -549,6 +550,7 @@ def run_case(
     *,
     thinking_override: bool | None,
     thinking_token_budget: int | None,
+    enforce_structured_output: bool,
 ) -> None:
     """Execute one catalog case and save machine- and human-readable artifacts."""
     spec = CASES[case]
@@ -557,6 +559,7 @@ def run_case(
         model,
         enable_thinking=thinking_override,
         thinking_token_budget=thinking_token_budget,
+        enforce_structured_output=enforce_structured_output,
     )
     response = client.chat.completions.create(**request)
     if not response.choices:
@@ -590,6 +593,7 @@ def run_case(
         "request": _request_summary(request),
         "qualitative_review": spec["review"],
         "native_thinking_enabled": thinking_enabled,
+        "structured_output_enforced": enforce_structured_output,
     }
     _write_json(output_dir / "request.json", request_metadata)
     _write_json(output_dir / "response.json", response_dict(response))
@@ -600,7 +604,12 @@ def run_case(
     validation: dict[str, Any] = {
         "api_response": {"status": "received"},
         "format_validation": {
-            "status": "not_applicable",
+            "status": (
+                "not_run"
+                if not enforce_structured_output
+                and spec["output"]["kind"] == "json_schema"
+                else "not_applicable"
+            ),
             "schema": spec["output"].get("schema"),
         },
         "qualitative_review": {
@@ -609,7 +618,7 @@ def run_case(
         },
     }
     structured: object | None = None
-    if spec["output"]["kind"] == "json_schema":
+    if enforce_structured_output and spec["output"]["kind"] == "json_schema":
         try:
             structured = json.loads(content)
             validate_structured_output(case, structured)
@@ -691,6 +700,15 @@ def build_parser() -> argparse.ArgumentParser:
         type=int,
         help="Override the thinking-token budget for an experimental reasoning request.",
     )
+    parser.add_argument(
+        "--vllm-compatible",
+        action="store_true",
+        help=(
+            "Use the vLLM-style free-form response contract: keep the same "
+            "prompts and sampling, but omit NIM response_format enforcement. "
+            "NIM media transport remains data-URL/media_io_kwargs based."
+        ),
+    )
     return parser
 
 
@@ -742,6 +760,7 @@ def main() -> None:
                     case,
                     thinking_override=args.thinking,
                     thinking_token_budget=args.thinking_token_budget,
+                    enforce_structured_output=not args.vllm_compatible,
                 )
             except Exception as exc:
                 if requested != "all":
