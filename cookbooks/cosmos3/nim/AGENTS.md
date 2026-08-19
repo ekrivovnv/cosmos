@@ -35,9 +35,9 @@ For guided customer workflows, load
   choosing a request. Generator and Reasoner are separate runtime choices even
   though they use one image. For the Reasoner task catalog, use the documented
   Super BF16 target-only baseline with video-token pruning and NIM-native
-  parsed reasoning disabled, preserve the catalog's exact vLLM user-prompt text
+  thinking disabled, preserve the catalog's exact vLLM user-prompt text
   and explicit sampling controls, and verify the selected profile before running
-  requests. Literal `<think>` text in a parity prompt is not the native reasoning
+  requests. Literal `<think>` text in a parity prompt is not the native thinking
   control. Use
   `examples/reasoner.py --list-cases` and `--describe <case> --format json` for
   endpoint-independent task discovery.

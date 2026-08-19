@@ -69,8 +69,8 @@ qualitative review criteria for every Reasoner example. Its user-prompt strings
 exactly match the runtime strings in the nearby vLLM notebook. The Python runner
 keeps the NIM-specific API adaptation in one place: it sends local media as data
 URLs, uses `media_io_kwargs` for video sampling, discovers the served model,
-keeps NIM-native parsed reasoning disabled for the catalog baseline, and uses
-JSON Schema rather than regular expressions for structured final answers.
+keeps NIM-native thinking disabled for the catalog baseline, and uses JSON
+Schema rather than regular expressions for structured final answers.
 
 List or inspect cases without a running endpoint:
 
@@ -101,14 +101,17 @@ uv run python examples/reasoner.py --case image_caption
 ```
 
 The `--case` option belongs to this cookbook runner, not the NIM API. Every
-video case requests 4 FPS sampling. All catalog cases leave NIM-native parsed
-reasoning disabled and consume the response from `message.content`. Six vLLM
+video case requests 4 FPS sampling. All catalog cases leave NIM-native thinking
+disabled and consume the response from `message.content`. Six vLLM
 prompt strings contain literal `<think>` formatting instructions. These tags
 are ordinary user-prompt text, not `chat_template_kwargs.enable_thinking`; text
 cases can therefore return visible tags in `message.content`, while the two
 structured trajectory cases remain constrained to their JSON schemas. The
-`--reasoning` option enables the separate NIM-native mechanism for an explicit
-API experiment and is not part of the parity baseline.
+`--thinking` option enables the separate NIM-native thinking mechanism for an
+explicit API experiment and is not part of the parity baseline. The runner also
+accepts the legacy `--reasoning` spelling. When enabled,
+thinking and the final answer remain in `message.content`; the service does not
+split them into a stable `reasoning` or `reasoning_content` field.
 
 Running `--case all` sends all 18 requests sequentially and can take substantial
 time and resources. Use it for deliberate catalog validation, not as a first
@@ -172,8 +175,8 @@ For each run, the script prints the final answer and writes an ignored
 - `output.txt`: final `message.content`;
 - `output.json`: parsed output, written only after JSON and semantic format
   checks pass for a structured case;
-- `reasoning.txt`: optional parsed reasoning from an explicit NIM-native API
-  experiment; prompt-authored `<think>` text remains in `output.txt`;
+- `reasoning.txt` is not produced: when native thinking is enabled, both the
+  thinking text and final answer remain in `output.txt` as `message.content`;
 - `validation.json`: separate API, format, and qualitative-review status;
 - `annotated.png`: validated normalized boxes or trajectories overlaid on image
   cases that have spatial output; and
@@ -305,15 +308,13 @@ Use Chat Completions for video requests in this pre-release version.
 The task catalog uses `chat_template_kwargs.enable_thinking=false`, which is the
 service default, and consumes responses from `message.content`. To maintain
 prompt parity, it preserves literal `<think>` formatting instructions in the six
-vLLM prompts that contain them. Those visible tags do not enable the NIM-native
-reasoning field and should not be parsed as a stable explanation. Responses
-requests use the same chat-template and sampling defaults while retaining their
-Responses-specific token-limit and structured-output field names.
-
-Reasoning traces are not a stable machine-readable explanation and should not
-be required by downstream logic. If evaluating optional reasoning fields
-outside the catalog baseline, first inspect the running NIM's `/openapi.json`
-and the installed OpenAI client response model.
+vLLM prompts that contain them. Those visible tags do not enable native
+thinking and should not be parsed as a stable explanation. If native thinking is
+enabled with `chat_template_kwargs.enable_thinking=true`, the thinking text and
+final answer are both returned in `message.content`; do not require a separate
+`reasoning` or `reasoning_content` field. Responses requests use the same
+chat-template and sampling defaults while retaining their Responses-specific
+token-limit and structured-output field names.
 
 Both API styles map a `developer` turn to a system instruction. Chat
 Completions also:
@@ -401,7 +402,7 @@ client code:
 
 The service normalizes the standard Chat Completions `response_format` shape
 and enables guided-decoding enforcement for Reasoner output, including output
-processed by the reasoning parser. Responses requests use their native
+generated while native thinking is enabled. Responses requests use their native
 `text.format` shape instead:
 
 ```json
