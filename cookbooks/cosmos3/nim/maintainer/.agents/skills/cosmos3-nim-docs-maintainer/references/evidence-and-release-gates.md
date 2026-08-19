@@ -124,15 +124,14 @@ thinking experiment (`--thinking --thinking-token-budget 64`) returned its
 structured result in `message.content`; no populated separate reasoning field
 was used by the example.
 
-The same image, robot-planning, grounding, and trajectory prompts were also
-sent through the runner's `--vllm-compatible` free-form mode. Image and text
-requests used the vLLM-compatible OpenAI shape directly. Video requests needed
-the documented NIM media adaptation: data URLs and `media_io_kwargs` instead of
-host `file://` URLs and vLLM's `mm_processor_kwargs`. The free-form requests
-returned vLLM-like `message.content` responses, including visible prompt-authored
-`<think>` blocks where requested. Semantic output remained mixed: robot planning
-and grounding were close, while video completion, next-action identification,
-and trajectories differed from the recorded vLLM answers.
+The exact-prompt catalog requests used the NIM Chat Completions API with data
+URL media, `media_io_kwargs` video sampling, explicit native-thinking controls,
+and NIM response-format schemas for structured cases. Thinking-enabled requests
+returned both thinking text and final output through `message.content` without a
+populated separate reasoning field. Semantic output remained mixed across
+backends: robot planning and grounding were close, while video completion,
+next-action identification, and trajectories differed from the recorded vLLM
+answers.
 
 This validates the documented Reasoner transport and format paths for this
 configuration, not Generator behavior, catalog-wide quality parity, or

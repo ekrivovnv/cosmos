@@ -107,11 +107,12 @@ prompt strings contain literal `<think>` formatting instructions. These tags
 are ordinary user-prompt text, not `chat_template_kwargs.enable_thinking`; text
 cases can therefore return visible tags in `message.content`, while the two
 structured trajectory cases remain constrained to their JSON schemas. The
-`--thinking` option enables the separate NIM-native thinking mechanism for an
-explicit API experiment and is not part of the parity baseline. The runner also
-accepts the legacy `--reasoning` spelling. When enabled,
-thinking and the final answer remain in `message.content`; the service does not
-split them into a stable `reasoning` or `reasoning_content` field.
+`--thinking` option enables the NIM-native thinking API for an explicit
+experiment and is not part of the parity baseline. When enabled, the request
+sets `chat_template_kwargs.enable_thinking=true` and a
+`thinking_token_budget`; thinking and the final answer remain in
+`message.content`. The service does not split them into a stable `reasoning` or
+`reasoning_content` field.
 
 Running `--case all` sends all 18 requests sequentially and can take substantial
 time and resources. Use it for deliberate catalog validation, not as a first
@@ -282,37 +283,25 @@ Data URLs are the portable baseline. During pre-release evaluation, do not rely
 on public HTTP(S) media fetching or formats beyond the included fixtures. A
 `file://` URL on the client does not identify a file inside the NIM container.
 
-## Use the vLLM request pattern with NIM
+## Native thinking and structured output
 
-The NIM accepts the same OpenAI-compatible messages, prompts, model discovery,
-and sampling controls used by the vLLM Reasoner examples. Two transport
-adaptations are required because the NIM runs in its own container:
-
-- send local images and videos as data URLs, or mount the media at a path visible
-  inside the container; and
-- replace the vLLM notebook's
-  `extra_body={"mm_processor_kwargs": {"fps": 4, "do_sample_frames": True}}`
-  with NIM's
-  `extra_body={"media_io_kwargs": {"video": {"fps": 4.0}}}`.
-
-For a structured catalog case, the default runner additionally sends
-`response_format` so the NIM can enforce the JSON schema. To reproduce the
-vLLM notebook's free-form response contract instead, omit that field with the
-runner's compatibility mode:
+The catalog runner sends `chat_template_kwargs.enable_thinking=false` by
+default. To run an explicit native-thinking request, enable thinking and set a
+token budget:
 
 ```bash
 uv run python examples/reasoner.py \\
   --case trajectory_2d \\
-  --vllm-compatible
+  --thinking \\
+  --thinking-token-budget 64
 ```
 
-In compatibility mode, the runner preserves the catalog's vLLM prompt and
-sampling controls, sends NIM-compatible media transport, and consumes the
-answer from `message.content` without local structured-output validation. A
-literal `<think>` block may therefore be visible in the returned content, as it
-is in the vLLM examples. This aligns request and response shape; it does not
-promise identical generated text, coordinates, temporal boundaries, or task
-quality across backends.
+Both thinking text and the final answer are returned in `message.content`; the
+runner does not depend on a separate `reasoning` or `reasoning_content` field.
+Structured catalog cases send their `response_format` JSON schema so the NIM
+can enforce the final-output contract. Literal `<think>` text inside a parity
+prompt remains ordinary user-prompt text and is not the native thinking
+control.
 
 ## Use the Responses API
 
@@ -517,7 +506,7 @@ them.
 
 | Status/symptom | Meaning | Action |
 | --- | --- | --- |
-| HTTP 400 | Sampling or request-shape validation commonly failed | Check model, sampling ranges, extension placement, and strict `include_reasoning`/`top_logprobs` types |
+| HTTP 400 | Sampling or request-shape validation commonly failed | Check model, sampling ranges, thinking controls, extension placement, and strict `top_logprobs` types |
 | HTTP 422 | Media validation or preprocessing commonly failed | Check data URL, media ordering, prompt media limits, and selected-image format support |
 | Chat Completions route 404 | `NIM_URL` reaches Generator or the route is absent from the selected image | Inspect `/v1/metadata`, start Reasoner, and verify the live OpenAPI document |
 | Empty/no choices | Backend did not return a normal Chat Completion | Preserve response/log details and check the selected Reasoner profile |
