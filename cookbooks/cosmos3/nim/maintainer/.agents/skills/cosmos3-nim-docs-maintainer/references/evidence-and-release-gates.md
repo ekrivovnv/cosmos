@@ -51,11 +51,12 @@ against the NIM contract rather than copying another backend's adapter.
   Transfer, and effective system-memory thresholds are approved for publication
   as release profile-selection floors. They establish a candidate profile, not
   full host compatibility, and remain subject to the exact image manifest.
-- The published tested-GPU inventory contains 22 of the SKUs in the current
-  NIMCraft NIM configuration; L4 is intentionally excluded from publication.
-  The published inventory identifies official validation targets; it does not
-  establish a passing result for every profile or task on every listed SKU and
-  is not a compatibility allowlist.
+- The published tested-GPU inventory contains the 22 discrete SKUs in the
+  current NIMCraft NIM configuration; L4 is intentionally excluded from
+  publication. It also includes Jetson AGX Thor T5000 and DGX Spark (GB10) as
+  verified unified-memory targets. Inventory membership identifies an official
+  validation target; it does not establish a passing result for every profile
+  or task on every listed device and is not a compatibility allowlist.
 - The final public image, release version/date, catalog URL, and model-card URL
   remain release-owned until approved.
 - The current evaluation chart reference is
@@ -73,6 +74,13 @@ confirmed:
 
 - Generator BF16 compute capability 8.0, updated Super VRAM/Transfer floors,
   and Reasoner Super BF16 TP2 at 73 GiB/device;
+- unified-memory selection subtracts the default 16-GiB host reserve from the
+  reported shared-memory total for static profile floors, uses resident model
+  and guardrails for Generator, and applies the same reserve to Reasoner
+  current-free-memory admission. The current implementation records the
+  Jetson AGX Thor T5000 as a 123-GiB unified-memory measurement target with an
+  approximately 6.8-GiB observed host working set, and identifies GB10/DGX
+  Spark for unified-memory Reasoner runtime defaults;
 - effective system-memory selection floors of 16 GiB for resident Generator and
   Reasoner profiles, 64 GiB for Nano offload, and 150 GiB for Super offload;
 - current-free-VRAM startup selection before model materialization, the
@@ -135,7 +143,10 @@ answers.
 
 This validates the documented Reasoner transport and format paths for this
 configuration, not Generator behavior, catalog-wide quality parity, or
-performance.
+performance. No exact-RC end-to-end validation record is retained for the
+unified-memory Thor T5000 or DGX Spark targets; their inventory inclusion
+records hardware/profile-policy verification, not full runtime validation on
+either device.
 
 The following records were collected before the 1.0.0 RC bump and are retained
 as historical coverage only; they do not validate the current image.
