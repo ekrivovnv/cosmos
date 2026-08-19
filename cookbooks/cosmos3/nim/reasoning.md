@@ -69,8 +69,8 @@ qualitative review criteria for every Reasoner example. Its user-prompt strings
 exactly match the runtime strings in the nearby vLLM notebook. The Python runner
 keeps the NIM-specific API adaptation in one place: it sends local media as data
 URLs, uses `media_io_kwargs` for video sampling, discovers the served model,
-keeps NIM-native thinking disabled for the catalog baseline, and uses JSON
-Schema rather than regular expressions for structured final answers.
+consumes the final answer from `message.content`, and uses JSON Schema rather
+than regular expressions for structured final answers.
 
 List or inspect cases without a running endpoint:
 
@@ -101,18 +101,12 @@ uv run python examples/reasoner.py --case image_caption
 ```
 
 The `--case` option belongs to this cookbook runner, not the NIM API. Every
-video case requests 4 FPS sampling. All catalog cases leave NIM-native thinking
-disabled and consume the response from `message.content`. Six vLLM
-prompt strings contain literal `<think>` formatting instructions. These tags
-are ordinary user-prompt text, not `chat_template_kwargs.enable_thinking`; text
-cases can therefore return visible tags in `message.content`, while the two
+video case requests 4 FPS sampling. All catalog cases consume the response
+from `message.content`. Six vLLM prompt strings contain literal `<think>`
+formatting instructions. These tags are ordinary user-prompt text; text cases
+can therefore return visible tags in `message.content`, while the two
 structured trajectory cases remain constrained to their JSON schemas. The
-`--thinking` option enables the NIM-native thinking API for an explicit
-experiment and is not part of the parity baseline. When enabled, the request
-sets `chat_template_kwargs.enable_thinking=true` and a
-`thinking_token_budget`; thinking and the final answer remain in
-`message.content`. The service does not split them into a stable `reasoning` or
-`reasoning_content` field.
+service does not require a separate reasoning field.
 
 Running `--case all` sends all 18 requests sequentially and can take substantial
 time and resources. Use it for deliberate catalog validation, not as a first
@@ -176,8 +170,6 @@ For each run, the script prints the final answer and writes an ignored
 - `output.txt`: final `message.content`;
 - `output.json`: parsed output, written only after JSON and semantic format
   checks pass for a structured case;
-- `reasoning.txt` is not produced: when native thinking is enabled, both the
-  thinking text and final answer remain in `output.txt` as `message.content`;
 - `validation.json`: separate API, format, and qualitative-review status;
 - `annotated.png`: validated normalized boxes or trajectories overlaid on image
   cases that have spatial output; and
@@ -283,26 +275,6 @@ Data URLs are the portable baseline. During pre-release evaluation, do not rely
 on public HTTP(S) media fetching or formats beyond the included fixtures. A
 `file://` URL on the client does not identify a file inside the NIM container.
 
-## Native thinking and structured output
-
-The catalog runner sends `chat_template_kwargs.enable_thinking=false` by
-default. To run an explicit native-thinking request, enable thinking and set a
-token budget:
-
-```bash
-uv run python examples/reasoner.py \\
-  --case trajectory_2d \\
-  --thinking \\
-  --thinking-token-budget 64
-```
-
-Both thinking text and the final answer are returned in `message.content`; the
-runner does not depend on a separate `reasoning` or `reasoning_content` field.
-Structured catalog cases send their `response_format` JSON schema so the NIM
-can enforce the final-output contract. Literal `<think>` text inside a parity
-prompt remains ordinary user-prompt text and is not the native thinking
-control.
-
 ## Use the Responses API
 
 The Responses create route is enabled unless the deployment sets
@@ -314,9 +286,8 @@ uv run python examples/reasoner_responses.py
 ```
 
 The request uses `store=false`. Responses create requests require a non-empty
-model, apply the same `temperature`, `top_p`, `top_k`, and
-`chat_template_kwargs.enable_thinking=false` defaults as Chat Completions, and
-map a `developer` input turn to a system instruction. An ordinary answer is
+model, apply the same `temperature`, `top_p`, and `top_k` defaults as Chat
+Completions, and map a `developer` input turn to a system instruction. An ordinary answer is
 returned as a message item and exposed by the OpenAI client through
 `response.output_text` rather than appearing only as a reasoning item.
 
@@ -326,14 +297,10 @@ Use Chat Completions for video requests in this pre-release version.
 
 ## Final answers, instructions, and tool calls
 
-The task catalog uses `chat_template_kwargs.enable_thinking=false`, which is the
-service default, and consumes responses from `message.content`. To maintain
-prompt parity, it preserves literal `<think>` formatting instructions in the six
-vLLM prompts that contain them. Those visible tags do not enable native
-thinking and should not be parsed as a stable explanation. If native thinking is
-enabled with `chat_template_kwargs.enable_thinking=true`, the thinking text and
-final answer are both returned in `message.content`; do not require a separate
-`reasoning` or `reasoning_content` field. Responses requests use the same
+The task catalog consumes responses from `message.content`. To maintain prompt
+parity, it preserves literal `<think>` formatting instructions in the six vLLM
+prompts that contain them. Those visible tags are response text and should not
+be parsed as a stable separate explanation. Responses requests use the same
 chat-template and sampling defaults while retaining their Responses-specific
 token-limit and structured-output field names.
 
@@ -422,8 +389,8 @@ client code:
 ```
 
 The service normalizes the standard Chat Completions `response_format` shape
-and enables guided-decoding enforcement for Reasoner output, including output
-generated while native thinking is enabled. Responses requests use their native
+and enables guided-decoding enforcement for Reasoner output. Responses requests
+use their native
 `text.format` shape instead:
 
 ```json
@@ -506,7 +473,7 @@ them.
 
 | Status/symptom | Meaning | Action |
 | --- | --- | --- |
-| HTTP 400 | Sampling or request-shape validation commonly failed | Check model, sampling ranges, thinking controls, extension placement, and strict `top_logprobs` types |
+| HTTP 400 | Sampling or request-shape validation commonly failed | Check model, sampling ranges, extension placement, and strict `top_logprobs` types |
 | HTTP 422 | Media validation or preprocessing commonly failed | Check data URL, media ordering, prompt media limits, and selected-image format support |
 | Chat Completions route 404 | `NIM_URL` reaches Generator or the route is absent from the selected image | Inspect `/v1/metadata`, start Reasoner, and verify the live OpenAPI document |
 | Empty/no choices | Backend did not return a normal Chat Completion | Preserve response/log details and check the selected Reasoner profile |
