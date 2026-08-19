@@ -83,10 +83,11 @@ confirmed:
   hardware-derived BF16 KV-cache selection, and advanced DFlash JSON
   configuration;
 - quantized Generator linear-backend selection;
-- the NIM API adaptation for the 18-case Reasoner catalog, including data-URL
-  media, request-level 4-FPS video sampling, an unpruned-video baseline,
-  thinking-disabled final-answer handling, standard JSON Schema output, and
-  local structural validators; and
+- the NIM API adaptation for the 18-case Reasoner catalog, including byte-equal
+  vLLM user-prompt strings, data-URL media, request-level 4-FPS video sampling,
+  an unpruned-video baseline, disabled NIM-native parsed reasoning, preserved
+  prompt-authored `<think>` text, standard JSON Schema output, and local
+  structural validators; and
 - runtime-aware metadata, health responses, and wrong-runtime diagnostics.
 
 Regenerate the source profile export before reconciling tables. Generated
@@ -141,7 +142,8 @@ placement. This validates that one request and configuration, not a stable JSON
 format, other seeds, other tasks, general Reasoner quality, or performance.
 
 The same image and one-B200 Super FP8 profile were then run target-only with
-thinking disabled and the default VidCom2 pruning rate of 0.6. All 18 catalog
+NIM-native parsed reasoning disabled and the default VidCom2 pruning rate of
+0.6. All 18 catalog
 cases completed API and format validation,
 including JSON parsing, timestamp/box/point invariants, and spatial artifact
 generation. Qualitative review passed 12 case-specific checklists. The video
@@ -150,7 +152,7 @@ next action, marked-subject description, and flower trajectory remained
 incomplete or semantically inaccurate. This validates the target-only catalog
 transport and format paths, not general task quality or performance.
 
-The target-only, thinking-disabled FP8 profile was then rerun with
+The target-only, native-reasoning-disabled FP8 profile was then rerun with
 `NIM_VIDEO_PRUNING_RATE=0`. All 18 cases again completed with
 `finish_reason=stop`, and all seven structured cases passed local format
 validation. Fourteen qualitative checklists passed. The video caption improved
@@ -162,7 +164,8 @@ next action; this result motivated keeping pruning disabled in the catalog
 baseline.
 
 The exact image was then launched on one NVIDIA B200 as Super BF16 target-only,
-with thinking and video pruning disabled. All 18 catalog cases completed with
+with NIM-native parsed reasoning and video pruning disabled. All 18 catalog
+cases completed with
 `finish_reason=stop`, and all seven structured cases passed format validation.
 The BF16 run corrected the flower-trajectory result seen with FP8; video caption,
 assisted-task next action, and marked-subject description remained incomplete.
@@ -173,12 +176,35 @@ Super BF16 response, but both omitted an explicit flower release and arm
 retreat. This validates deterministic parity for that request, not sampled
 parity, complete task semantics, general model quality, or performance.
 
+The exact image was subsequently launched on one NVIDIA H200 as Super BF16
+without DFlash or video pruning. Before inference, all 18 catalog user prompts
+were checked byte for byte against the runtime strings in
+`cookbooks/cosmos3/reasoner/run_with_vllm.ipynb`. NIM-native parsed reasoning
+remained disabled; six prompts still contained their original literal `<think>`
+instructions. All 18 requests completed with `finish_reason=stop`, and all seven
+structured cases passed JSON and local semantic format validation. Four text
+cases returned visible `<think>` blocks in `message.content`; guided output kept
+the two structured trajectory responses as schema-conforming JSON.
+
+This exact-prompt run retained deterministic robot-planning parity, the physical
+plausibility answer `A`, a near-identical situation-understanding answer, a
+matching driving Action-CoT class, and a grounding box close to the recorded
+vLLM answer. It did not establish catalog-wide output parity: video captioning
+placed the white box back on the table instead of in the shipping box, and the
+assisted-task case proposed removing the old cartridge instead of obtaining the
+new one. The interval answer omitted one box carrier, and the timestamp range
+started earlier than the recorded vLLM answer. The vLLM notebook contains no
+embedded outputs and was not rerun concurrently, so comparisons other than the
+separately controlled robot-planning request use the recorded prompt-guide
+answers and are qualitative, not a backend equivalence test.
+
 Two live correctness findings remain internal release gates:
 
 - With native reasoning controls enabled, both DFlash and target-only returned
   `finish_reason=stop` with `message.content=null` and placed the complete text
   or structured answer in `message.reasoning`. This reproduced with 512- and
-  2048-token reasoning budgets, so the catalog keeps thinking disabled.
+  2048-token reasoning budgets, so the catalog keeps NIM-native parsed
+  reasoning disabled.
 - For a fixed-seed 2D grounding request, DFlash produced invalid coordinates.
   In the follow-up control, DFlash passed 0/10 greedy requests at
   `temperature=0` and 4/20 sampled seeds; target-only passed 10/10 and 20/20,
@@ -213,10 +239,10 @@ refine entries when evidence changes:
 - quantized Generator linear-backend behavior in the selected image;
 - public Helm chart URL to replace the staging reference, plus approved values,
   installation workflow, and monitoring integration;
-- qualitative resolution and revalidation of the Super BF16 target-only gaps:
-  incomplete video caption, assisted-task next action, marked-subject
-  description, and robot-planning release/retreat semantics; plus evaluation of
-  default VidCom2 output quality on the video catalog;
+- controlled, concurrent vLLM/NIM review of all exact-prompt catalog outputs,
+  especially video captioning, assisted-task next action, interval/timestamp
+  completeness, trajectory semantics, and robot-planning release/retreat;
+  plus evaluation of default VidCom2 output quality on the video catalog;
 - native reasoning-parser separation of reasoning from non-empty final content,
   plus approved reasoning-trace wording; and
 - approved acknowledgements and product license/model-card links for the exact

@@ -64,12 +64,13 @@ do not hard-code a model ID from another image or deployment.
 
 The endpoint-independent catalog in
 [`examples/reasoner_cases.yaml`](examples/reasoner_cases.yaml) defines the
-media, prompt, sampling, output contract, thinking setting, and qualitative
-review criteria for every Reasoner example. The Python runner keeps the
-NIM-specific API adaptation in one place: it sends local media as data URLs,
-uses `media_io_kwargs` for video sampling, discovers the served model, keeps
-thinking disabled for the catalog baseline, and uses JSON Schema rather than
-regular expressions for structured final answers.
+media, prompt, sampling, output contract, native-thinking setting, and
+qualitative review criteria for every Reasoner example. Its user-prompt strings
+exactly match the runtime strings in the nearby vLLM notebook. The Python runner
+keeps the NIM-specific API adaptation in one place: it sends local media as data
+URLs, uses `media_io_kwargs` for video sampling, discovers the served model,
+keeps NIM-native parsed reasoning disabled for the catalog baseline, and uses
+JSON Schema rather than regular expressions for structured final answers.
 
 List or inspect cases without a running endpoint:
 
@@ -100,11 +101,14 @@ uv run python examples/reasoner.py --case image_caption
 ```
 
 The `--case` option belongs to this cookbook runner, not the NIM API. Every
-video case requests 4 FPS sampling. All catalog cases leave thinking disabled
-and consume the final answer from `message.content`; tasks such as planning,
-next-action prediction, and Action CoT do not require a parsed reasoning trace.
-The `--reasoning` option is reserved for an explicit API experiment and is not
-part of the catalog baseline.
+video case requests 4 FPS sampling. All catalog cases leave NIM-native parsed
+reasoning disabled and consume the response from `message.content`. Six vLLM
+prompt strings contain literal `<think>` formatting instructions. These tags
+are ordinary user-prompt text, not `chat_template_kwargs.enable_thinking`; text
+cases can therefore return visible tags in `message.content`, while the two
+structured trajectory cases remain constrained to their JSON schemas. The
+`--reasoning` option enables the separate NIM-native mechanism for an explicit
+API experiment and is not part of the parity baseline.
 
 Running `--case all` sends all 18 requests sequentially and can take substantial
 time and resources. Use it for deliberate catalog validation, not as a first
@@ -137,7 +141,9 @@ and `/v1/manifest` before running the examples.
 Every catalog request explicitly sends `temperature=0.7`, `top_p=0.8`,
 `top_k=20`, `presence_penalty=0`, and `repetition_penalty=1` unless a case
 records an override. These values match the effective Super checkpoint and raw
-vLLM example defaults instead of relying on server-side default injection.
+vLLM example defaults instead of relying on server-side default injection. The
+catalog preserves vLLM user-prompt text byte for byte, but media transport and
+structured-output enforcement remain NIM-specific.
 
 The `robot_planning` case overrides temperature and adds a fixed seed for its
 controlled parity request: `temperature=0`, `top_p=0.8`, `top_k=20`,
@@ -166,7 +172,8 @@ For each run, the script prints the final answer and writes an ignored
 - `output.txt`: final `message.content`;
 - `output.json`: parsed output, written only after JSON and semantic format
   checks pass for a structured case;
-- `reasoning.txt`: optional reasoning data from an explicit API experiment;
+- `reasoning.txt`: optional parsed reasoning from an explicit NIM-native API
+  experiment; prompt-authored `<think>` text remains in `output.txt`;
 - `validation.json`: separate API, format, and qualitative-review status;
 - `annotated.png`: validated normalized boxes or trajectories overlaid on image
   cases that have spatial output; and
@@ -296,11 +303,12 @@ Use Chat Completions for video requests in this pre-release version.
 ## Final answers, instructions, and tool calls
 
 The task catalog uses `chat_template_kwargs.enable_thinking=false`, which is the
-service default, and consumes ordinary final answers from `message.content`.
-It does not add prompt-authored `<think>` formatting instructions or require a
-reasoning field. Responses requests use the same chat-template and sampling
-defaults while retaining their Responses-specific token-limit and
-structured-output field names.
+service default, and consumes responses from `message.content`. To maintain
+prompt parity, it preserves literal `<think>` formatting instructions in the six
+vLLM prompts that contain them. Those visible tags do not enable the NIM-native
+reasoning field and should not be parsed as a stable explanation. Responses
+requests use the same chat-template and sampling defaults while retaining their
+Responses-specific token-limit and structured-output field names.
 
 Reasoning traces are not a stable machine-readable explanation and should not
 be required by downstream logic. If evaluating optional reasoning fields
@@ -463,12 +471,14 @@ semantic proposal in visual coordinates. It is not a domain-specific Generator
 Action tensor and must not be sent directly to a robot. See
 [Generator Action representations](action.md#domains-and-representations).
 
-The catalog adapts the task coverage in the
-[Reasoner Prompt Guide](../reasoner/reasoner_prompt_guide.md) to the NIM API.
-Treat recorded answers in that guide as examples from another run, not as golden
-NIM output or a guarantee that the service exposes hidden reasoning traces. Ask
-for concise justifications or structured final answers; do not depend on
-`<think>` blocks or hidden chain-of-thought.
+The catalog preserves the exact user prompts from the
+[vLLM Reasoner notebook](../reasoner/run_with_vllm.ipynb) while adapting media
+transport and structured output to the NIM API. Treat recorded answers in the
+[Reasoner Prompt Guide](../reasoner/reasoner_prompt_guide.md) as examples from
+another run, not as golden NIM output. Literal `<think>` blocks requested by
+those prompts are visible response formatting, not a guarantee that the service
+exposes a stable hidden reasoning trace; downstream logic must not depend on
+them.
 
 ## Errors
 

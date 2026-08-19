@@ -2,16 +2,20 @@
 # SPDX-License-Identifier: OpenMDW-1.1
 
 version: 1
+prompt_source:
+  backend: vllm
+  path: cookbooks/cosmos3/reasoner/run_with_vllm.ipynb
+  contract: Exact runtime user-prompt strings; NIM media transport and structured-output enforcement remain backend-specific.
 validated_baseline:
   model_variant: super
   precision: bf16
   dflash: false
   video_pruning_rate: 0.0
-  note: All catalog API and format paths have been observed on this target-only, unpruned-video baseline; task quality still requires case-specific review.
+  note: All exact-prompt catalog API and format paths have been observed on this target-only, unpruned-video baseline; task quality and general vLLM output parity still require case-specific review.
 defaults:
   max_tokens: 4096
   video_fps: 4.0
-  reasoning_enabled: false
+  native_reasoning_enabled: false
   thinking_token_budget: 512
   sampling:
     temperature: 0.7
@@ -54,10 +58,7 @@ cases:
     media:
       type: video
       asset: temporal_localization_1.mp4
-    prompt: |-
-      List all action segments in the video. For each event, return its numeric
-      start and end time in seconds and a concise caption. List multiple events
-      when applicable.
+    prompt: "List all action segments in the video. For each detected event, you must determine:\n\nProvide the result in json format with 'seconds' for time depiction for each event. Use keywords 'start', 'end' and 'caption' in the json output. Please list multiple events if applicable.\n\n```json\n[\n{\n  \"start\": t_start,\n  \"end\": t_end,\n  \"caption\": EVENT1\n},\n{\n  \"start\": t_start,\n  \"end\": t_end,\n  \"caption\": EVENT2\n},\n...\n]\n``` "
     output:
       kind: json_schema
       schema: temporal_events_seconds
@@ -71,9 +72,7 @@ cases:
     media:
       type: video
       asset: temporal_localization_2.mp4
-    prompt: |-
-      Describe the notable events in the provided video. For each event, return
-      start and end timecodes in mm:ss.ff format and a concise caption.
+    prompt: Describe the notable events in the provided video. Provide the result in json format with 'mm:ss.ff' format for time depiction for each event.Use keywords 'start', 'end' and 'caption' in the json output.
     output:
       kind: json_schema
       schema: temporal_events_timecodes
@@ -88,10 +87,7 @@ cases:
       type: video
       asset: temporal_localization_2.mp4
     prompt: |-
-      When is "A man in a white sweater walks out of a room carrying a box,
-      closes the door behind him, walks on the floor, and turns left at the end
-      near the wall." depicted in the video? Return start and end timecodes in
-      mm:ss.ff format.
+      When is "A man in a white sweater walks out of a room carrying a box, closes the door behind him, walks on the floor, and turns left at the end near the wall." depicted in the video? Please provide the result in json format with 'mm:ss.ff' format for time depiction for the event. Use keywords 'start', 'end' in the json output.
     output:
       kind: json_schema
       schema: timestamp_range
@@ -116,7 +112,7 @@ cases:
     media:
       type: video
       asset: robotics_next_action.mp4
-    prompt: What can be the next immediate action?
+    prompt: "What can be the next immediate action? Answer the question using the following format: <think> Your reasoning. </think> Write your final answer immediately after the </think> tag."
     output:
       kind: text
     review:
@@ -128,10 +124,7 @@ cases:
     media:
       type: video
       asset: drive_scene_next_action.mp4
-    prompt: |-
-      You are an autonomous vehicle planning system. The video depicts the
-      observation from the vehicle's camera. Observe the critical objects in the
-      environment and state the next action and driving trajectory.
+    prompt: You are an autonomous vehicle planning system. The video depicts the observation from the vehicle's camera. You need to observe the critical objects in the environment and reason your next action and the driving trajectory ahead.
     output:
       kind: text
     review:
@@ -143,9 +136,7 @@ cases:
     media:
       type: image
       asset: robot_planning.png
-    prompt: |-
-      The task is to put flower into the red bottle. Generate a plan consisting
-      of subtasks for accomplish the task.
+    prompt: The task is to put flower into the red bottle. Generate a plan consisting of subtasks for accomplish the task.
     sampling:
       temperature: 0.0
       top_p: 0.8
@@ -166,10 +157,14 @@ cases:
       type: video
       asset: assisted_task_next_action.mp4
     prompt: |-
-      This is the overall task that the agent is trying to complete: "The student
-      exchanges the black ink cartridge of the printer." In the video, the agent
-      is following one step of that task: "place old ink_cartridge." What should
-      be the next action of the agent?
+      This is the overall task that the agent is trying to complete: "The student exchanges the black ink cartridge of the printer."
+                  In the video, the agent is trying to follow the instruction (a single step out of many to complete the overall task): "place old ink_cartridge."
+                  What should be the next action of the agent?
+                  Answer the question using the following format:
+                  <think>
+                  Your reasoning.
+                  </think>
+                  Write your final answer immediately after the </think> tag.
     output:
       kind: text
     review:
@@ -181,7 +176,15 @@ cases:
     media:
       type: video
       asset: common_sense_reasoning.mp4
-    prompt: Can the countertop support the weight of the juicers?
+    prompt: |-
+      Can the countertop support the weight of the juicers?
+                  Answer the question using the following format:
+
+                  <think>
+                  Your reasoning.
+                  </think>
+
+                  Write your final answer immediately after the </think> tag.
     output:
       kind: text
     review:
@@ -193,9 +196,7 @@ cases:
     media:
       type: image
       asset: grounding_2d.png
-    prompt: |-
-      Locate the accurate bounding box of the load as a whole. Use coordinates
-      normalized independently from 0 to 1000 on each image axis.
+    prompt: Locate the accurate bounding box of the load as a whole. Return a json.
     sampling:
       seed: 0
     output:
@@ -211,9 +212,7 @@ cases:
     media:
       type: image
       asset: describe_anything.png
-    prompt: |-
-      Caption the notable attributes in the provided image. List and describe all
-      marked subjects with their subject ID, category, and detailed caption.
+    prompt: 'Please caption the notable attributes in the provided image. List and describe all marked subjects in the image with their categories and detailed captions using a json with keyword "subject_id", "category" and "caption".'
     sampling:
       seed: 0
     output:
@@ -228,12 +227,15 @@ cases:
     media:
       type: image
       asset: action_cot_trajectory.png
-    prompt: |-
-      You are given the task "Move the pink bowl to the right". Return the
-      complete ordered 2D trajectory the end effector should follow, including
-      approach, grasp, lift, transport to the right, placement, and retraction.
-      Use coordinates normalized independently from 0 to 1000, with the origin
-      at the top-left.
+    prompt: |
+      You are given the task "Move the pink bowl to the right". Specify the 2D trajectory your end effector should follow in pixel space. Return the trajectory coordinates in JSON format like this: {"point_2d": [x, y], "label": "gripper trajectory"}.
+      Answer the question using the following format:
+
+      <think>
+      Your reasoning.
+      </think>
+
+      Write your final answer immediately after the </think> tag.
     sampling:
       temperature: 0.6
       top_p: 0.95
@@ -256,12 +258,7 @@ cases:
     media:
       type: image
       asset: robot_planning.png
-    prompt: |-
-      You are given the task "Put flower into the red bottle". Return the
-      complete ordered 2D trajectory the end effector should follow, including
-      approach, grasp, lift, transport to the bottle, placement, and retraction.
-      Use coordinates normalized independently from 0 to 1000, with the origin
-      at the top-left.
+    prompt: "You are given the task \"Put flower into the red bottle\". Specify the 2D trajectory your end effector should follow in pixel space. Return the trajectory coordinates in JSON format like this: {\"point_2d\": [x, y], \"label\": \"gripper trajectory\"}. \nAnswer the question using the following format:\n\n<think> Your reasoning. </think>\nWrite your final answer immediately after the </think> tag.\n"
     sampling:
       temperature: 0.6
       top_p: 0.95
@@ -285,9 +282,12 @@ cases:
       type: video
       asset: action_cot_driving_scene.mp4
     prompt: |-
-      The video depicts the observation from the vehicle's camera. Identify the
-      objects in the scene that are critical for safe navigation and state the
-      required driving response.
+      The video depicts the observation from the vehicle's camera. You need to think step by step and identify the objects in the scene that are critical for safe navigation.
+      Answer the question using the following format:
+      <think>
+      Your reasoning.
+      </think>
+      Write your final answer immediately after the </think> tag.
     sampling:
       temperature: 0.6
       top_p: 0.95
@@ -307,11 +307,10 @@ cases:
       type: video
       asset: physical_plausibility.mp4
     prompt: |-
-      Is this video physically plausible under normal laws of physics, including
-      object permanence, shape constancy, and continuous object trajectories?
-      Base the answer on the visible events and ignore simulation-rendering
-      quality. The rising wall is part of the experiment and should not be judged
-      for plausibility. Answer (A) Possible or (B) Impossible.
+      Is this video physically plausible/possible according to your understanding of e.g. object permanence, shape constancy (objects maintain shape over time), continuous trajectories of objects? Assume it is the normal laws of physics.
+      Your answer should be based on the events in the video and ignore the quality of the simulation engine. The rising wall is part of the experiment setup and should not be judged for plausibility.
+      (A) Possible
+      (B) Impossible
     output:
       kind: text
     review:
@@ -323,9 +322,7 @@ cases:
     media:
       type: video
       asset: situation_understanding.mp4
-    prompt: |-
-      What is the person doing with the skillet? What will the person likely do
-      next in this situation?
+    prompt: What is the person doing with the skillet? What will the person likely do next in this situation?
     output:
       kind: text
     review:

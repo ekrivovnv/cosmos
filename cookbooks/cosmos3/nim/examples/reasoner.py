@@ -126,9 +126,15 @@ def load_catalog(path: Path = CATALOG_PATH) -> dict[str, Any]:
     catalog = yaml.safe_load(path.read_text(encoding="utf-8"))
     if not isinstance(catalog, dict) or catalog.get("version") != 1:
         raise ValueError("Reasoner catalog must be a version 1 YAML mapping")
+    prompt_source = catalog.get("prompt_source")
     defaults = catalog.get("defaults")
     baseline = catalog.get("validated_baseline")
     cases = catalog.get("cases")
+    if not isinstance(prompt_source, dict) or not all(
+        isinstance(prompt_source.get(field), str) and prompt_source[field].strip()
+        for field in ("backend", "path", "contract")
+    ):
+        raise TypeError("Reasoner catalog prompt_source must identify its contract")
     if not isinstance(defaults, dict) or not isinstance(baseline, dict):
         raise TypeError("Reasoner catalog defaults and validated_baseline must be mappings")
     if not isinstance(defaults.get("sampling"), dict) or not isinstance(
@@ -168,6 +174,7 @@ def load_catalog(path: Path = CATALOG_PATH) -> dict[str, Any]:
 
 
 CATALOG = load_catalog()
+PROMPT_SOURCE: dict[str, str] = CATALOG["prompt_source"]
 CASES: dict[str, dict[str, Any]] = CATALOG["cases"]
 DEFAULTS: dict[str, Any] = CATALOG["defaults"]
 VALIDATED_BASELINE: dict[str, Any] = CATALOG["validated_baseline"]
@@ -191,11 +198,11 @@ def response_format(spec: dict[str, Any]) -> dict[str, Any] | None:
 
 
 def case_reasoning(spec: dict[str, Any], override: bool | None) -> bool:
-    """Resolve a CLI reasoning override against the catalog default."""
+    """Resolve a CLI native-reasoning override against the catalog default."""
     if override is not None:
         return override
     reasoning = spec.get("reasoning", {})
-    default = bool(DEFAULTS.get("reasoning_enabled", False))
+    default = bool(DEFAULTS.get("native_reasoning_enabled", False))
     return bool(reasoning.get("enabled", default)) if isinstance(reasoning, dict) else default
 
 
@@ -383,6 +390,7 @@ def describe_case(case: str) -> dict[str, Any]:
         spec["output"]["json_schema"] = deepcopy(SCHEMAS[schema_name])
     return {
         "case": case,
+        "prompt_source": deepcopy(PROMPT_SOURCE),
         "validated_baseline": deepcopy(VALIDATED_BASELINE),
         "defaults": deepcopy(DEFAULTS),
         **spec,
@@ -403,7 +411,12 @@ def list_cases(output_format: str) -> None:
     if output_format == "json":
         print(
             json.dumps(
-                {"validated_baseline": VALIDATED_BASELINE, "cases": rows}, indent=2
+                {
+                    "prompt_source": PROMPT_SOURCE,
+                    "validated_baseline": VALIDATED_BASELINE,
+                    "cases": rows,
+                },
+                indent=2,
             )
         )
         return
@@ -577,7 +590,7 @@ def run_case(
         "validated_baseline": VALIDATED_BASELINE,
         "request": _request_summary(request),
         "qualitative_review": spec["review"],
-        "reasoning_enabled": reasoning_enabled,
+        "native_reasoning_enabled": reasoning_enabled,
     }
     _write_json(output_dir / "request.json", request_metadata)
     _write_json(output_dir / "response.json", response_dict(response))
@@ -670,13 +683,13 @@ def build_parser() -> argparse.ArgumentParser:
         "--reasoning",
         dest="reasoning",
         action="store_true",
-        help="Experimentally request parsed reasoning for every selected case.",
+        help="Experimentally enable NIM-native parsed reasoning for every selected case.",
     )
     reasoning.add_argument(
         "--no-reasoning",
         dest="reasoning",
         action="store_false",
-        help="Keep reasoning disabled for every selected case.",
+        help="Keep NIM-native parsed reasoning disabled for every selected case.",
     )
     parser.set_defaults(reasoning=None)
     parser.add_argument(
