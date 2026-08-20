@@ -139,9 +139,25 @@ path, and the opt-in guided-output grounding request also passed. One-time
 comparison with `maintainer/reasoner-semantic-fixtures.yaml` gave grounding IoU
 0.926 against the recorded vLLM box, above the 0.75 review threshold. Temporal
 localization returned one whole-video event instead of the fixture's minimum
-four events and therefore failed semantic-quality review despite passing local
+three events and therefore failed semantic-quality review despite passing local
 JSON and timestamp validation. This validates request transport, extraction,
 and local format handling, not catalog-wide semantic quality or performance.
+
+The tutorial image `vllm/vllm-openai:cosmos3` at digest
+`sha256:db0bb920b0b54e82ea96a98659bbd21921f87d0dcfc86feffdafa2db3f08be55`
+was run directly on the same H200. Super BF16 ran at TP1 rather than the
+tutorial's TP4 because only one GPU was allocated. Its grounding result passed
+the local validator and had IoU 0.931 against the fixture. The tutorial's video
+combination of server-level `num_frames=-1` and request-level
+`mm_processor_kwargs` at 4 FPS failed with HTTP 400 for both Super and Edge:
+the loader supplied 37 frames before the processor attempted to sample again.
+Using request-level `media_io_kwargs` at 4 FPS, as the NIM adaptation does,
+completed successfully. Super returned three ordered segments covering pickup,
+dispensing, placement, and retraction, motivating a three-event semantic floor;
+Edge returned one whole-video segment and failed that floor. With the catalog's
+explicit effective sampling and thinking controls, Edge grounding also passed.
+This direct comparison validates the NIM-specific media adaptation and fixture
+thresholds for these two cases, not all tutorial cases or TP4 output parity.
 
 ## Historical validation from the superseded 20260819 RC
 

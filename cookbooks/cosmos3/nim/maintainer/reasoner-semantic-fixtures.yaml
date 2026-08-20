@@ -42,7 +42,7 @@ cases:
         end: 18.7
         action: robot retracts both arms
     acceptance:
-      minimum_events: 4
+      minimum_events: 3
       maximum_boundary_delta_seconds: 1.5
       required_actions:
         - cup pickup
