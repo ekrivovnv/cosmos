@@ -142,11 +142,8 @@ Also:
   preflight pass establishes only candidate-profile compatibility;
 - run live requests only when the exact image and required hardware are
   available, recording the image reference and active runtime; and
-- for cluster RC checks, follow `AGENTS.md`'s cluster execution workflow: use
-  the documented pin with `$HOME/c3/Makefile`, the canonicalized standard
-  `NIM_CACHE`, `cache-doctor`, `cache-preflight`, and `rcrun`. Do not replace
-  that workflow with an ad hoc container invocation or the public customer
-  Docker wrapper.
+- for cluster RC checks, run the public customer Docker command with only the
+  local UID, canonical cache, and Slurm adaptations specified in `AGENTS.md`.
 
 Before finishing, reread the complete diff for consistency between public docs,
 examples, dependency metadata, `AGENTS.md`, and this skill. Report static and
