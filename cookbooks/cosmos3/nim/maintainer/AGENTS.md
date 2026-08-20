@@ -81,7 +81,9 @@ maintainer instructions take precedence over the customer-assistant guidance in
   status handling, and primary output without hiding them behind a large helper
   abstraction. Parse CLI arguments before endpoint or media work, reject
   unknown arguments, and require runtime, endpoint, selected-profile, and
-  task-compatible model-variant metadata before inference.
+  task-compatible model-variant metadata before inference. Keep Reasoner
+  semantic reference fixtures under `maintainer/`; use them for maintainer
+  review only and do not expose them through public pages or runner output.
 - Validate affected links, paths, JSON, Python syntax, documented commands, and
   `uv.lock`. Report static checks separately from live NIM validation.
 - Do not add CI workflows, repository automation, or unrelated tooling unless

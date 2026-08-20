@@ -96,9 +96,9 @@ confirmed:
 - quantized Generator linear-backend selection;
 - the NIM API adaptation for the 18-case Reasoner catalog, including byte-equal
   vLLM user-prompt strings, data-URL media, request-level 4-FPS video sampling,
-  an unpruned-video baseline, disabled NIM-native thinking, preserved
-  prompt-authored `<think>` text, standard JSON Schema output, and local
-  structural validators; and
+  disabled NIM-native thinking, preserved prompt-authored `<think>` text,
+  explicit effective sampling controls, prompt-constrained JSON extraction,
+  opt-in NIM JSON Schema guidance, and local structural validators; and
 - runtime-aware metadata, health responses, and wrong-runtime diagnostics.
 
 Regenerate the source profile export before reconciling tables. Generated
@@ -129,9 +129,19 @@ profiles for both runtimes:
   `0ef8dad974a6e18226d70838ead8161670fbdd871ce4bc1efcd3f707a2bce612`, with
   23.1-GiB VRAM and 16-GiB effective-system-memory floors.
 
-These preflight results establish candidate-profile compatibility only. No
-cold-start, management-endpoint, or inference validation is retained for this
-exact RC.
+These preflight results establish candidate-profile compatibility only.
+
+The exact image was also launched on one NVIDIA H200 as Super FP8 profile
+`c70e25d00f876b14b07441fc7920b8a7001487aecf3f258739bfbcc9a208e4a9`, with
+the bundled DFlash draft enabled and video pruning unset. All 18 catalog cases
+completed API and local format validation on the prompt-constrained default
+path, and the opt-in guided-output grounding request also passed. One-time
+comparison with `maintainer/reasoner-semantic-fixtures.yaml` gave grounding IoU
+0.926 against the recorded vLLM box, above the 0.75 review threshold. Temporal
+localization returned one whole-video event instead of the fixture's minimum
+four events and therefore failed semantic-quality review despite passing local
+JSON and timestamp validation. This validates request transport, extraction,
+and local format handling, not catalog-wide semantic quality or performance.
 
 ## Historical validation from the superseded 20260819 RC
 
@@ -328,10 +338,10 @@ refine entries when evidence changes:
 - public Helm chart URL to replace the staging reference, plus approved values,
   installation workflow, and monitoring integration;
 - controlled, concurrent vLLM/NIM review of all exact-prompt catalog outputs,
-  especially video captioning, assisted-task next action, interval/timestamp
-  completeness, trajectory semantics, and robot-planning release/retreat;
-  plus evaluation of explicitly enabled VidCom2 output quality on the video
-  catalog;
+  especially temporal segmentation, video captioning, assisted-task next
+  action, interval/timestamp completeness, trajectory semantics, and
+  robot-planning release/retreat; plus evaluation of explicitly enabled
+  VidCom2 output quality on the video catalog;
 - approved native-thinking output and reasoning-trace wording for the current
   image; and
 - approved acknowledgements and product license/model-card links for the exact
