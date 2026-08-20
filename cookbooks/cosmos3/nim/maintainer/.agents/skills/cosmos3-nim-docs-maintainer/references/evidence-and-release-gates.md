@@ -140,8 +140,20 @@ comparison with `maintainer/reasoner-semantic-fixtures.yaml` gave grounding IoU
 0.926 against the recorded vLLM box, above the 0.75 review threshold. Temporal
 localization returned one whole-video event instead of the fixture's minimum
 three events and therefore failed semantic-quality review despite passing local
-JSON and timestamp validation. This validates request transport, extraction,
-and local format handling, not catalog-wide semantic quality or performance.
+JSON and timestamp validation. The same Super FP8 profile was then run
+target-only with `NIM_USE_DFLASH=0`: 17 of 18 cases passed local format
+validation, while `describe_anything` returned `description` instead of the
+requested `caption` field.
+
+One-run manual review against the catalog criteria rated direct vLLM Super at
+14 pass and 4 fail, NIM with DFlash at 13 pass, 2 partial, and 3 fail, and NIM
+target-only at 14 pass and 4 fail. All three missed video-caption completion and
+the driving Action-CoT pedestrian. vLLM and target-only segmented temporal
+localization while DFlash collapsed it into one event; only target-only passed
+the assisted-task next action, while only target-only failed
+`describe_anything` format. These sampled results validate request transport,
+extraction, and local format handling and identify review targets; they do not
+establish stable catalog-wide semantic quality or performance.
 
 The tutorial image `vllm/vllm-openai:cosmos3` at digest
 `sha256:db0bb920b0b54e82ea96a98659bbd21921f87d0dcfc86feffdafa2db3f08be55`
@@ -152,12 +164,14 @@ combination of server-level `num_frames=-1` and request-level
 `mm_processor_kwargs` at 4 FPS failed with HTTP 400 for both Super and Edge:
 the loader supplied 37 frames before the processor attempted to sample again.
 Using request-level `media_io_kwargs` at 4 FPS, as the NIM adaptation does,
-completed successfully. Super returned three ordered segments covering pickup,
-dispensing, placement, and retraction, motivating a three-event semantic floor;
-Edge returned one whole-video segment and failed that floor. With the catalog's
-explicit effective sampling and thinking controls, Edge grounding also passed.
-This direct comparison validates the NIM-specific media adaptation and fixture
-thresholds for these two cases, not all tutorial cases or TP4 output parity.
+completed successfully. With the catalog's explicit effective sampling and
+thinking controls, all 18 Super cases passed API and local format validation.
+Super temporal localization returned seven ordered segments covering pickup,
+dispensing, placement, and retraction; Edge returned one whole-video segment
+and failed the three-event semantic floor. Edge grounding passed under the same
+explicit controls. This direct comparison validates the NIM-specific media
+adaptation and the one-run fixture thresholds, not stable quality or TP4 output
+parity.
 
 ## Historical validation from the superseded 20260819 RC
 
