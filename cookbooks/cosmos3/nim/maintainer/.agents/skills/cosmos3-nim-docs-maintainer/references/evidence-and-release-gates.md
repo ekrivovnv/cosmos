@@ -86,6 +86,9 @@ confirmed:
 - current-free-VRAM startup selection before model materialization, the
   container preflight invocation, equivalent-layout fallback, explicit-pin
   failure, and the Reasoner runtime reserve/utilization clamp;
+- exact arbitrary Generator video frame counts within the mode and resolution
+  bounds, generation at the next native `1 + 4k` count, trimming to the exact
+  requested output count, and rounded V2V latent-index validation;
 - Reasoner TP1 preference, TP2 availability fallback, guided-decoding
   enforcement, Responses create normalization, disabled-by-default video-token
   pruning with VidCom2 as the selected method when enabled, and operator-level
@@ -108,7 +111,11 @@ implementation or be presented as an approved image manifest.
 ## Current RC validation status
 
 The supplied build-completion record establishes the exact evaluation image
-pinned in `deployment.md`. An authenticated registry lookup confirmed that the
+pinned in `deployment.md`. The source delta from the superseded RC adds exact
+arbitrary Generator video frame counts: it removes the public `1 + 4k` cadence
+restriction, generates non-native requests at the next native count, trims the
+decoded result to the requested count, and validates V2V latent indexes against
+the rounded internal count. An authenticated registry lookup confirmed that the
 tag resolves to multi-architecture manifest-list digest
 `sha256:a3e67b87dc28303936ae6ca03fba6ce83b0d185a1435117991eb6814db233b2a`.
 The embedded NIM manifest release and profile inventory, preflight behavior,
