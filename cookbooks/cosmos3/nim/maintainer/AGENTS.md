@@ -23,7 +23,9 @@ maintainer instructions take precedence over the customer-assistant guidance in
   claims in maintainer records. Keep that provenance internal: customer-facing
   pages state documented product behavior directly and never say that guidance
   is based on source code. Do not silently fill release-owned gaps from memory
-  or old releases.
+  or old releases. Keep maintainer references current rather than chronological;
+  remove superseded validation narratives once no active gate depends on them
+  and use Git history as the archive.
 - Treat timeout ceilings, individual observations, and end-to-end client command
   times as distinct from validated service latency. Publish expected
   performance only with an approved release image, reference configuration, and

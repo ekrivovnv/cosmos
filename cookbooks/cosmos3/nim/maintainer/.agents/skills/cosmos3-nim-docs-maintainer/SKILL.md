@@ -67,7 +67,9 @@ Classify each changed claim as:
   prose or a table.
 
 Never upgrade source evidence to a tested support claim. Never use historical
-values to fill an unresolved release fact.
+values to fill an unresolved release fact. Do not accumulate superseded run
+narratives in maintainer references; keep only historical rationale that still
+explains an active decision or gate and rely on Git history for the archive.
 
 ## 4. Edit runnable material
 
