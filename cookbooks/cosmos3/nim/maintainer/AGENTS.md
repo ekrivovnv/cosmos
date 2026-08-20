@@ -67,6 +67,52 @@ maintainer instructions take precedence over the customer-assistant guidance in
 - Keep acknowledgement status visible without inventing an inventory before the
   image-specific notices are approved.
 
+## Cluster RC execution
+
+For live RC checks on the maintainer cluster, use the runtime plumbing in
+`$HOME/c3/Makefile` rather than adapting the public deployment command. The
+standard cache alias is `$HOME/scratch/.cache/ngc_cache`; the Makefile
+canonicalizes `NIM_CACHE` with `realpath -m` before mounting it. Do not publish
+the resulting cluster-specific NFS path.
+
+From this maintainer directory, load and pull the current documentation pin,
+verify the cache's ownership and container write path, and start a Nano FP8
+Reasoner for management-endpoint checks as follows:
+
+```bash
+export NIM_CACHE="${NIM_CACHE:-$HOME/scratch/.cache/ngc_cache}"
+export NIM_IMAGE="$(awk -F"'" '/export NIM_IMAGE=/{print $2; exit}' ../deployment.md)"
+test -n "$NIM_IMAGE"
+docker pull "$NIM_IMAGE"
+
+make -C "$HOME/c3" cache-doctor
+make -C "$HOME/c3" cache-preflight RUN_IMAGE="$NIM_IMAGE"
+docker ps -a --filter name='^/cosmos3-gen-serve$'
+make -C "$HOME/c3" rcrun \
+  RC="$NIM_IMAGE" \
+  RUN_DOCKER_FLAGS=-d \
+  NIM_MODEL_TYPE=reasoner \
+  NIM_MODEL_VARIANT=nano \
+  NIM_PRECISION=fp8 \
+  NIM_USE_DFLASH=0
+```
+
+Change the selectors to the runtime and profile under review. The `rcrun`
+target uses the invoking numeric UID:GID, places `HOME` and `XDG_CACHE_HOME`
+under `/opt/nim/.cache`, bind-mounts the canonical cache at that path, and uses
+`--gpus all`; under Slurm this exposes only the allocated GPUs and avoids
+Docker-proxy index mismatches. It also applies the runtime IPC, ulimit, port,
+and credential plumbing from the Makefile. Do not run as the image's default
+UID 1000, mount the unresolved cache alias directly, or use `chmod a+rwX` on
+the NFS cache. The cache root and every entry must be owned by the invoking
+UID:GID.
+
+`rcrun` force-removes an existing container named `cosmos3-gen-serve` before
+launch. Inspect the name as shown above and obtain confirmation before replacing
+someone else's or a non-disposable container. Stop a container after the check
+to release its GPUs; remove the stopped container or persistent data only with
+explicit confirmation.
+
 ## Editing and validation
 
 - Preserve the OpenMDW-1.1 SPDX notice and existing Markdown style.
