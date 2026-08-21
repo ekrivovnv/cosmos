@@ -41,7 +41,7 @@ against the NIM contract rather than copying another backend's adapter.
 ## Active release maintenance
 
 - Deployment currently uses the versioned Cosmos3 1.0.0 experimental RC
-  `1.0.0-rc.experimental.20260820211500`, not a final release identity. Record
+  `1.0.0-rc.experimental.20260821144604`, not a final release identity. Record
   source-derived evidence in maintainer files only and require the exact image
   manifest or live behavior before presenting claims as validated in the
   evaluation image. Before public release, `deployment.md` owns the exact
@@ -127,14 +127,12 @@ implementation or be presented as an approved image manifest.
 
 ## Current RC validation status
 
-The supplied build-completion record establishes the exact evaluation image
-pinned in `deployment.md`. The source delta from the superseded RC adds exact
-arbitrary Generator video frame counts: it removes the public `1 + 4k` cadence
-restriction, generates non-native requests at the next native count, trims the
-decoded result to the requested count, and validates V2V latent indexes against
-the rounded internal count. An authenticated registry lookup confirmed that the
-tag resolves to multi-architecture manifest-list digest
-`sha256:a3e67b87dc28303936ae6ca03fba6ce83b0d185a1435117991eb6814db233b2a`.
+The supplied image reference and associated source revision identify the exact
+evaluation build pinned in `deployment.md`. Inspection of the supplied source
+revision found only benchmark client-image pin updates, so this RC bump does
+not add a public contract claim. An authenticated registry lookup confirmed
+that the tag resolves to multi-architecture manifest-list digest
+`sha256:536a78530f73e30f5123318f22305d4cde62ed120ebdae315ef1b64e8d1d834c`.
 The embedded NIM manifest release and profile inventory, preflight behavior,
 cold start, management endpoints, and inference have not been validated in
 this documentation update. Do not carry the superseded RC observations below
