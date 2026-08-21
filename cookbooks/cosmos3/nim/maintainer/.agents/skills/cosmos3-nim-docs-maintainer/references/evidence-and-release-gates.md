@@ -18,9 +18,11 @@ Use sources in this order when they disagree:
 6. Other backends and the Cosmos framework for concepts only, never Certified
    NIM request fields or support claims.
 
-Public docs must not expose private checkout paths, internal commit IDs, or
-unreleased profile IDs. Record evidence status in prose whenever it affects
-whether a claim is merely source-compatible or actually release-tested.
+Customer-facing docs must not expose private checkout paths, internal commit
+IDs, or unreleased profile IDs. Exact source commit hashes may be retained in
+this maintainer reference as internal provenance for RC-to-RC comparisons.
+Record evidence status in prose whenever it affects whether a claim is merely
+source-compatible or actually release-tested.
 
 ## Current source areas
 
@@ -46,6 +48,11 @@ against the NIM contract rather than copying another backend's adapter.
   manifest or live behavior before presenting claims as validated in the
   evaluation image. Before public release, `deployment.md` owns the exact
   evaluation image reference; update it on every RC bump.
+- The current RC source revision is
+  `4b505c903687efa80ffff65dd5d66753227ab8d4`. Retain each current revision as
+  the comparison baseline for the next RC. The superseded 20260820 211500 RC
+  source revision was not recorded, so a complete RC-to-RC source delta is not
+  available for this bump.
 - Never replace an RC reference with `latest`.
 - The current support-matrix compute-capability, GPU-count, per-device VRAM,
   Transfer, and effective system-memory thresholds are approved for publication
@@ -127,11 +134,12 @@ implementation or be presented as an approved image manifest.
 
 ## Current RC validation status
 
-The supplied image reference and associated source revision identify the exact
-evaluation build pinned in `deployment.md`. Inspection of the supplied source
-revision found only benchmark client-image pin updates, so this RC bump does
-not add a public contract claim. An authenticated registry lookup confirmed
-that the tag resolves to multi-architecture manifest-list digest
+The supplied image reference and source revision recorded above identify the
+exact evaluation build pinned in `deployment.md`. Because the previous RC
+source revision was not retained, this update does not claim a complete
+RC-to-RC source comparison or add a public contract claim. An authenticated
+registry lookup confirmed that the tag resolves to multi-architecture
+manifest-list digest
 `sha256:536a78530f73e30f5123318f22305d4cde62ed120ebdae315ef1b64e8d1d834c`.
 The embedded NIM manifest release and profile inventory, preflight behavior,
 cold start, management endpoints, and inference have not been validated in
