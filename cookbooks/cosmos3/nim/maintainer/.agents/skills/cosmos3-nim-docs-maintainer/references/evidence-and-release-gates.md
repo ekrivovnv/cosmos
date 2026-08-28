@@ -44,7 +44,7 @@ against the NIM contract rather than copying another backend's adapter.
 ## Active release maintenance
 
 - Deployment uses the exact Cosmos3 image
-  `nvcr.io/nvstaging/nim/cosmos3:2.0.0-rc.20260827161543-143666eb470ae967`.
+  `nvcr.io/nvstaging/nim/cosmos3:2.0.0-8bd2d17cdc1091ba`.
   `deployment.md` owns this reference; update it for each approved image and
   never replace it with `latest`.
 - The source revision corresponding to this image is
@@ -132,31 +132,12 @@ implementation or be presented as an approved image manifest.
 
 ## Current image validation status
 
-The exact image resolves to OCI manifest-list digest
-`sha256:702bdd216ece87b3a58810901c6e0d764ce8050fe63521aff07191b5d36c4a88`,
-with `amd64` manifest digest
-`sha256:35cea474b9839a8dc85ac2c9669553bffe93386d9c1de204dbd0bbe400514f8e`
-and `arm64` manifest digest
-`sha256:2cf3b612bdc04d15c67a0dfc65ec34011b7e0a7e0d352d002583709bb2b9fb07`.
-The embedded manifest reports release `2.0.0-rc.20260827161543`, with 115
-Generator profiles and 7 Reasoner profiles. Regenerating the 122 profiles from
-the recorded source revision produced the same normalized tag inventory as the
-embedded image manifest.
-
-On one NVIDIA H100 PCIe GPU with compute capability 9.0, 81,559 MiB total, and
-81,081 MiB free, exact-image pre-download profile selection passed for Nano
-Generator FP8 latency and Nano Reasoner FP8. These checks establish candidate
-profile compatibility only. Direct image checks confirmed the Reasoner
-precision preferences for `sm_80`, `sm_89`, `sm_90`, `sm_100`, and `sm_120`.
-Option parsing confirmed that `NIM_DISABLE_CHUNKED_MM_INPUT` defaults to `true`,
-the resulting effective `NIM_MAX_NUM_BATCHED_TOKENS` is `16384`, and
-`NIM_GPU_MEMORY_UTILIZATION` defaults to `0.93`.
-
-The image contains `/opt/nim/LICENSE`, `/opt/nim/MODEL_LICENSE`,
-`/opt/nim/NOTICE`, component material under `/opt/nim/licenses`, and the
-package-modification source bundle under `/usr/share/cosmos3/oss-source`.
-Checksums for the source bundle passed. Cold start, management endpoints, and
-inference were not run for this documentation update.
+The current 2.0.0 image was supplied as the promotion that uses public model
+artifacts, with no other product-contract change. Per the release update
+request, the registry manifest, embedded profile inventory, defaults, preflight,
+cold start, management endpoints, and inference were not revalidated for this
+exact tag. The source-derived contracts above remain the documentation baseline
+until exact-image evidence supersedes them.
 
 ## Open validation and documentation gaps
 
