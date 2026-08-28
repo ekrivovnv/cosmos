@@ -132,12 +132,35 @@ implementation or be presented as an approved image manifest.
 
 ## Current image validation status
 
-The current 2.0.0 image was supplied as the promotion that uses public model
-artifacts, with no other product-contract change. Per the release update
-request, the registry manifest, embedded profile inventory, defaults, preflight,
-cold start, management endpoints, and inference were not revalidated for this
-exact tag. The source-derived contracts above remain the documentation baseline
-until exact-image evidence supersedes them.
+The exact image resolves to OCI manifest-list digest
+`sha256:9fea8c0c0df52914e43d7c7e663fc9c7c7ca902fdeacb8b7e7b45f0ecfc9c2ee`,
+with `amd64` manifest digest
+`sha256:dad096ce3552363e7ebf2f1805f8b0da099679af396a6581e6b2f2dfea7a9950`
+and `arm64` manifest digest
+`sha256:3a4af0a82426c9b6b31703357ca5433e07c324f9d1275c7ca402668df35767dc`.
+Its labels and embedded manifest report version and release `2.0.0`. The
+manifest contains 115 Generator and 7 Reasoner profiles. Regenerating all 122
+profiles from the recorded source revision produced the same normalized tag
+inventory as the embedded manifest. All 19,937 embedded artifact references
+use the public `ngc://nim/nvidia/cosmos3` model location; none uses an
+`nvstaging` artifact URI.
+
+On one NVIDIA H100 PCIe GPU with compute capability 9.0, 81,559 MiB total, and
+81,081 MiB free, exact-image pre-download profile selection passed for Nano
+Generator FP8 latency and Nano Reasoner FP8. These checks establish candidate
+profile compatibility only. Direct image checks confirmed the Reasoner
+precision preferences for `sm_80`, `sm_89`, `sm_90`, `sm_100`, and `sm_120`.
+Option parsing confirmed that `NIM_DISABLE_CHUNKED_MM_INPUT` defaults to `true`,
+the resulting effective `NIM_MAX_NUM_BATCHED_TOKENS` is `16384`, and
+`NIM_GPU_MEMORY_UTILIZATION` defaults to `0.93`.
+
+The image contains nonempty `/opt/nim/LICENSE`, `/opt/nim/MODEL_LICENSE`, and
+`/opt/nim/NOTICE` files plus nine files under `/opt/nim/licenses`. The NIM terms
+reference the NVIDIA Software License and Product-Specific Terms for NVIDIA AI
+Products; the model terms identify OpenMDW-1.1. Checksums pass for the
+package-modification source bundle under `/usr/share/cosmos3/oss-source`. Cold
+start, management endpoints including `/v1/license`, and inference were not run
+for this validation.
 
 ## Open validation and documentation gaps
 
