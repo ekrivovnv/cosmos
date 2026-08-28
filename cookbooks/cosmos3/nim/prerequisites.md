@@ -31,7 +31,7 @@ Plan for:
 | CPU architecture | The release image provides `amd64` and `arm64` variants; use the variant selected by the container runtime |
 | GPU compute capability | Generator: BF16 `>=8.0`, FP8 `>=8.9`; Reasoner: BF16 `>=8.0`, FP8 `>=8.9`, NVFP4 `>=10.0` |
 | GPU count and per-device VRAM | See the [Generator](support-matrix.md#generator-configurations) and [Reasoner](support-matrix.md#reasoner-configurations) tables |
-| Host RAM | On a discrete-GPU host, non-offloading profiles require 40 GiB for Generator Nano, 78 GiB for Generator Super FP8, 112 GiB for Generator Super BF16, 24 GiB for Reasoner Nano, 36 GiB for Reasoner Super NVFP4, 46 GiB for Reasoner Super FP8, or 76 GiB for Reasoner Super BF16; see the [Generator](support-matrix.md#generator-configurations) and [Reasoner](support-matrix.md#reasoner-configurations) tables |
+| Host RAM | On a discrete-GPU host, non-offloading profiles require 40 GiB for Generator Nano, 78 GiB for Generator Super FP8, 112 GiB for Generator Super BF16, 24 GiB for Reasoner Nano BF16, 18 GiB for Reasoner Nano FP8 or NVFP4, 36 GiB for Reasoner Super NVFP4, 46 GiB for Reasoner Super FP8, or 76 GiB for Reasoner Super BF16; see the [Generator](support-matrix.md#generator-configurations) and [Reasoner](support-matrix.md#reasoner-configurations) tables |
 | Free disk | Provision for the image, selected model artifacts, materialization, and outputs; no single workload-independent floor is documented |
 | Container shared memory | The Docker reference launch allocates 16 GiB; validate the requirement for the selected media workload and concurrency |
 

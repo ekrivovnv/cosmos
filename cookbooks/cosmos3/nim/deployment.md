@@ -403,8 +403,9 @@ summarized in the [configuration matrix](support-matrix.md). Each participating
 GPU must have enough current free memory at startup, not only enough total
 capacity. On discrete-GPU hosts, non-offloading profiles require 40 GiB for
 Generator Nano, 78 GiB for Generator Super FP8, 112 GiB for Generator Super
-BF16, 24 GiB for Reasoner Nano, 36 GiB for Reasoner Super NVFP4, 46 GiB for
-Reasoner Super FP8, or 76 GiB for Reasoner Super BF16. Their embedded profile
+BF16, 24 GiB for Reasoner Nano BF16, 18 GiB for Reasoner Nano FP8 or NVFP4,
+36 GiB for Reasoner Super NVFP4, 46 GiB for Reasoner Super FP8, or 76 GiB for
+Reasoner Super BF16. Their embedded profile
 tags check only 16 GiB so an attempted startup is not blocked; passing that
 admission check does not satisfy the practical requirement. Nano offload
 profiles retain a 64-GiB profile floor, and Super offload profiles retain 150

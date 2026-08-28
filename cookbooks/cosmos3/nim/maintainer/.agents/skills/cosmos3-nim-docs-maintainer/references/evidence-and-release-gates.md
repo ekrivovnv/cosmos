@@ -60,8 +60,9 @@ against the NIM contract rather than copying another backend's adapter.
   representative requests.
 - Approved empirical practical host RAM minima for discrete-GPU non-offloading
   profiles are: Generator Nano and Nano-DROID 40 GiB, Generator Super FP8 78
-  GiB, Generator Super BF16 112 GiB, Reasoner Nano 24 GiB, Reasoner Super
-  NVFP4 36 GiB, Reasoner Super FP8 46 GiB, and Reasoner Super BF16 76 GiB.
+  GiB, Generator Super BF16 112 GiB, Reasoner Nano BF16 24 GiB, Reasoner Nano
+  FP8 and NVFP4 18 GiB, Reasoner Super NVFP4 36 GiB, Reasoner Super FP8 46 GiB,
+  and Reasoner Super BF16 76 GiB.
   These values do not add a separate host RAM requirement on unified-memory
   systems.
 - The published tested-GPU inventory contains the 22 discrete SKUs in the

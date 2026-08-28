@@ -274,8 +274,8 @@ Reasoner does not use Generator latency/throughput or model-offload selectors:
 | Model | Precision | GPUs | Tensor parallelism | Minimum VRAM/device | Practical host RAM minimum | Minimum compute capability |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
 | `nano` | BF16 | 1 | 1 | 23.1 GiB | 24 GiB | 8.0 |
-| `nano` | FP8 | 1 | 1 | 23.1 GiB | 24 GiB | 8.9 |
-| `nano` | NVFP4 | 1 | 1 | 23.1 GiB | 24 GiB | 10.0 |
+| `nano` | FP8 | 1 | 1 | 23.1 GiB | 18 GiB | 8.9 |
+| `nano` | NVFP4 | 1 | 1 | 23.1 GiB | 18 GiB | 10.0 |
 | `super` | BF16 | 1 | 1 | 135 GiB | 76 GiB | 8.0 |
 | `super` | BF16 | 2 | 2 | 73 GiB | 76 GiB | 8.0 |
 | `super` | FP8 | 1 | 1 | 67 GiB | 46 GiB | 8.9 |
