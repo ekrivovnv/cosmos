@@ -1,7 +1,7 @@
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 SPDX-License-Identifier: OpenMDW-1.1 -->
 
-# Stream video frames with the Cosmos3 Reasoner NIM
+# Stream video frames with the Cosmos3 NIM Reasoner
 
 The streaming API maintains a reasoning session across a sequence of image
 frames. Your client decodes or captures the video, sends one JPEG or PNG at a
@@ -13,7 +13,7 @@ Use **WebSocket** for a live feed: one connection owns one session, and
 disconnecting releases its resources. REST provides the same session behavior
 for clients that cannot maintain a WebSocket connection.
 
-[Deploy a Reasoner NIM](deployment.md) with `NIM_ENABLE_STREAMING=true` using
+[Deploy the Cosmos3 NIM Reasoner](deployment.md) with `NIM_ENABLE_STREAMING=true` using
 an image with streaming support. See [Streaming video session settings](configuration.md#streaming-video-sessions)
 for enablement, capacity, and idle timeouts.
 
@@ -195,7 +195,7 @@ sent with subsequent messages: the connection identifies the session.
 ```mermaid
 sequenceDiagram
     participant C as Video client
-    participant N as Reasoner NIM
+    participant N as Cosmos3 NIM Reasoner
     C->>N: Open /v1/streaming/ws
     C->>N: JSON create (prompt, sampling, frame_format)
     N-->>C: JSON created (session_id, model, retention)
