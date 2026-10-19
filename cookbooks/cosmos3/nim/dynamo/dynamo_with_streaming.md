@@ -61,6 +61,30 @@ The YAML sets synchronous scheduling explicitly and uses the same
 `NIM_DYNAMO_STREAMING_ENDPOINT` on frontend and workers. Keep that value
 identical; use a distinct endpoint for each separate model pool.
 
+## Use Edge Reasoner
+
+Edge supports the same REST session API in BF16 and FP8. In both
+`model-download.yaml` and the streaming manifest's `ReasonerWorker`, set:
+
+```yaml
+- name: NIM_MODEL_VARIANT
+  value: edge
+- name: NIM_PRECISION
+  value: fp8  # or bf16
+- name: NIM_USE_DFLASH
+  value: '0'
+- name: NIM_STREAMING_SPEC_METHOD
+  value: none
+```
+
+Replace the existing variant and precision entries rather than adding duplicates.
+Keep the image, cache, and GPU selectors aligned between the Job and workers.
+Edge does not support DFlash in this version. Set the streaming method explicitly
+to `none` so images that default streaming to DFlash do not request a draft.
+The shared frontend needs no model-specific change; the client discovers the
+Edge model from `/v1/streaming/config`. Use a separate streaming endpoint if
+running Edge alongside a Nano or Super pool.
+
 ## Deploy and check
 
 Run from `cookbooks/cosmos3/nim/dynamo`. If your image uses another registry,

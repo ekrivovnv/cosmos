@@ -275,6 +275,9 @@ codec, or remote-fetch path against the deployed image before depending on it.
 
 ## Specialist T2I and I2V variants
 
+Edge has no general-purpose Generator, T2I, or I2V profile in this NIM. Its
+supported Generator variant is [Edge-DROID policy](action.md#edge-droid-and-nano-droid-policy).
+
 General-purpose `nano` and `super` models support the tasks included by the
 selected image. Super also provides task-specific variants:
 

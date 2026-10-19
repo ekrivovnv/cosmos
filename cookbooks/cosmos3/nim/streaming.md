@@ -9,6 +9,10 @@ time, and receives a complete text reply for each frame. The server retains a
 bounded history for context and releases older state as the session advances.
 It does not accept an MP4 file or a camera URL as a frame.
 
+Edge Reasoner supports these same WebSocket and REST clients in BF16 or FP8.
+Choose `NIM_MODEL_VARIANT=edge` and `NIM_USE_DFLASH=0` before launch; the client
+discovers the active model, so no model-ID edit is needed.
+
 Use **WebSocket** for a live feed: one connection owns one session, and
 disconnecting releases its resources. REST provides the same session behavior
 for clients that cannot maintain a WebSocket connection.
@@ -25,8 +29,13 @@ checks only the shared frontend's `/health`, `/v1/models`, and
 Standalone NIM mode retains its readiness, runtime metadata, and selected-profile
 checks.
 
-For streaming, n-gram speculative decoding replaces DFlash because DFlash is
-currently not supported for streaming.
+Edge does not support DFlash in this version. Set `NIM_USE_DFLASH=0` and
+`NIM_STREAMING_SPEC_METHOD=none` to run Edge without speculative decoding.
+For Dynamo Edge workers, use the same settings; see the
+[Edge deployment settings](dynamo/dynamo_with_streaming.md#use-edge-reasoner).
+Nano and Super streaming default to DFlash when enabled; use
+`NIM_STREAMING_SPEC_METHOD=ngram` for GPU n-gram speculation or `none` to disable
+speculation. See [advanced streaming controls](configuration.md#advanced-streaming-controls).
 
 ## Example client
 

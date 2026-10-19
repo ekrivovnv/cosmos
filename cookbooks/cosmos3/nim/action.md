@@ -245,14 +245,23 @@ Before physical execution, independently enforce joint/workspace bounds,
 collision constraints, timing limits, emergency stops, and task-specific safety
 checks. A valid API response is not an execution authorization.
 
-## Nano-DROID policy
+## Edge-DROID and Nano-DROID policy
 
-Nano-DROID is a specialist policy checkpoint selected with:
+Edge-DROID and Nano-DROID are BF16 specialist policy checkpoints. Choose one
+at startup; both use the same action-only NIM request contract. The image must
+include a matching Generator profile in its manifest; a Reasoner-only image
+cannot serve DROID policy. For Edge-DROID:
 
 ```bash
 -e NIM_MODEL_TYPE=generator \
--e NIM_MODEL_VARIANT=nano-droid
+-e NIM_MODEL_VARIANT=edge-droid \
+-e NIM_PRECISION=bf16 \
+-e NIM_CACHE_BACKEND=none
 ```
+
+Use `NIM_MODEL_VARIANT=nano-droid` for Nano-DROID. The example explicitly
+disables SeaCache and leaves guardrails enabled. This NIM supports DROID policy
+only for these specialist variants, not DROID forward or inverse dynamics.
 
 Its request uses the same `POST /v1/infer` API as other Generator tasks:
 
@@ -305,9 +314,22 @@ A successful response is action-only:
 ```
 
 The shortened `data` shows the row width only. The full response has 32 rows
-and no `b64_image` or `b64_video`. A runnable cookbook case remains deferred
-until an approved public composed DROID observation and matching state are
-available.
+and no `b64_image` or `b64_video`.
+
+Run the checked-in [policy client](examples/policy_droid.py) after readiness:
+
+```bash
+uv run --locked python examples/policy_droid.py
+```
+
+It uses the first frame of each camera in the public
+[`droid_lerobot_example`](../generator/action/assets/droid_lerobot_example)
+from the [vLLM-Omni policy notebook](../generator/action/run_policy_with_vllm_omni.ipynb),
+composes the wrist view above the two exterior views, and sends the matching
+first-frame joint/gripper state. It saves the composed image and validates the
+action-only `[32, 8]` response under `examples/outputs/`. The notebook's direct
+vLLM video-rollout API is different: use this NIM client's request rather than
+copying its `/v1/videos` payload. This example does not execute robot actions.
 
 ## Inverse dynamics
 
@@ -370,7 +392,7 @@ The shortened `data` shows one row; a real response has every row reported by
 
 The runnable script performs these checks before saving predicted action JSON.
 A specialist policy can instead return the same action envelope with both media
-fields absent, as described under [Nano-DROID policy](#nano-droid-policy).
+fields absent, as described under [Edge/Nano-DROID policy](#edge-droid-and-nano-droid-policy).
 
 Reasoner prompts can also produce text or JSON describing a “next action” or a
 2D trajectory. Those normalized visual coordinates are semantic Reasoner
@@ -424,7 +446,7 @@ configuration; see [operations.md](operations.md#guardrails).
 | Wrong conditioning media | Image for forward/policy; video for inverse dynamics |
 | Configuration cannot run the action case | Confirm the selected image's action-capable model variant and supported domain |
 | Bridge URL input fails | Enable allowed URL input and container network access, or replace it with a data URL |
-| Nano-DROID rejects model-owned fields | Omit fixed action dimensions, cadence, state flags, and top-level media-output controls |
+| DROID rejects model-owned fields | Omit fixed action dimensions, cadence, state flags, and top-level media-output controls |
 | Client fails on missing `b64_video` | Handle action-only specialist responses separately from general visual Action responses |
 
 For startup, OOM, and service diagnostics, see

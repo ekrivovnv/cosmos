@@ -43,6 +43,7 @@ chooses T2I, T2V, I2V, V2V, Transfer, or an Action operation.
 | Variant | Supported use |
 | --- | --- |
 | `nano` | General-purpose generation and compatible Generator tasks |
+| `edge-droid` | DROID policy with an action-only response; BF16 only |
 | `nano-droid` | DROID policy with an action-only response; BF16 only |
 | `super` | General-purpose generation and compatible Generator tasks |
 | `super-t2i` | Text-to-image only |
@@ -51,13 +52,15 @@ chooses T2I, T2V, I2V, V2V, Transfer, or an Action operation.
 | `super-i2v-4step` | Four-step image-to-video only |
 
 Select a Generator model with `NIM_MODEL_VARIANT`. For Generator, the variant
-also determines Nano versus Super. Select `NIM_PERF_PROFILE=latency` to
+also determines the Edge, Nano, or Super checkpoint family. Select `NIM_PERF_PROFILE=latency` to
 prioritize individual request latency or `throughput` to prioritize aggregate
 request rate. Latency is the software default, but make the choice explicit in
 deployment automation.
 
-Reasoner provides `nano` and `super`, also selected with
+Reasoner provides `edge`, `nano`, and `super`, also selected with
 `NIM_MODEL_VARIANT`. Reasoner does not use `NIM_PERF_PROFILE`.
+Edge Reasoner supports BF16 and FP8. The only Edge Generator variant is
+`edge-droid`; `NIM_MODEL_TYPE=generator NIM_MODEL_VARIANT=edge` is unsupported.
 
 If `NIM_PRECISION` is omitted, Generator prefers FP8 when compatible.
 Reasoner derives its preference from GPU compute capability: BF16 for 8.0
@@ -78,7 +81,8 @@ See [Deploy the NIM](deployment.md#advanced-profile-controls).
 | Video-to-video | Generator | Prompt + video | MP4 video | [Generation](generation.md#video-to-video) |
 | Forward dynamics | Generator | Image + action trajectory | Rollout video | [Action](action.md#forward-dynamics) |
 | Policy | Generator | Image + task/state | Video + predicted action | [Action](action.md#policy) |
-| Nano-DROID policy | Generator | Image + task/current state | Predicted action | [Action](action.md#nano-droid-policy) |
+| Nano-DROID policy | Generator | Image + task/current state | Predicted action | [Action](action.md#edge-droid-and-nano-droid-policy) |
+| Edge-DROID policy | Generator | Composed camera views + task/current state | Predicted action | [Action](action.md#edge-droid-and-nano-droid-policy) |
 | Inverse dynamics | Generator | Video | Video + predicted action | [Action](action.md#inverse-dynamics) |
 | Video Transfer | Generator | Prompt + spatial control | Controlled MP4 video | [Transfer](transfer.md) |
 | Image/video reasoning | Reasoner | Media + text | Text or structured result | [Reasoning](reasoning.md) |
@@ -137,7 +141,7 @@ uv run python examples/reasoner.py --case image_caption
 Specialist models accept only their documented task. Use
 [`t2i_4step.py`](examples/t2i_4step.py),
 [`i2v_4step.py`](examples/i2v_4step.py), or the
-[Nano-DROID request](action.md#nano-droid-policy) only after launching the
+[DROID policy example](action.md#edge-droid-and-nano-droid-policy) only after launching the
 matching variant.
 
 Generator examples save decoded media and action JSON under

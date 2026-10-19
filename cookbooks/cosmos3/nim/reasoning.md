@@ -10,6 +10,12 @@ model; `/v1/infer` is a Generator endpoint and is not used here.
 See [Deployment](deployment.md) to select and launch a Reasoner model. This
 page covers Reasoner routes, media, sampling, and responses.
 
+The same clients work with `edge`, `nano`, and `super`. Edge has BF16 and FP8
+profiles, with served model ID `nvidia/cosmos3-edge-reasoner`; the examples
+discover this ID from `/v1/models`. For Edge experiments, launch with
+`NIM_MODEL_VARIANT=edge`, `NIM_PRECISION=bf16` or `fp8`, and `NIM_USE_DFLASH=0`.
+See [Edge experiments](deployment.md#edge-experiments) for launch selectors.
+
 For stateful reasoning over successive video frames, see
 [Streaming video](streaming.md). Its [example client](streaming.md#example-client)
 is bundled in this cookbook and uses the same pinned environment and `NIM_URL`
@@ -152,7 +158,7 @@ same explicit effective sampling values as the other non-reasoning cases.
 Task-level quality remains case-specific and must be reviewed against the
 qualitative criteria recorded with each case. The runner warns rather than
 fails when the endpoint serves another Reasoner variant so the catalog remains
-usable for comparison; do not present a Nano result as a Super-validated
+usable for comparison; do not present an Edge or Nano result as a Super-validated
 example.
 
 ### Artifacts and validation boundaries
@@ -314,6 +320,7 @@ depending on reasoning or tool-call fields.
 
 ## Reasoner DFlash
 
+Edge Reasoner does not support DFlash in this version; set `NIM_USE_DFLASH=0`.
 Nano and Super Reasoner use their bundled DFlash speculative-decoding drafts by
 default. The request routes and payloads do not change. The task catalog's
 Super BF16 baseline explicitly sets `NIM_USE_DFLASH=0` and runs the selected

@@ -40,6 +40,7 @@ manifest.
 | `NIM_MODEL_VARIANT` | Supported use |
 | --- | --- |
 | `nano` | General-purpose Nano Generator |
+| `edge-droid` | Edge-DROID policy; BF16 only |
 | `nano-droid` | Nano-DROID policy; BF16 only |
 | `super` | General-purpose Super Generator |
 | `super-t2i` | Full-step T2I specialist |
@@ -47,7 +48,7 @@ manifest.
 | `super-i2v` | Full-step I2V specialist |
 | `super-i2v-4step` | Four-step I2V specialist |
 
-For Generator, `NIM_MODEL_VARIANT` determines Nano versus Super and selects
+For Generator, `NIM_MODEL_VARIANT` selects
 an exact general-purpose or specialist model.
 
 Choose the workload objective explicitly:
@@ -61,10 +62,12 @@ The software defaults to `latency` when the selector is omitted.
 
 ### Select a Reasoner model
 
-Set `NIM_MODEL_TYPE=reasoner` and choose `NIM_MODEL_VARIANT=nano` or `super`.
-Reasoner does not use `NIM_PERF_PROFILE`. Nano and Super Reasoner enable their
+Set `NIM_MODEL_TYPE=reasoner` and choose `NIM_MODEL_VARIANT=edge`, `nano`, or `super`.
+Edge supports BF16 and FP8; it has no NVFP4 profile. Reasoner does not use
+`NIM_PERF_PROFILE`. Edge does not support DFlash in this version; set
+`NIM_USE_DFLASH=0` for Edge. Nano and Super Reasoner enable their
 bundled DFlash speculative-decoding drafts by default. Set `NIM_USE_DFLASH=0`
-to run the selected Reasoner target model without DFlash; see
+to run Nano or Super without DFlash; see
 [Configuration](configuration.md#speculative-decoding).
 
 ### Precision selection
@@ -74,7 +77,7 @@ when compatible. Reasoner prefers BF16 on compute capability 8.0 through 8.8,
 FP8 on 8.9 through 9.x, and NVFP4 on 10.0 or newer; selection uses another
 compatible precision when the preferred row is unavailable. Set
 `NIM_PRECISION=bf16`, `fp8`, or another available value only when the workload
-requires an explicit precision. Nano-DROID currently has BF16 profiles only.
+requires an explicit precision. Edge-DROID and Nano-DROID have BF16 profiles only.
 
 ## Before you deploy
 
@@ -340,6 +343,39 @@ model and precision selectors together and revalidate representative requests.
 Both runtimes listen on container HTTP port `8000`; the Docker mapping chooses
 the host port. To run both containers concurrently, publish one on another
 unused host port and set that client's `NIM_URL` accordingly.
+
+### Edge experiments
+
+Use an image whose manifest includes the Edge profiles. For Edge Reasoner,
+use the Reasoner launch above with these selectors:
+
+```text
+-e NIM_MODEL_TYPE=reasoner \
+-e NIM_MODEL_VARIANT=edge \
+-e NIM_PRECISION=fp8 \
+-e NIM_USE_DFLASH=0
+```
+
+Use `NIM_PRECISION=bf16` for the BF16 target. To exercise the Responses API
+and streaming examples, leave `NIM_DISABLE_RESPONSES_ROUTE=false` and set
+`NIM_ENABLE_STREAMING=true` before launch.
+
+For Edge-DROID, use the Generator launch with:
+
+```text
+-e NIM_MODEL_TYPE=generator \
+-e NIM_MODEL_VARIANT=edge-droid \
+-e NIM_PRECISION=bf16 \
+-e NIM_PERF_PROFILE=latency \
+-e NIM_CACHE_BACKEND=none
+```
+
+These experiments disable DFlash for Reasoner and SeaCache for Generator.
+Leave `NIM_CACHE_CONFIG` unset when using `NIM_CACHE_BACKEND=none`; guardrails
+remain enabled. After readiness, verify the selected profile and use the
+[Reasoner catalog](reasoning.md#run-the-task-catalog) or the
+[DROID policy client](action.md#edge-droid-and-nano-droid-policy). Edge-DROID does not serve
+general image/video generation, forward dynamics, or inverse dynamics.
 
 ## Wait for readiness
 

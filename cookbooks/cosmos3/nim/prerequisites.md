@@ -35,6 +35,11 @@ Plan for:
 | Free disk | Provision for the image, selected model artifacts, materialization, and outputs; no single workload-independent floor is documented |
 | Container shared memory | The Docker reference launch allocates 16 GiB; validate the requirement for the selected media workload and concurrency |
 
+For Edge Reasoner and Edge-DROID, use the image manifest's profile floors and
+validate practical host RAM for the workload; the Nano/Super host RAM numbers
+above do not define Edge requirements. Edge Reasoner supports BF16/FP8;
+Edge-DROID supports BF16 policy only.
+
 Do not add together memory from multiple GPUs to satisfy a per-device floor.
 If the deployment must serve Transfer, provision each GPU against the
 **Transfer minimum VRAM/device** column in the
