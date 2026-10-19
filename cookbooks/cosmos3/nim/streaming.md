@@ -1,7 +1,7 @@
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 SPDX-License-Identifier: OpenMDW-1.1 -->
 
-# Stream video frames with the Cosmos3 Reasoner NIM
+# Stream video frames with the Cosmos3 NIM Reasoner
 
 The streaming API maintains a reasoning session across a sequence of image
 frames. Your client decodes or captures the video, sends one JPEG or PNG at a
@@ -9,15 +9,11 @@ time, and receives a complete text reply for each frame. The server retains a
 bounded history for context and releases older state as the session advances.
 It does not accept an MP4 file or a camera URL as a frame.
 
-Edge Reasoner supports these same WebSocket and REST clients in BF16 or FP8.
-Choose `NIM_MODEL_VARIANT=edge` and `NIM_USE_DFLASH=0` before launch; the client
-discovers the active model, so no model-ID edit is needed.
-
 Use **WebSocket** for a live feed: one connection owns one session, and
 disconnecting releases its resources. REST provides the same session behavior
 for clients that cannot maintain a WebSocket connection.
 
-[Deploy a Reasoner NIM](deployment.md) with `NIM_ENABLE_STREAMING=true` using
+[Deploy the Cosmos3 NIM Reasoner](deployment.md) with `NIM_ENABLE_STREAMING=true` using
 an image with streaming support. See [Streaming video session settings](configuration.md#streaming-video-sessions)
 for enablement, capacity, and idle timeouts.
 
@@ -29,13 +25,13 @@ checks only the shared frontend's `/health`, `/v1/models`, and
 Standalone NIM mode retains its readiness, runtime metadata, and selected-profile
 checks.
 
-Edge does not support DFlash in this version. Set `NIM_USE_DFLASH=0` and
-`NIM_STREAMING_SPEC_METHOD=none` to run Edge without speculative decoding.
-For Dynamo Edge workers, use the same settings; see the
-[Edge deployment settings](dynamo/dynamo_with_streaming.md#use-edge-reasoner).
-Nano and Super streaming default to DFlash when enabled; use
-`NIM_STREAMING_SPEC_METHOD=ngram` for GPU n-gram speculation or `none` to disable
-speculation. See [advanced streaming controls](configuration.md#advanced-streaming-controls).
+Nano and Super streaming default to DFlash speculation when DFlash is enabled;
+set `NIM_STREAMING_SPEC_METHOD=ngram` for GPU n-gram speculation or `none` to
+disable it. Edge works with the same clients, which discover its model ID;
+launch it with `NIM_USE_DFLASH=0` and `NIM_STREAMING_SPEC_METHOD=none`, in
+standalone ([Edge experiments](deployment.md#edge-experiments)) or
+[Dynamo](dynamo/dynamo_with_streaming.md#use-edge-reasoner) mode. See
+[Advanced streaming controls](configuration.md#advanced-streaming-controls).
 
 ## Example client
 
@@ -204,7 +200,7 @@ sent with subsequent messages: the connection identifies the session.
 ```mermaid
 sequenceDiagram
     participant C as Video client
-    participant N as Reasoner NIM
+    participant N as Cosmos3 NIM Reasoner
     C->>N: Open /v1/streaming/ws
     C->>N: JSON create (prompt, sampling, frame_format)
     N-->>C: JSON created (session_id, model, retention)
