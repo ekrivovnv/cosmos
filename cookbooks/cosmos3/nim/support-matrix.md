@@ -1,79 +1,56 @@
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 SPDX-License-Identifier: OpenMDW-1.1 -->
 
-# Cosmos3 Certified NIM support matrix
+# Cosmos3 NIM support matrix
 
-Use this page to match a model to precision, GPU compute capability, GPU count,
-per-device VRAM, and system-memory requirements.
-
-> **Published requirements:** The tables below define GPU compute capability,
-> GPU count, per-device VRAM, Transfer headroom, and the system-memory floor
-> that profile selection enforces. Confirm that a matching configuration exists
-> in `/v1/manifest` for the exact image you run. A selected profile is still
-> only a candidate until cold start and representative requests succeed;
-> see [Prerequisites](prerequisites.md#hardware-requirements).
+Match a model to precision, GPU compute capability, GPU count, per-device VRAM,
+and system memory. All memory values are binary GiB per device.
 
 ## Choose a model
 
-Choose the model first. The NIM then selects a compatible profile for the
-visible host.
+Choose the model; the NIM selects a compatible profile and precision (see
+[Precision selection](deployment.md#precision-selection)).
 
-| Runtime | Model | Supported use | Automatic precision behavior |
-| --- | --- | --- | --- |
-| Generator | `nano` | General-purpose Generator tasks included by the image | Prefer FP8 when compatible; otherwise fall back |
-| Generator | `edge-droid` | DROID policy with action-only output (**experimental**) | BF16 only |
-| Generator | `nano-droid` | DROID policy with action-only output | BF16 only |
-| Generator | `super` | General-purpose Generator tasks included by the image | Prefer FP8 when compatible; otherwise fall back |
-| Generator | `super-t2i` | Full-step T2I only | Prefer FP8 when compatible; otherwise fall back |
-| Generator | `super-t2i-4step` | Four-step T2I only | Prefer FP8 when compatible; otherwise fall back |
-| Generator | `super-i2v` | Full-step I2V only | Prefer FP8 when compatible; otherwise fall back |
-| Generator | `super-i2v-4step` | Four-step I2V only | Prefer FP8 when compatible; otherwise fall back |
-| Reasoner | `nano` | Image/video reasoning | Prefer BF16 on compute capability 8.0 through 8.8, FP8 on 8.9 through 9.x, and NVFP4 on 10.0 or newer when compatible |
-| Reasoner | `edge` | Image/video reasoning and streaming | BF16 or FP8; no NVFP4 profile |
-| Reasoner | `super` | Image/video reasoning | Prefer BF16 on compute capability 8.0 through 8.8, FP8 on 8.9 through 9.x, and NVFP4 on 10.0 or newer when compatible |
+| Runtime | Model | Supported use |
+| --- | --- | --- |
+| Generator | `nano` | General-purpose Generator tasks |
+| Generator | `edge-droid` | DROID policy with action-only output; BF16 only; **experimental** |
+| Generator | `nano-droid` | DROID policy with action-only output; BF16 only |
+| Generator | `super` | General-purpose Generator tasks |
+| Generator | `super-t2i` | Full-step T2I only |
+| Generator | `super-t2i-4step` | Four-step T2I only |
+| Generator | `super-i2v` | Full-step I2V only |
+| Generator | `super-i2v-4step` | Four-step I2V only |
+| Reasoner | `edge` | Image/video reasoning; BF16 or FP8 only |
+| Reasoner | `nano` | Image/video reasoning |
+| Reasoner | `super` | Image/video reasoning |
 
-A Generator specialist rejects requests for other tasks. Confirm that
-the selected image includes the model before deployment.
+A Generator specialist rejects requests for other tasks. Edge has no
+general-purpose Generator.
 
-> **Experimental:** Edge-DROID policy is experimental in this release. NVIDIA
-> is still verifying it with benchmarks. Validate its accuracy and latency for
-> your workload before relying on it. Edge supports only Reasoner tasks and
-> Edge-DROID policy; there is no general-purpose Edge Generator.
+> **Experimental:** Edge-DROID policy is experimental in this release while
+> NVIDIA verifies it with benchmarks. Validate its accuracy, latency, and safety
+> behavior for your workload before relying on it.
 
-Nano and Super Reasoner profiles include variant-specific DFlash drafts and use
-them by default. Set `NIM_USE_DFLASH=0` to run the selected target model without
-speculative decoding. Edge Reasoner and Generator do not support DFlash in this version.
+After startup,
+[verify the selection](deployment.md#verify-the-selection).
 
 ### Practical model recommendation
 
-Profile compatibility is a hard hardware requirement, not a performance
-recommendation. Choose the model family first, then let preflight select an
-exact image-specific profile:
-
-- On H200- and B200-class discrete GPUs, use Super when the workload needs it.
-  Start with `NIM_MODEL_TYPE=generator` or `reasoner`, set
-  `NIM_MODEL_VARIANT=super`, and—for Generator—set
-  `NIM_PERF_PROFILE=latency`; normally leave precision, offload, tags, and the
-  profile ID unset.
-- On H100, RTX PRO 6000 Blackwell, and lower-throughput discrete devices,
-  default to Nano for image and especially video generation. Super can remain
-  profile-compatible through a resident or offload layout, but use it only for
-  an explicit model requirement after preflight and representative testing.
-- On unified-memory systems such as DGX Spark and Jetson AGX Thor, default to
-  Nano for both runtimes. Some Super Reasoner rows fit the shared-memory
-  floors, but Super is not recommended on these systems for practical
-  turnaround.
-- For the smallest GPUs, Edge Reasoner and Edge-DROID have the lowest memory
-  floors. See [Edge verified GPUs](#edge-verified-gpus).
-
-These recommendations do not remove compatible profiles or replace the tables
-below. After startup, verify the selected profile through `/v1/metadata` and
-`/v1/manifest`; do not copy a profile ID from another image or host.
+- H200- and B200-class discrete GPUs: use Super when the workload needs it,
+  with `NIM_PERF_PROFILE=latency` for Generator; leave precision, offload,
+  tags, and profile ID unset.
+- H100, RTX PRO 6000 Blackwell, and lower-throughput discrete GPUs: default to
+  Nano, especially for video. Use Super only for an explicit model requirement.
+- Unified-memory systems (DGX Spark, Jetson AGX Thor): default to Nano for both
+  runtimes. Some Super Reasoner rows fit, but turnaround is impractical.
+- Smallest GPUs: Edge Reasoner and Edge-DROID have the lowest floors; see
+  [Edge verified GPUs](#edge-verified-gpus).
 
 ## GPU architecture and topology
 
-Compatibility uses CUDA compute capability, per-device VRAM, and effective
-system RAM rather than a GPU SKU allowlist:
+Compatibility uses compute capability, per-device VRAM, and system RAM, not a
+GPU SKU allowlist:
 
 | Runtime | Precision | Minimum compute capability |
 | --- | --- | ---: |
@@ -83,42 +60,21 @@ system RAM rather than a GPU SKU allowlist:
 | Reasoner | FP8 | 8.9 |
 | Reasoner | NVFP4 | 10.0 |
 
-Meeting a minimum compute capability does not mean that every GPU at or above
-it can run a profile. The memory floors, GPU count, and the exact image
-manifest apply as well; see [Tested GPU inventory](#tested-gpu-inventory) for
-the devices verified in this release.
-
-Active Generator profiles use BF16 or FP8; there is no active Generator NVFP4
-row.
-
-Reasoner requires all visible GPUs to have the same compute capability.
-Generator eligibility is calculated from the least-capable GPU and the smallest
-per-device memory total. Use homogeneous GPUs for either runtime; mixed-GPU
-configurations are not supported.
-
-All memory values below are binary GiB per device. Do not add VRAM across
-devices to satisfy a per-device floor. Static compatibility first checks total
-VRAM. At startup, the NIM captures free memory once and requires each GPU used
-by the selected layout to meet the same floor. For Reasoner on a discrete GPU,
-usable free memory is measured after a 4-GiB runtime reserve
-(`NIM_GPU_MEMORY_HEADROOM_GIB`). Automatic selection does not choose Reasoner
-profiles on a GeForce RTX 4090.
-
-For an integrated GPU with unified host/device memory, automatic selection
-applies these floors to the effective shared memory defined in [Unified-memory
-thresholds](#unified-memory-thresholds). Generator selection keeps the model
-and both guardrails resident, so only rows with **Model offload = None** and
-**Guardrails = Resident** are eligible. Reasoner floors use the same effective
-total.
+Use homogeneous GPUs; mixed-GPU configurations are not supported, and
+Reasoner requires the same compute capability on every GPU. Do not add VRAM
+across devices. Each GPU in the selected layout must meet the floor in total
+and in free memory at startup; on a discrete GPU, Reasoner measures free
+memory after a 4-GiB runtime reserve (`NIM_GPU_MEMORY_HEADROOM_GIB`).
+Automatic selection does not choose Reasoner profiles on a GeForce RTX 4090.
+On unified-memory systems, Generator uses only rows with
+**Model offload = None** and **Guardrails = Resident**.
 
 ### Unified-memory thresholds
 
-Unified-memory systems use one DRAM pool for the host and the device. The
-**effective shared memory** is 70% of the device-reported total; the remaining
-30% stays available to the host. The same 70% share is the default Reasoner
-`NIM_GPU_MEMORY_UTILIZATION` on these systems. Earlier images subtracted a
-fixed host reserve set by `NIM_UNIFIED_MEMORY_HOST_RESERVE_GIB`; this image
-ignores that variable.
+On unified-memory systems, **effective shared memory** is 70% of the
+device-reported total; the rest stays with the host. The same share is the
+default Reasoner `NIM_GPU_MEMORY_UTILIZATION`. This image ignores the earlier
+`NIM_UNIFIED_MEMORY_HOST_RESERVE_GIB`.
 
 | Runtime/profile | Effective shared-memory floor | Unified-memory policy |
 | --- | ---: | --- |
@@ -134,43 +90,29 @@ ignores that variable.
 | Reasoner `super` FP8, TP1 | 67 GiB/device | No CPU/model offload |
 | Reasoner `super` NVFP4, TP1 | 73 GiB/device | No CPU/model offload |
 
-The effective floor is compared with 70% of the value returned by the running
-system, not with a product's decimal memory label. Current free shared memory
-is checked separately at startup. A profile must also meet its compute-capability,
-GPU-count, and exact-image manifest requirements.
+Floors are compared with 70% of the binary-GiB total reported by the running system;
+current free shared memory is checked separately at startup.
 
 ## Tested GPU inventory
 
-The following devices are included in the release hardware inventory. The
-discrete GPU rows are configured for official NIM testing; the unified-memory
-rows are verified hardware targets for the shared-memory profile policy.
-Product names are shortened for readability, grouped by architecture, and
-sorted by nominal memory within each group.
-
-Inventory membership does not mean that every runtime, model, precision, GPU
-count, offload mode, and task is tested or available on that device. Use the
-configuration tables below to find a candidate, and confirm that the exact
-image manifest contains a matching profile. A device outside this inventory
-can still be compatible when it meets the compute-capability and memory floors.
+Devices in the release hardware inventory, grouped by architecture and sorted
+by nominal memory. Inventory membership does not mean every configuration is
+tested on that device, and devices outside it can be compatible when they meet
+the floors.
 
 ### Unified-memory systems
 
-These systems share host and device memory; the capacity shown here is not
-separate VRAM. Take 70% of the binary-GiB total reported by the running system
-before comparing it with the effective floors above.
+Capacity is a shared host/device pool, not separate VRAM:
 
 | Device | Nominal shared memory |
 | --- | ---: |
 | Jetson AGX Thor T5000 | 123 GiB |
 | DGX Spark (GB10) | 128 GB (about 119 GiB) |
 
-At these capacities, the effective share is roughly 83 to 86 GiB. Memory floors
-permit the resident Generator Edge-DROID and Nano rows, but not the Super
-Generator rows. For Reasoner, the Edge and Nano rows and the Super FP8 and
-NVFP4 TP1 rows meet the memory floor. This is capacity compatibility, not a
-recommendation to use Super on these systems; prefer Nano for practical
-turnaround. Compute capability, GPU count, current free memory, and the exact
-image manifest still determine the selected profile.
+The effective share is roughly 83 to 86 GiB. It fits the resident Generator
+Edge-DROID and Nano rows but no Super Generator row, and the Reasoner Edge,
+Nano, and Super FP8/NVFP4 TP1 rows. Reasoner Super BF16 TP1 (135 GiB) exceeds
+both systems' total capacity, so freeing cache cannot make it fit.
 
 ### Blackwell Ultra
 
@@ -219,12 +161,8 @@ image manifest still determine the selected profile.
 | A100 SXM4 40 GB | 40 GB HBM2e |
 | A100 SXM4 80 GB | 80 GB HBM2e |
 
-Nominal memory is shown only to order this inventory. The Thor and DGX
-Spark entries are verified unified-memory targets, not separate-VRAM GPUs.
-Profile selection uses
-the per-device binary-GiB floors below and the memory reported by the running
-system. For Grace Hopper, the table shows HBM GPU memory. In the GH200 480 GB
-entry, 480 GB identifies CPU memory and is not GPU VRAM.
+Nominal memory only orders this inventory. For GH200 480 GB, 480 GB is CPU
+memory; the table shows HBM GPU memory.
 
 ## Generator configurations
 
@@ -248,33 +186,25 @@ only to the general-purpose `nano` and `super` variants.
 | `super` | FP8 | Model | Resident | 1 | 64 GiB | 80 GiB | 76 GiB |
 | `super` | FP8 | Layer | Resident | 1 | 38 GiB | 80 GiB | 50 GiB |
 
-Specialist variants (`nano-droid`, `edge-droid`, and the `super-*` variants)
-use only the resident-guardrail rows of their base model.
+Specialist variants (`nano-droid`, `edge-droid`, and `super-*`) use only the
+resident-guardrail rows of their base model. Multi-GPU rows use every GPU: a
+`latency` profile splits each request with guidance parallelism 2 and sequence
+parallelism `n_gpus / 2`; a `throughput` profile runs one engine replica per
+GPU, and there is no one-GPU `throughput` profile. To limit the GPU count, see
+[Advanced profile controls](configuration.md#advanced-profile-controls).
 
-The 31-GiB Nano layer-offload configurations are intended to support ordinary
-generation on 32-GB client GPUs such as the GeForce RTX 5090. This is not
-a GPU SKU allowlist: the device must expose at least 31 binary GiB to the
-runtime and meet the precision's compute-capability requirement. The RTX 5090
-does not meet the 35-GiB Transfer minimum for these configurations.
+The 31-GiB Nano layer-offload rows target 32-GB client GPUs such as the
+GeForce RTX 5090, which does not meet their 35-GiB Transfer minimum.
 
-Profile selection enforces the system-memory floor against host memory or a
-smaller container memory limit. Earlier images enforced only 16 GiB for
-non-offloading profiles. Provision these values as minimums; media
-processing, concurrency, and other host workloads can need more.
+> **System memory:** Profile selection enforces each row's system-memory floor
+> (Generator and Reasoner) against host memory or a smaller container memory
+> limit. Treat the floors as minimums; media processing, concurrency, and other
+> host workloads can need more. Unified-memory systems have no separate host RAM
+> requirement; size them with
+> [Unified-memory thresholds](#unified-memory-thresholds).
 
-Multi-GPU rows use every GPU in one of two layouts. A `latency` profile splits
-each request with guidance parallelism 2 and sequence parallelism
-`n_gpus / 2`. A `throughput` profile runs one engine replica per GPU. There is
-no one-GPU `throughput` profile. See [Advanced profile
-controls](configuration.md#advanced-profile-controls) to limit the GPU count.
-
-These host RAM values do not change unified-memory guidance. DGX Spark and
-Jetson AGX Thor use one host/device pool; evaluate them with [Unified-memory
-thresholds](#unified-memory-thresholds) rather than adding a separate host
-RAM requirement.
-
-Leave offload and guardrail residency on automatic selection unless a specific
-configuration has been validated for the deployment.
+Leave offload and guardrail residency on automatic selection unless a
+configuration is validated for the deployment.
 
 ## Reasoner configurations
 
@@ -292,23 +222,16 @@ Reasoner does not use Generator latency/throughput or model-offload selectors:
 | `super` | FP8 | 1 | 1 | 67 GiB | 43 GiB | 8.9 |
 | `super` | NVFP4 | 1 | 1 | 73 GiB | 33 GiB | 10.0 |
 
-Edge Reasoner supports BF16 and FP8 only and has no DFlash draft. Profile
-selection enforces the system-memory floor; size host RAM and GPU headroom for
-the actual context, media, and concurrency. Unified-memory systems use the
-shared-pool guidance above without a separate host RAM requirement.
-
-When both Super BF16 layouts fit, profile ranking prefers the one-GPU TP1
-layout. If TP1 does not have enough current free memory but TP2 fits on both
-participating GPUs, automatic selection can fall back to TP2. To require TP2,
-set `NIM_TAGS_SELECTOR='n_gpus=2,nim_tp=2'`. Nano and Super Reasoner rows include the
-variant-specific DFlash draft, and DFlash is enabled by default.
+System memory follows the note under
+[Generator configurations](#generator-configurations). Selection prefers Super
+BF16 TP1 and can fall back to TP2 when TP1 lacks free memory; to require TP2,
+set `NIM_TAGS_SELECTOR='n_gpus=2,nim_tp=2'`.
 
 ## Edge verified GPUs
 
-Edge Reasoner and Edge-DROID were verified on the following GPUs. Edge-DROID
-policy remains experimental and is still being benchmarked; verification does
-not establish policy accuracy for a workload. Each deployment must also meet
-the profile floors above and the exact image manifest.
+Edge Reasoner and Edge-DROID were verified on these GPUs. Verification does not
+establish Edge-DROID policy accuracy for a workload; each deployment must still
+meet the floors above and the exact image manifest.
 
 | Architecture | GPUs |
 | --- | --- |
@@ -319,68 +242,23 @@ the profile floors above and the exact image manifest.
 | Ampere | A100 SXM4 40 GB, A100 SXM4 80 GB, A100 PCIe 40 GB, A100 80 GB PCIe |
 
 Ampere GPUs (compute capability 8.0) support only the BF16 Edge profiles.
-Automatic selection does not choose Reasoner profiles on a GeForce RTX 4090.
-
-## Automatic profile selection
-
-Users normally set:
-
-- runtime;
-- model variant;
-- Generator latency or throughput; and
-- precision only when it must be pinned.
-
-The NIM first finds statically compatible profiles for those choices, visible
-GPU totals, and effective system memory. It then uses one current-free-memory
-snapshot without changing the requested model, precision, or Generator
-performance objective. Generator prefers FP8 when compatible. Reasoner prefers
-BF16 on compute capability 8.0 through 8.8, FP8 on 8.9 through 9.x, and NVFP4
-on 10.0 or newer, using another compatible precision when the preferred row is
-unavailable. Selection prefers a resident Generator profile when it fits. If
-the preferred layout is currently too large, it can fall back across equivalent
-layouts, preferring Generator layer offload before model offload and allowing a
-fitting Reasoner TP layout. If none fits, startup fails. An explicit
-`NIM_MODEL_PROFILE` never falls back.
-
-Exact profile IDs and low-level manifest tags are advanced image-specific
-controls. Do not copy them between images or hosts. Free unrelated GPU memory
-before launch and restart the NIM if you want automatic selection to reconsider
-a layout.
 
 ## Transfer headroom
 
-Transfer can require more peak memory than ordinary generation on the same
-model. Startup compares the selected profile's per-device floor and Transfer
-overhead with the detected GPU memory. A deployment can therefore serve
-ordinary generation while rejecting Transfer.
-
-Use a larger GPU or a lower-memory configuration when Transfer does not fit.
-`NIM_ALLOW_UNSAFE_TRANSFER=1` bypasses the check for diagnosis but can cause an
-out-of-memory failure and does not make the deployment supported.
+Transfer needs more peak memory than ordinary generation, so startup checks it
+separately; a deployment can serve generation while rejecting Transfer. Use a
+larger GPU or a lower-memory configuration. `NIM_ALLOW_UNSAFE_TRANSFER=1`
+bypasses the check for diagnosis only and can cause out-of-memory failures.
 
 ## Media and codecs
 
 | Direction | Media | Documented formats/codecs and limits |
 | --- | --- | --- |
 | Input | Images | Use the included JPEG, PNG, and WebP fixtures; verify other formats against the deployed image |
-| Input | Videos | MP4/MOV, Matroska/WebM, FLV, and AVI containers. H.264, HEVC, and MPEG-4 Part 2 decode through NVDEC; VP8, VP9, and AV1 use software decode. Other codecs are rejected. The included fixtures are MP4 |
+| Input | Videos | MP4/MOV, Matroska/WebM, FLV, and AVI containers; H.264, H.265/HEVC, and MPEG-4 Part 2 decode through NVDEC, VP8, VP9, and AV1 use software decode; other codecs return HTTP 422 |
 | Output | Generator image | JPEG |
 | Output | Generator video | VP9 in MP4 |
 
-The request schemas accept base64 and MIME-aware data URLs. HTTP(S) input is
-available only when enabled and reachable from the container. Schema acceptance
-does not guarantee every image format, video container, codec, chroma format,
-frame rate, or remote source.
-
-## Verify a running deployment
-
-```bash
-curl -fsS http://localhost:8000/v1/metadata | python3 -m json.tool
-uv run python examples/inspect_profile.py
-```
-
-Metadata confirms the configuration chosen for the running container. The
-profile helper decodes the selected image's YAML manifest and prints the active
-profile without its full artifact inventory. See
-[Operations](operations.md#inspect-the-running-service) for the raw
-management-endpoint workflow.
+Inputs are base64 or data URLs; HTTP(S) input works only when enabled and
+reachable from the container. See [API reference](api-reference.md) for the
+media rules.
