@@ -167,8 +167,25 @@ precomputed control video.
 | `num_video_frames_per_chunk` | Integer `>= 1` | 93 generally, 101 WSM-only |
 | `num_conditional_frames` | Integer `>= 0` and smaller than chunk size | 1 |
 | `num_first_chunk_conditional_frames` | Integer `>= 0`; bounded by chunk and output | 0 |
+| `<control>.control_weight` | Finite number `>= 0`; enabled weights must have a positive sum | 1.0 |
 
 `num_first_chunk_conditional_frames > 0` requires `input_reference`.
+`control_weight` belongs inside a control object, such as
+`"depth": {"video": "...", "control_weight": 3.0}`; see
+[Advanced multiple controls](#advanced-multiple-controls).
+
+### Control guidance behavior
+
+When control guidance and text guidance are both active, the control term is
+scaled by `control_guidance` alone. Earlier images also multiplied that term by
+`guidance_scale`. With the edge-family defaults, the effective control
+coefficient is therefore 1.5 instead of 4.5. Request defaults are unchanged, but
+outputs that combine text and control guidance differ from earlier images. Do
+not compare them with Transfer quality baselines from an earlier image.
+
+To approximate the earlier strength, multiply the earlier `control_guidance` by
+`guidance_scale`, staying within the documented maximum of 10.0.
+`control_guidance=1.0` disables the extra control-guidance branch.
 
 Current defaults by family:
 
@@ -189,6 +206,34 @@ the pinned release image; recheck them when moving to another image.
 The request schema can enable more than one control in the same `transfer`
 object. Current default selection deliberately uses the general edge-family
 defaults for mixed requests rather than combining defaults from each control.
+
+Every control object (`edge`, `blur`, `depth`, `seg`, and `wsm`) accepts an
+optional `control_weight`. Weights are relative: the NIM normalizes them across
+the enabled controls. This example derives an edge control from the source and
+combines it with a precomputed depth video, giving normalized edge and depth
+weights of 0.25 and 0.75:
+
+```json
+{
+  "model_mode": "video2video",
+  "prompt": "A snowy mountain road",
+  "input_reference": "data:video/mp4;base64,<BASE64_SOURCE_VIDEO>",
+  "guidance_scale": 3.0,
+  "transfer": {
+    "edge": {"control_weight": 1.0},
+    "depth": {
+      "video": "data:video/mp4;base64,<BASE64_DEPTH_CONTROL>",
+      "control_weight": 3.0
+    },
+    "control_guidance": 1.5
+  }
+}
+```
+
+An omitted weight defaults to 1.0; `"edge": true` and `"blur": true` also use
+1.0. A weight of zero is accepted only when another enabled control has a
+positive weight. The request fails with HTTP 422 when the enabled weights do not
+have a finite positive sum.
 
 This guide does not validate a multi-control combination. Use one control per
 request unless the exact combination has been validated for the deployment.
@@ -232,7 +277,9 @@ Transfer rejects:
 - V2V fields `condition_frame_indexes_vision` and `condition_video_keep`;
 - derived edge/blur without `input_reference`;
 - depth/seg/WSM without a nested non-empty control video;
-- a nested precomputed edge/blur video combined with its preset; and
+- a nested precomputed edge/blur video combined with its preset;
+- a negative or non-finite `control_weight`, or enabled weights whose sum is
+  not positive; and
 - chunk/conditioning values that violate their bounds.
 
 | Failure | Fix |

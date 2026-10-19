@@ -251,9 +251,11 @@ image/video face path. Generator BYOC does not replace the NIM-owned guardrail
 artifacts.
 
 Low-VRAM Generator profiles can independently sleep the text guard and output
-visual guardrails during diffusion. Profile tags own the normal policy;
-`NIM_OFFLOAD_TEXT_GUARDRAIL` and `NIM_OFFLOAD_VIDEO_GUARDRAIL` are advanced
-overrides. Change one dimension at a time and measure memory, latency, and
+visual guardrails during diffusion. Profile tags own this policy; use the
+`NIM_TEXT_GUARD_OFFLOAD` and `NIM_VIDEO_GUARD_OFFLOAD` profile selectors to
+choose `resident` or `offloaded` profiles. The earlier
+`NIM_OFFLOAD_TEXT_GUARDRAIL` and `NIM_OFFLOAD_VIDEO_GUARDRAIL` variables are
+ignored. Change one dimension at a time and measure memory, latency, and
 safety behavior.
 
 ## Prompt-upsampling diagnostics
@@ -346,10 +348,10 @@ Task-specific validation belongs to [Generation](generation.md),
 | Artifact download fails | Container lacks `NGC_API_KEY`, entitlement, DNS/network, or storage | Verify key injection and NGC connectivity; inspect cache capacity/ownership |
 | Cache permission denied | Host mount is not writable by the container | Fix ownership/ACLs and retain a persistent writable `/opt/nim/.cache` |
 | No compatible profile | GPU compute capability, total or current free per-device VRAM, or effective system memory does not satisfy the selected model/precision/offload requirements | Run the [pre-download profile preflight](deployment.md#run-the-pre-download-profile-preflight), inspect the exact image manifest, free unrelated GPU memory, remove unnecessary pins, choose a smaller model or compatible precision, or use supported hardware |
-| Preflight passes but cold start fails | The 16-GiB non-offload admission floor passed but practical host RAM is too low, or artifact download/materialization or runtime initialization failed | Compare discrete-host RAM with the practical requirement in the support matrix, preserve the failed container, and inspect its logs; do not treat preflight as full host compatibility |
+| Preflight passes but cold start fails | Host RAM is too low for the workload, or artifact download/materialization or runtime initialization failed | Preserve the failed container, inspect its logs, and compare host RAM with the support-matrix floors; do not treat preflight as full host compatibility |
 | Discrete-GPU availability probe fails | NVML or the NVIDIA utility driver capability is unavailable, or CUDA-visible devices cannot be matched to NVML | Verify the driver, Container Toolkit configuration, GPU visibility, and utility capability before retrying |
-| Integrated GPU has no compatible profile | The host reserve lowers usable shared memory, and Generator offload profiles are not eligible | Choose a resident profile that fits after the reserve; change `NIM_UNIFIED_MEMORY_HOST_RESERVE_GIB` only from validated host-memory measurements |
-| Profile filtered by system memory | The container cgroup or host exposes less RAM than the profile admission tag requires | Raise the container memory limit or choose a compatible profile; admission floors are 16 GiB for non-offloading Generator/Reasoner, 64 GiB for Nano offload, and 150 GiB for Super offload, while discrete hosts must also meet the higher practical RAM requirements in the support matrix |
+| Integrated GPU has no compatible profile | Only 70% of the shared pool counts toward profile floors, and Generator offload profiles are not eligible | Choose a resident profile that fits the [effective shared-memory floor](support-matrix.md#unified-memory-thresholds), such as Nano or Edge |
+| Profile filtered by system memory | The container cgroup or host exposes less RAM than the profile's system-memory floor | Raise the container memory limit or choose a compatible profile; see the floors in the [support matrix](support-matrix.md#generator-configurations) |
 | Conflicting selectors | A shorthand disagrees with `NIM_TAGS_SELECTOR` | Set each selector in one place and inspect the full launch environment |
 | Visible GPUs sit idle | Selected profile uses fewer GPUs than Docker exposed | Restrict `--gpus` or intentionally pin an available layout matching the desired count |
 | Compute-capability precision failure | Requested precision needs a newer GPU architecture | Select an available precision compatible with the hardware |
@@ -398,9 +400,9 @@ Task-specific validation belongs to [Generation](generation.md),
 | Responses route 404 | Route disabled, absent, or requested from Generator | Confirm Reasoner metadata, then use Chat Completions and inspect live OpenAPI/operator setting |
 | Retrieval/cancel does not work | Response storage/background support is not enabled | Use `store=false` create flow or validate storage configuration for the selected image |
 | Structured output is prose or invalid JSON | The request uses the wrong schema shape or the backend did not return a constrained result | Use Chat Completions `response_format` or Responses `text.format`, inspect live OpenAPI and logs, and preserve the response for diagnosis |
-| Host OOM or near-zero `MemAvailable` on unified memory | Reasoner used the `0.93` default or a target too large for the shared host/device pool | Restart with `NIM_GPU_MEMORY_UTILIZATION=0.80` for image-only or `0.70` for video or mixed media; lower it further only from host measurements |
+| Host OOM or near-zero `MemAvailable` on unified memory | The Reasoner memory share is too large for the shared host/device pool and the host workload | Remove any explicit `NIM_GPU_MEMORY_UTILIZATION` above the `0.70` default, or lower it from host measurements, then restart |
 | KV-cache/context OOM | Context, media tokens, batching, or concurrency is too large | Reduce media FPS and concurrency; the default unchunked multimodal path enforces a 16,384 batched-token minimum, so enable multimodal chunking with `NIM_DISABLE_CHUNKED_MM_INPUT=0` only after validation before lowering that budget |
-| DFlash startup is rejected | DFlash was enabled for Generator, the selected Nano/Super draft is missing, or an independent path/configuration is invalid | Use the matching bundled draft or a valid absolute local `NIM_DFLASH_MODEL_PATH`; otherwise set `NIM_USE_DFLASH=0` for target-only Reasoner operation |
+| DFlash startup is rejected | DFlash was enabled for Generator or Edge (including through `NIM_OPTIMIZATION_PRESET=TPOT`), the selected Nano/Super draft is missing, or an independent path/configuration is invalid | Use the matching bundled draft or a valid absolute local `NIM_DFLASH_MODEL_PATH`; otherwise set `NIM_USE_DFLASH=0` for target-only Reasoner operation |
 | Reasoner checkpoint source fails | Local layout, `hf://` URI, revision, token, or inferred profile properties are invalid | Validate `NIM_MODEL_PATH`, `HF_TOKEN`, cache/network access, and matching selectors |
 
 ### BYOC

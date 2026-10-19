@@ -270,8 +270,10 @@ or end of the input and defaults to `first`.
 
 The decoded-video ceiling is 75 MB. Data URLs expand binary media by roughly
 one third, so large videos can make the JSON request substantially larger. Use
-the MP4 fixtures included with the examples, and verify any other container,
-codec, or remote-fetch path against the deployed image before depending on it.
+the MP4 fixtures included with the examples. The image accepts MP4/MOV,
+Matroska/WebM, FLV, and AVI containers with the codecs listed in the
+[support matrix](support-matrix.md#media-and-codecs); verify any other path,
+including remote fetch, against the deployed image before depending on it.
 
 ## Specialist T2I and I2V variants
 

@@ -63,12 +63,10 @@ Guide the customer through the canonical pages in this order:
 
 Use only the exact image and commands in `deployment.md`; never substitute
 `latest`. After the image pull, run the documented pre-download profile
-preflight with the intended selectors and GPUs. For a Reasoner on DGX Spark/GB10
-or Jetson AGX Thor, every preflight and launch command shown to the customer,
-starting with the first one, must include
-`-e NIM_GPU_MEMORY_UTILIZATION=0.80` for an image-only workload or
-`-e NIM_GPU_MEMORY_UTILIZATION=0.70` for video or mixed-media workloads. Do not
-show a generic Reasoner command first and add the setting later. Treat preflight
+preflight with the intended selectors and GPUs. On DGX Spark/GB10 or Jetson AGX
+Thor, the Reasoner defaults to `NIM_GPU_MEMORY_UTILIZATION=0.70`; if the customer
+lowers it from host measurements, include the same value in every preflight and
+launch command, starting with the first one. Treat preflight
 success as evidence for a candidate profile only, not full host compatibility;
 cold start and representative requests remain required. One service container
 starts one runtime. The preflight container is temporary and `--rm` removes
@@ -87,9 +85,8 @@ For hardware guidance:
   rather than inferring from a marketing memory label;
 - evaluate every participating device's total and currently free memory against
   the per-device floor, including the documented Reasoner runtime reserve; on a
-  discrete-GPU host also require the practical host RAM minimum for the selected
-  non-offloading model/precision row rather than treating the 16-GiB profile
-  admission tag as sufficient;
+  discrete-GPU host also require the system-memory floor for the selected
+  model/precision/offload row;
 - on unified memory, use `MemAvailable` for current state because it includes
   reclaimable cache; report `MemFree` and the cache components separately,
   never add cache to `MemAvailable`, and do not add the discrete-host practical
@@ -132,13 +129,12 @@ For hardware guidance:
    present `MemFree`, `MemAvailable`, `Cached`, `SReclaimable`, `Shmem`, and the
    approximate reclaimable cache. Explain that `MemAvailable` already includes
    reclaimable memory.
-2. If the customer needs Reasoner, classify the workload before presenting any
-   Docker command. Use `NIM_GPU_MEMORY_UTILIZATION=0.80` for image-only or
-   `0.70` for video or mixed media. Include the value explicitly in the first
-   preflight command and every later Reasoner launch command; the `0.93` default
-   is not reduced automatically on the unified pool.
-3. Compare the requested profile family's floor with effective total capacity
-   after the host reserve. If the floor exceeds effective total, report
+2. If the customer needs Reasoner, explain that the NIM defaults
+   `NIM_GPU_MEMORY_UTILIZATION` to `0.70` on the unified pool. Suggest a lower
+   value only from host measurements, and include it in the first preflight
+   command and every later Reasoner launch command.
+3. Compare the requested profile family's floor with effective total capacity,
+   which is 70% of the device-reported total. If the floor exceeds effective total, report
    **exceeds total capacity**; cache reclamation cannot change that result. For
    example, Reasoner Super BF16 TP1 requires 135 GiB effective memory and cannot
    fit the DGX Spark shared pool.

@@ -4,7 +4,7 @@ SPDX-License-Identifier: OpenMDW-1.1 -->
 # Deploy the Cosmos3 Certified NIM
 
 Use this page to authenticate to NGC, choose a model, launch Generator or
-Reasoner, and verify the selected service. The commands pin the current 2.0.0
+Reasoner, and verify the selected service. The commands pin the current 2.1.0
 release image. Use the [Support matrix](support-matrix.md) to choose a
 compatible configuration. For an active container, `/v1/manifest` is the
 authority for available profiles.
@@ -28,8 +28,8 @@ then takes one snapshot of current free memory on every visible GPU. It prefers
 a compatible profile that avoids offload and makes effective use of the
 available GPUs, but can choose an equivalent lower-memory offload or
 tensor-parallel layout when the preferred layout does not currently fit. On an
-integrated GPU with unified host/device memory, selection reserves host memory
-and uses resident Generator model and guardrail profiles. Startup fails
+integrated GPU with unified host/device memory, selection treats 70% of the
+shared pool as GPU memory and uses resident Generator model and guardrail profiles. Startup fails
 if the chosen model cannot run on the host. See [Support
 matrix](support-matrix.md#gpu-architecture-and-topology) for the memory and
 shared-memory rules, then confirm the selected profile in the exact image
@@ -51,6 +51,10 @@ manifest.
 For Generator, `NIM_MODEL_VARIANT` selects
 an exact general-purpose or specialist model.
 
+> **Experimental:** Edge-DROID policy is experimental in this release. NVIDIA
+> is still verifying it with benchmarks. Validate its accuracy and latency for
+> your workload before relying on it.
+
 Choose the workload objective explicitly:
 
 | `NIM_PERF_PROFILE` | Optimize for |
@@ -64,8 +68,8 @@ The software defaults to `latency` when the selector is omitted.
 
 Set `NIM_MODEL_TYPE=reasoner` and choose `NIM_MODEL_VARIANT=edge`, `nano`, or `super`.
 Edge supports BF16 and FP8; it has no NVFP4 profile. Reasoner does not use
-`NIM_PERF_PROFILE`. Edge does not support DFlash in this version; set
-`NIM_USE_DFLASH=0` for Edge. Nano and Super Reasoner enable their
+`NIM_PERF_PROFILE`. Edge does not support DFlash in this version; its profiles
+disable DFlash by default and reject `NIM_USE_DFLASH=1`. Nano and Super Reasoner enable their
 bundled DFlash speculative-decoding drafts by default. Set `NIM_USE_DFLASH=0`
 to run Nano or Super without DFlash; see
 [Configuration](configuration.md#speculative-decoding).
@@ -129,7 +133,7 @@ evaluation logout step when you finish.
 Pin and pull the current release image:
 
 ```bash
-export NIM_IMAGE='nvcr.io/nim/nvidia/cosmos3:2.0.0'
+export NIM_IMAGE='nvcr.io/nim/nvidia/cosmos3:2.1.0'
 docker pull "$NIM_IMAGE"
 ```
 
@@ -137,28 +141,24 @@ Do not replace the versioned tag with `latest` or another unvalidated image.
 
 ### Set the Reasoner memory share on unified-memory systems
 
-Before the first Reasoner preflight or launch on DGX Spark/GB10 or Jetson AGX
-Thor, set a workload-specific share of the unified host/device memory pool. For
-an image-only Reasoner workload, use:
+On DGX Spark/GB10 and Jetson AGX Thor, the NIM uses 70% of the unified
+host/device memory pool for the model by default. It applies that share to
+profile floors and uses it as the Reasoner `NIM_GPU_MEMORY_UTILIZATION`
+default. No extra variable is required.
+
+Lower the share only when host measurements show that media processing or other
+host workloads need more memory, for example:
 
 ```bash
-export NIM_GPU_MEMORY_UTILIZATION=0.80
+export NIM_GPU_MEMORY_UTILIZATION=0.60
 ```
 
-For any Reasoner workload that includes video, or a mix of images and video,
-use:
-
-```bash
-export NIM_GPU_MEMORY_UTILIZATION=0.70
-```
-
-The default `0.93` is not reduced automatically and can leave too little memory
-for the host and media processing. Pass the exported value with
-`-e NIM_GPU_MEMORY_UTILIZATION` in every Reasoner preflight and service-launch
-command on these systems, starting with the first command. Do not set this
-Reasoner-only variable for Generator or as a routine override on a discrete
-GPU. See [Reasoner context and scheduling](configuration.md#context-and-scheduling)
-for the variable contract.
+If you set a value, pass it with `-e NIM_GPU_MEMORY_UTILIZATION` in every
+Reasoner preflight and service-launch command on that system. Do not set this
+Reasoner-only variable for Generator. Earlier images required an explicit value
+and used `NIM_UNIFIED_MEMORY_HOST_RESERVE_GIB`; this image ignores that
+variable. See [Reasoner context and
+scheduling](configuration.md#context-and-scheduling) for the variable contract.
 
 ## Run the pre-download profile preflight
 
@@ -185,19 +185,14 @@ docker run --rm \
 Use the runtime, model, precision, performance, offload, profile-selection
 environment, GPU exposure, and container memory limit intended for the real
 deployment. Expose every GPU that deployment will use. For Reasoner, set
-`NIM_MODEL_TYPE=reasoner`, select `nano` or `super`, and omit
-`NIM_PERF_PROFILE`.
-
-On DGX Spark or Jetson AGX Thor, use the value exported in [Set the Reasoner
-memory share on unified-memory systems](#set-the-reasoner-memory-share-on-unified-memory-systems)
-in the first preflight command. This complete example checks Nano Reasoner:
+`NIM_MODEL_TYPE=reasoner`, select `edge`, `nano`, or `super`, and omit
+`NIM_PERF_PROFILE`. This complete example checks Nano Reasoner:
 
 ```bash
 docker run --rm \
   --gpus '"device=0"' \
   -e NIM_MODEL_TYPE=reasoner \
   -e NIM_MODEL_VARIANT=nano \
-  -e NIM_GPU_MEMORY_UTILIZATION="$NIM_GPU_MEMORY_UTILIZATION" \
   --entrypoint /bin/bash \
   "$NIM_IMAGE" \
   -lc '
@@ -262,15 +257,16 @@ docker run -d --name cosmos3-generator \
 
 The command starts the container in the background. Follow startup logs with
 `docker logs -f cosmos3-generator`; press Ctrl+C to stop following logs without
-stopping the container. On a discrete-GPU host, provision at least 40 GiB of
-host RAM if automatic selection chooses a non-offloading Nano profile; the
-16-GiB profile admission check is intentionally lower than that practical
-requirement. Use the separate RAM floor in the support matrix if selection
-chooses an offload profile.
+stopping the container. On a discrete-GPU host, a non-offloading Nano
+profile requires at least 40 GiB of system memory for BF16 or 35 GiB for FP8.
+Profile selection enforces these floors. Offload profiles have separate floors
+in the [support matrix](support-matrix.md#generator-configurations).
 
 Replace the model and performance objective with values supported by the image.
 Expose the GPU count required by the selected configuration instead of keeping
-`--gpus '"device=0"'` when a multi-GPU configuration is required. Add
+`--gpus '"device=0"'` when a multi-GPU configuration is required. The
+Generator uses as many exposed GPUs as a compatible profile supports; see
+[GPU count and parallelism](configuration.md#advanced-profile-controls). Add
 `-e NIM_PRECISION=fp8` only when precision must be pinned.
 
 ## Launch Reasoner
@@ -284,9 +280,9 @@ docker rm -f cosmos3-generator
 
 ### DGX Spark and Jetson AGX Thor
 
-Use Nano and pass the unified-memory share exported before preflight. This
-command is ready for an image-only workload when the exported value is `0.80`,
-or a video or mixed-media workload when it is `0.70`:
+Use Nano. The NIM applies the unified-memory default automatically; add
+`-e NIM_GPU_MEMORY_UTILIZATION="$NIM_GPU_MEMORY_UTILIZATION"` only if you
+exported a lower measured value:
 
 ```bash
 docker run -d --name cosmos3-reasoner \
@@ -299,13 +295,11 @@ docker run -d --name cosmos3-reasoner \
   -e NGC_API_KEY \
   -e NIM_MODEL_TYPE=reasoner \
   -e NIM_MODEL_VARIANT=nano \
-  -e NIM_GPU_MEMORY_UTILIZATION="$NIM_GPU_MEMORY_UTILIZATION" \
   -v "$LOCAL_NIM_CACHE:/opt/nim/.cache" \
   "$NIM_IMAGE"
 ```
 
-Do not omit `-e NIM_GPU_MEMORY_UTILIZATION` and rely on the `0.93` default on
-these unified-memory systems. Follow startup logs with
+Follow startup logs with
 `docker logs -f cosmos3-reasoner`; press Ctrl+C to stop following logs without
 stopping the container.
 
@@ -313,8 +307,8 @@ stopping the container.
 
 This example launches the Super FP8 Reasoner on a compatible discrete GPU. The
 one-GPU configuration requires compute capability 8.9 or newer, at least 67
-GiB of total and currently usable VRAM after the Reasoner reserve, and 46 GiB
-of practical host RAM; see the [Reasoner
+GiB of total and currently usable VRAM after the 4-GiB Reasoner reserve, and
+43 GiB of system memory; see the [Reasoner
 configurations](support-matrix.md#reasoner-configurations):
 
 ```bash
@@ -352,15 +346,16 @@ use the Reasoner launch above with these selectors:
 ```text
 -e NIM_MODEL_TYPE=reasoner \
 -e NIM_MODEL_VARIANT=edge \
--e NIM_PRECISION=fp8 \
--e NIM_USE_DFLASH=0
+-e NIM_PRECISION=fp8
 ```
 
 Use `NIM_PRECISION=bf16` for the BF16 target. To exercise the Responses API
 and streaming examples, leave `NIM_DISABLE_RESPONSES_ROUTE=false` and set
 `NIM_ENABLE_STREAMING=true` before launch.
 
-For Edge-DROID, use the Generator launch with:
+For Edge-DROID, use the Generator launch with the following selectors. Edge-DROID
+policy is experimental in this release and is still being verified with
+benchmarks:
 
 ```text
 -e NIM_MODEL_TYPE=generator \
@@ -370,9 +365,11 @@ For Edge-DROID, use the Generator launch with:
 -e NIM_CACHE_BACKEND=none
 ```
 
-These experiments disable DFlash for Reasoner and SeaCache for Generator.
-Leave `NIM_CACHE_CONFIG` unset when using `NIM_CACHE_BACKEND=none`; guardrails
-remain enabled. After readiness, verify the selected profile and use the
+Edge has no DFlash draft, and Edge-DROID disables SeaCache by default; the
+explicit `NIM_CACHE_BACKEND=none` keeps that choice visible. Leave
+`NIM_CACHE_CONFIG` unset when using `NIM_CACHE_BACKEND=none`; guardrails remain
+enabled. Edge was verified on the GPUs listed under [Edge verified
+GPUs](support-matrix.md#edge-verified-gpus). After readiness, verify the selected profile and use the
 [Reasoner catalog](reasoning.md#run-the-task-catalog) or the
 [DROID policy client](action.md#edge-droid-and-nano-droid-policy). Edge-DROID does not serve
 general image/video generation, forward dynamics, or inverse dynamics.
@@ -414,6 +411,8 @@ latency/throughput selection. Use these controls only for a validated need:
 | Variable | Use |
 | --- | --- |
 | `NIM_OFFLOAD_MODE` | Request an available lower-memory model offload mode |
+| `NIM_TEXT_GUARD_OFFLOAD`, `NIM_VIDEO_GUARD_OFFLOAD` | Select Generator profiles whose guardrails are `resident` or `offloaded` during diffusion |
+| `NIM_NUM_GPUS` and parallel-size variables | Select an available GPU count or parallel layout |
 | `NIM_TAGS_SELECTOR` | Filter profiles by exact manifest tags |
 | `NIM_MODEL_PROFILE` | Pin one reviewed profile ID from the exact image |
 
@@ -431,22 +430,16 @@ See [Configuration](configuration.md#advanced-profile-controls) for details.
 | `--ulimit` | Raise memory-lock, stack, and open-file limits |
 | `-p HOST:8000` | Publish the selected host port |
 | `-e NGC_API_KEY` | Pass the exported NGC credential |
-| `-e NIM_GPU_MEMORY_UTILIZATION=...` | Set the required Reasoner memory share on DGX Spark or Jetson AGX Thor |
+| `-e NIM_GPU_MEMORY_UTILIZATION=...` | Optionally lower the Reasoner memory share on DGX Spark or Jetson AGX Thor |
 | `-v ...:/opt/nim/.cache` | Persist model artifacts |
 
 GPU counts, compute-capability gates, VRAM floors, and practical host RAM are
 summarized in the [configuration matrix](support-matrix.md). Each participating
 GPU must have enough current free memory at startup, not only enough total
-capacity. On discrete-GPU hosts, non-offloading profiles require 40 GiB for
-Generator Nano, 78 GiB for Generator Super FP8, 112 GiB for Generator Super
-BF16, 24 GiB for Reasoner Nano BF16, 18 GiB for Reasoner Nano FP8 or NVFP4,
-36 GiB for Reasoner Super NVFP4, 46 GiB for Reasoner Super FP8, or 76 GiB for
-Reasoner Super BF16. Their embedded profile
-tags check only 16 GiB so an attempted startup is not blocked; passing that
-admission check does not satisfy the practical requirement. Nano offload
-profiles retain a 64-GiB profile floor, and Super offload profiles retain 150
-GiB. Docker or Kubernetes memory limits count as available system memory.
-Unified-memory systems continue to use the shared-pool table and do not add a
+capacity. Each profile also declares a system-memory floor that selection
+enforces; for example, Generator Nano BF16 requires 40 GiB and Reasoner Nano
+BF16 requires 24 GiB. Docker or Kubernetes memory limits count as available
+system memory. Unified-memory systems continue to use the shared-pool table and do not add a
 separate host RAM requirement. Confirm that the selected row and its tags are
 present in the target image before deployment.
 

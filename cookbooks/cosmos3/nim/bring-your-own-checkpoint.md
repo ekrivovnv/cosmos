@@ -16,7 +16,7 @@ preserving the Certified NIM server, profile selection, and runtime contract.
 
 | Runtime | Accepted source | What the NIM still provides |
 | --- | --- | --- |
-| Generator | Absolute local directory | Server, profile, and Generator guardrail artifacts |
+| Generator | Absolute local directory or `hf://owner/repository[:revision]` | Server, profile, and Generator guardrail artifacts |
 | Reasoner | Absolute local directory or `hf://owner/repository[:revision]` | Server, selected runtime layout, and profile compatibility policy |
 | Nano or Super Reasoner DFlash draft | Absolute local directory only | Primary Reasoner checkpoint, server, and profile policy |
 
@@ -65,6 +65,26 @@ Choose a Generator variant, precision, and latency/throughput objective that
 match the checkpoint. The NIM still provides Generator guardrail artifacts.
 The cache must be writable, NGC artifact access may still be required, and
 `NIM_DISABLE_MODEL_DOWNLOAD=1` is rejected for Generator profiles.
+
+### Hugging Face source
+
+The Generator also accepts `hf://owner/repository[:revision]`. The NIM
+downloads the repository into the NIM cache, using `HF_TOKEN` when set. An
+omitted revision defaults to `main`; pin a commit for reproducible deployments.
+The repository root must contain the complete layout shown above, including
+`model_index.json` and `transformer/`. The inferred variant and precision must
+match the selected profile, as for a local directory:
+
+```text
+-e NIM_MODEL_PATH='hf://owner/repository:revision' \
+-e HF_TOKEN \
+-e NIM_MODEL_VARIANT=nano \
+-e NIM_PRECISION=fp8
+```
+
+Pass `HF_TOKEN` only for a private repository. The NIM still downloads the
+profile's NGC artifacts, including guardrails, so keep `NGC_API_KEY` and a
+writable cache.
 
 ## Reasoner checkpoint
 

@@ -70,7 +70,7 @@ The task guides define the remaining required inputs and invalid combinations.
 | `seed` | non-negative integer or null | Reproducibility; the service generates one when omitted |
 | `guidance_scale` | finite number in `[1.0,7.0]` | Sampling when not owned by a specialist model |
 | `num_inference_steps` | integer in `[1,100]` | Sampling when not owned by a specialist model |
-| `flow_shift` | finite number | Sampling when not owned by a specialist model |
+| `flow_shift` | finite number greater than 0 | Sampling when not owned by a specialist model |
 | `resolution` | enum | Generation and Transfer; see [resolution keys](generation.md#resolution-keys) |
 | `num_frames` | integer | Generation and Transfer; Action derives it and rejects the field |
 | `fps` | finite number in `[1.0,60.0]` | Video tasks; retained but not encoded for T2I |

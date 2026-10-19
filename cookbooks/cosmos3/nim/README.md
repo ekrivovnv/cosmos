@@ -12,7 +12,7 @@ contains two runtimes, but each container runs only one:
   Completions and, when enabled, the Responses API.
 
 > Deployment commands pin the current release image,
-> `nvcr.io/nim/nvidia/cosmos3:2.0.0`. The [Support matrix](support-matrix.md)
+> `nvcr.io/nim/nvidia/cosmos3:2.1.0`. The [Support matrix](support-matrix.md)
 > publishes the release profile-selection floors;
 > confirm an available row in the running image's manifest. A matching profile
 > establishes a candidate configuration, while cold start and representative
@@ -43,7 +43,7 @@ chooses T2I, T2V, I2V, V2V, Transfer, or an Action operation.
 | Variant | Supported use |
 | --- | --- |
 | `nano` | General-purpose generation and compatible Generator tasks |
-| `edge-droid` | DROID policy with an action-only response; BF16 only |
+| `edge-droid` | DROID policy with an action-only response; BF16 only; **experimental** |
 | `nano-droid` | DROID policy with an action-only response; BF16 only |
 | `super` | General-purpose generation and compatible Generator tasks |
 | `super-t2i` | Text-to-image only |
@@ -61,6 +61,8 @@ Reasoner provides `edge`, `nano`, and `super`, also selected with
 `NIM_MODEL_VARIANT`. Reasoner does not use `NIM_PERF_PROFILE`.
 Edge Reasoner supports BF16 and FP8. The only Edge Generator variant is
 `edge-droid`; `NIM_MODEL_TYPE=generator NIM_MODEL_VARIANT=edge` is unsupported.
+Edge-DROID policy is experimental in this release while NVIDIA verifies it with
+benchmarks.
 
 If `NIM_PRECISION` is omitted, Generator prefers FP8 when compatible.
 Reasoner derives its preference from GPU compute capability: BF16 for 8.0
@@ -82,7 +84,7 @@ See [Deploy the NIM](deployment.md#advanced-profile-controls).
 | Forward dynamics | Generator | Image + action trajectory | Rollout video | [Action](action.md#forward-dynamics) |
 | Policy | Generator | Image + task/state | Video + predicted action | [Action](action.md#policy) |
 | Nano-DROID policy | Generator | Image + task/current state | Predicted action | [Action](action.md#edge-droid-and-nano-droid-policy) |
-| Edge-DROID policy | Generator | Composed camera views + task/current state | Predicted action | [Action](action.md#edge-droid-and-nano-droid-policy) |
+| Edge-DROID policy (experimental) | Generator | Composed camera views + task/current state | Predicted action | [Action](action.md#edge-droid-and-nano-droid-policy) |
 | Inverse dynamics | Generator | Video | Video + predicted action | [Action](action.md#inverse-dynamics) |
 | Video Transfer | Generator | Prompt + spatial control | Controlled MP4 video | [Transfer](transfer.md) |
 | Image/video reasoning | Reasoner | Media + text | Text or structured result | [Reasoning](reasoning.md) |
@@ -129,11 +131,11 @@ uv run python examples/reasoner.py --case image_caption
 1. Verify the GPU host against [Prerequisites](prerequisites.md).
 2. Choose a compatible model and hardware configuration from the
    [Support matrix](support-matrix.md).
-3. For a Reasoner on DGX Spark or Jetson AGX Thor, choose the documented
-   [unified-memory share](deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems)
-   before the first preflight command.
-4. Follow [Deployment](deployment.md) to authenticate, pull the image, set any
-   required unified-memory share, run the pre-download profile preflight,
+3. On DGX Spark or Jetson AGX Thor, review the
+   [unified-memory share](deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems);
+   the NIM applies a 70% default automatically.
+4. Follow [Deployment](deployment.md) to authenticate, pull the image, run the
+   pre-download profile preflight,
    prepare the cache, and launch either Generator or Reasoner.
 5. Return to [Use an existing NIM endpoint](#use-an-existing-nim-endpoint) to
    verify the service and run the first request.

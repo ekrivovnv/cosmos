@@ -17,9 +17,8 @@ For guided customer workflows, load
   participating GPU and effective host/container RAM before choosing a profile
   family. Detect DGX Spark/GB10 and Jetson AGX Thor as unified memory; report
   `MemFree`, `MemAvailable`, and reclaimable-cache components for those hosts.
-  On discrete-GPU hosts, use the support matrix's practical host RAM minima;
-  the 16-GiB admission tag on non-offloading profiles is intentionally not the
-  practical requirement. Do not add a separate host RAM requirement to a
+  On discrete-GPU hosts, use the support matrix's system-memory floors, which
+  profile selection enforces, as minimums. Do not add a separate host RAM requirement to a
   unified-memory system.
 - Treat the public pages and examples in this directory as the authority. Do not
   invent a fixed value where the guide requires host or workload validation, or
@@ -61,12 +60,11 @@ For guided customer workflows, load
   profile. Normally leave precision, offload, tags, and profile ID unset.
   Generator then prefers FP8 when compatible; Reasoner derives its preference
   from compute capability (BF16 on 8.0 through 8.8, FP8 on 8.9 through 9.x,
-  and NVFP4 on 10.0 or newer). For a Reasoner on DGX Spark/GB10 or Jetson AGX
-  Thor, include
-  `NIM_GPU_MEMORY_UTILIZATION=0.80` for image-only workloads or `0.70` for video
-  or mixed-media workloads in the first preflight command shown and in the
-  service launch; never present a generic command first and retrofit the
-  setting afterward. Present preflight success only as candidate-profile
+  and NVFP4 on 10.0 or newer). On DGX Spark/GB10 or Jetson AGX Thor, the NIM
+  counts 70% of the unified pool toward profile floors and defaults the
+  Reasoner `NIM_GPU_MEMORY_UTILIZATION` to `0.70`; suggest a lower value only
+  from host measurements, and then pass it from the first preflight through
+  service launch. Present preflight success only as candidate-profile
   compatibility; full host compatibility still requires cold start and
   representative requests.
 - Recommend Super on H200- and B200-class discrete GPUs when needed. Default to

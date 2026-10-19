@@ -247,6 +247,12 @@ checks. A valid API response is not an execution authorization.
 
 ## Edge-DROID and Nano-DROID policy
 
+> **Experimental:** Edge-DROID policy is experimental in this release. NVIDIA
+> is still verifying it with benchmarks. Validate its accuracy, latency, and
+> safety behavior for your workload before relying on it, and see [Edge verified
+> GPUs](support-matrix.md#edge-verified-gpus) for the devices on which it was
+> verified.
+
 Edge-DROID and Nano-DROID are BF16 specialist policy checkpoints. Choose one
 at startup; both use the same action-only NIM request contract. The image must
 include a matching Generator profile in its manifest; a Reasoner-only image

@@ -31,14 +31,14 @@ Plan for:
 | CPU architecture | The release image provides `amd64` and `arm64` variants; use the variant selected by the container runtime |
 | GPU compute capability | Generator: BF16 `>=8.0`, FP8 `>=8.9`; Reasoner: BF16 `>=8.0`, FP8 `>=8.9`, NVFP4 `>=10.0` |
 | GPU count and per-device VRAM | See the [Generator](support-matrix.md#generator-configurations) and [Reasoner](support-matrix.md#reasoner-configurations) tables |
-| Host RAM | On a discrete-GPU host, non-offloading profiles require 40 GiB for Generator Nano, 78 GiB for Generator Super FP8, 112 GiB for Generator Super BF16, 24 GiB for Reasoner Nano BF16, 18 GiB for Reasoner Nano FP8 or NVFP4, 36 GiB for Reasoner Super NVFP4, 46 GiB for Reasoner Super FP8, or 76 GiB for Reasoner Super BF16; see the [Generator](support-matrix.md#generator-configurations) and [Reasoner](support-matrix.md#reasoner-configurations) tables |
+| Host RAM | Each profile declares a system-memory floor that selection enforces, for example 40 GiB for Generator Nano BF16, 76 GiB for Generator Super FP8, 24 GiB for Reasoner Nano BF16, and 8 GiB for Edge Reasoner; see the [Generator](support-matrix.md#generator-configurations) and [Reasoner](support-matrix.md#reasoner-configurations) tables |
 | Free disk | Provision for the image, selected model artifacts, materialization, and outputs; no single workload-independent floor is documented |
 | Container shared memory | The Docker reference launch allocates 16 GiB; validate the requirement for the selected media workload and concurrency |
 
-For Edge Reasoner and Edge-DROID, use the image manifest's profile floors and
-validate practical host RAM for the workload; the Nano/Super host RAM numbers
-above do not define Edge requirements. Edge Reasoner supports BF16/FP8;
-Edge-DROID supports BF16 policy only.
+Edge Reasoner supports BF16/FP8; Edge-DROID supports BF16 policy only and is
+experimental in this release. See [Edge verified
+GPUs](support-matrix.md#edge-verified-gpus) for the devices on which Edge was
+verified.
 
 Do not add together memory from multiple GPUs to satisfy a per-device floor.
 If the deployment must serve Transfer, provision each GPU against the
@@ -55,8 +55,8 @@ equivalent lower-memory layout or make selection fail. Confirm the selected
 configuration in the exact image's manifest before deployment.
 
 On an integrated GPU where device and host share one memory pool, the selector
-withholds 16 GiB for the host by default before comparing the remaining shared
-memory with profile floors. Generator selection uses resident model and
+compares 70% of the shared pool with profile floors and leaves the rest for
+the host. Generator selection uses resident model and
 resident guardrail profiles on these systems; CPU-offload profiles do not
 reduce shared-memory use.
 
@@ -97,35 +97,29 @@ is not a guarantee that every cached byte can be reclaimed.
 
 A memory-related preflight failure has two materially different causes:
 
-- A floor above the device-reported total after the unified-memory host reserve
-  **exceeds total capacity**. Stopping processes or reclaiming cache cannot make
+- A floor above 70% of the device-reported total **exceeds total capacity**. Stopping processes or reclaiming cache cannot make
   that profile fit.
 - A floor that fits the effective total but fails the current-memory check
   **fits the hardware but not the current memory state**. Inspect `MemFree`,
   `MemAvailable`, and the cache components, stop identified competing
   workloads, and rerun preflight.
 
-Preflight applies the runtime-specific current-memory and reserve rules. Before
-the first Reasoner preflight on DGX Spark or Jetson AGX Thor, choose and pass
-the required workload-specific
+Preflight applies the runtime-specific current-memory and reserve rules. On
+DGX Spark or Jetson AGX Thor, the Reasoner defaults to a 0.70
 [`NIM_GPU_MEMORY_UTILIZATION`](deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems)
-for the unified pool; keep the same value through service launch. Clearing page
+share of the unified pool; if you lower it, keep the same value from preflight
+through service launch. Clearing page
 cache or deleting the persistent NIM model cache is not part of the normal
 deployment workflow; see [Unified-memory
 diagnostics](operations.md#unified-memory-diagnostics).
 
-Lower-VRAM profiles can keep model weights in system memory. Non-offloading
-Generator and Reasoner profiles deliberately carry only a 16-GiB system-memory
-admission floor so the NIM does not block an attempted startup. On a
-discrete-GPU host, passing that check does not replace the empirical practical
-RAM requirements in the [Generator](support-matrix.md#generator-configurations)
-and [Reasoner](support-matrix.md#reasoner-configurations) tables. Nano
-model/layer-offload
-profiles carry a 64-GiB profile floor, and Super model/layer-offload profiles
-carry 150 GiB; separate empirical practical minima are not established for
-those offload rows. The NIM checks a container memory limit before host physical
-memory, so a lower Docker or Kubernetes limit can make an otherwise capable
-host incompatible.
+Lower-VRAM profiles can keep model weights in system memory. Every profile
+declares a system-memory floor, and profile selection rejects a profile whose
+floor exceeds the memory available to the container. Earlier images enforced
+only 16 GiB for non-offloading profiles. The NIM checks a container memory
+limit before host physical memory, so a lower Docker or Kubernetes limit can
+make an otherwise capable host incompatible. Treat the floors as minimums;
+media processing, concurrency, and other host workloads can need more.
 
 Unified-memory systems do not add a separate host RAM requirement: continue to
 size the single shared pool with the unified-memory table and current-state
