@@ -32,9 +32,10 @@ The current Generator path expects this structural shape:
 └── model_index.json
 ```
 
-The NIM infers Nano or Super and the precision from
+The NIM infers Edge, Nano, or Super and the precision from
 `transformer/config.json` and checks them against the selected profile. Set
-`NIM_MODEL_VARIANT` to select a specialist Generator contract.
+`NIM_MODEL_VARIANT` to select a specialist Generator contract; the only Edge
+Generator contract is the BF16 `edge-droid` policy.
 
 ### Launch
 
@@ -63,10 +64,11 @@ at minimum:
 - tokenizer files; and
 - processor or preprocessor configuration.
 
-The NIM infers `nano` or `super`, BF16/FP8/NVFP4 precision, and Reasoner or
-Omni layout, then selects a compatible profile. An explicit
-`NIM_MODEL_VARIANT`, `NIM_PRECISION`, or `NIM_MODEL_PROFILE` must agree with
-the checkpoint. Mount it read-only and select the Reasoner:
+The NIM infers `edge`, `nano`, or `super`, the precision (Edge: BF16/FP8;
+Nano/Super also NVFP4), and Reasoner or Omni layout, then selects a compatible
+profile. An explicit `NIM_MODEL_VARIANT`, `NIM_PRECISION`, or
+`NIM_MODEL_PROFILE` must agree with the checkpoint. Mount it read-only and
+select the Reasoner:
 
 ```bash
 -e NIM_MODEL_TYPE=reasoner \
@@ -76,10 +78,11 @@ the checkpoint. Mount it read-only and select the Reasoner:
 
 With a local checkpoint, `NIM_DISABLE_MODEL_DOWNLOAD=1` prevents profile
 artifact downloads. With `NIM_MODEL_PATH`, the NIM does not download the
-profile's DFlash draft, which Reasoner enables by default. Mount a matching
-Nano or Super draft through
+profile's DFlash draft, which Nano and Super Reasoner enable by default. Mount a
+matching Nano or Super draft through
 `NIM_DFLASH_MODEL_PATH` (absolute local path, no `hf://`), or set
-`NIM_USE_DFLASH=0` to run target-only. The draft needs only:
+`NIM_USE_DFLASH=0` to run target-only; Edge has no DFlash, so always set
+`NIM_USE_DFLASH=0` for Edge. The draft needs only:
 
 ```text
 /byoc/cosmos3-dflash/
@@ -141,7 +144,7 @@ validation baseline.
 | Generator rejects disabled downloads | Generator still needs NIM-provided guardrails | Remove `NIM_DISABLE_MODEL_DOWNLOAD=1` and provide NGC/cache access |
 | Hugging Face source rejected offline | `hf://` requires download but downloads are disabled | Use an absolute pre-downloaded local path |
 | DFlash path is rejected | The draft path is relative, uses `hf://`, is not mounted, or lacks one of its two required files | Use an absolute local mount containing `config.json` and `model.safetensors` |
-| DFlash configuration is rejected | DFlash is disabled, the draft does not match the Nano/Super target, or `NIM_DFLASH_CONFIG` sets reserved `method`/`model` keys | Use the selected Reasoner's matching draft, keep DFlash enabled, and remove reserved keys; see [Speculative decoding](configuration.md#speculative-decoding) |
+| DFlash configuration is rejected | DFlash is disabled, the target is Edge (no DFlash), the draft does not match the Nano/Super target, or `NIM_DFLASH_CONFIG` sets reserved `method`/`model` keys | For Edge, set `NIM_USE_DFLASH=0`; otherwise use the selected Reasoner's matching draft, keep DFlash enabled, and remove reserved keys; see [Speculative decoding](configuration.md#speculative-decoding) |
 | Metadata shows `default` | Override was omitted, rejected, or applied to another container | Inspect launch environment, mounts, startup logs, and `/v1/metadata` |
 
 For broader startup, cache, GPU, and readiness diagnosis, see

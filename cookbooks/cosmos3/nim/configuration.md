@@ -22,12 +22,14 @@ commands.
 | Name | Default | Use |
 | --- | --- | --- |
 | `NIM_MODEL_TYPE` | `generator` | Select `generator` or `reasoner` |
-| `NIM_MODEL_VARIANT` | `nano` preference | Select `nano` or `super` for either runtime; Generator also accepts `nano-droid`, `super-t2i`, `super-t2i-4step`, `super-i2v`, and `super-i2v-4step` |
+| `NIM_MODEL_VARIANT` | `nano` preference | Select `nano` or `super` for either runtime; Reasoner also accepts `edge`, and Generator also accepts `edge-droid`, `nano-droid`, `super-t2i`, `super-t2i-4step`, `super-i2v`, and `super-i2v-4step` |
 | `NIM_PRECISION` | Generator: FP8 preference; Reasoner: GPU-derived preference | Optionally pin a precision available in the image; see [Precision selection](deployment.md#precision-selection) |
 | `NIM_PERF_PROFILE` | `latency` | Generator only: choose `latency` or `throughput` |
 
 Reasoner rejects `NIM_PERF_PROFILE`, including `profile=` in
-`NIM_TAGS_SELECTOR`, with a startup error. Nano-DROID has BF16 profiles only.
+`NIM_TAGS_SELECTOR`, with a startup error. Edge Reasoner has BF16 and FP8
+profiles; Edge-DROID and Nano-DROID have BF16 profiles only. There is no
+general-purpose Edge Generator.
 The NIM chooses the best compatible profile for these settings and the visible
 GPUs; a normal deployment does not need a profile ID.
 
@@ -156,11 +158,14 @@ change other controls one at a time and measure the effect.
 
 | Name | Default | Use |
 | --- | --- | --- |
-| `NIM_USE_DFLASH` | `true` for Reasoner | Use the bundled Nano or Super DFlash draft; set `false` to run the target model without speculative decoding |
+| `NIM_USE_DFLASH` | `true` for Nano/Super Reasoner | Use the bundled Nano or Super DFlash draft; set `false` to run the target model without speculative decoding, and always for Edge |
 | `NIM_DFLASH_MODEL_PATH` | Empty | Nano or Super Reasoner: use an independent absolute local DFlash directory containing `config.json` and `model.safetensors`; see [Local directory](bring-your-own-checkpoint.md#local-directory) for the mount |
 
-DFlash is on by default for Reasoner and does not change the request API; set
-`NIM_USE_DFLASH=0` to disable it (Generator rejects an explicit enable).
+DFlash is on by default for Nano and Super Reasoner and does not change the
+request API; set `NIM_USE_DFLASH=0` to disable it (Generator rejects an
+explicit enable). Edge Reasoner does not support DFlash in this version: set
+`NIM_USE_DFLASH=0`, plus `NIM_STREAMING_SPEC_METHOD=none` when
+[streaming](#advanced-streaming-controls) is enabled.
 `NIM_DFLASH_MODEL_PATH` accepts only an absolute local path, not `hf://`, and
 `NIM_DFLASH_CONFIG` requires DFlash enabled and cannot set the `method` or
 `model` keys.
@@ -222,14 +227,15 @@ Leave these at their defaults unless diagnosing or tuning a measured workload:
 
 | Name | Default | Use |
 | --- | --- | --- |
-| `NIM_STREAMING_SPEC_METHOD` | `ngram` | Replace configured DFlash speculation with GPU n-gram speculation; `none` disables speculation. The `dflash` override is for diagnostics only and is unsupported for streaming |
-| `NIM_STREAMING_SPEC_NUM_TOKENS` | `3` | Number of proposed tokens for the n-gram replacement; values below 1 become 1, and non-integer values fall back to 3 |
+| `NIM_STREAMING_SPEC_METHOD` | `dflash` when DFlash is enabled; otherwise `none` | Select `dflash`, GPU n-gram speculation (`ngram`), or `none`; takes precedence over `NIM_USE_DFLASH` |
+| `NIM_STREAMING_SPEC_NUM_TOKENS` | `3` | Number of proposed n-gram tokens; values below 1 become 1, and non-integer values fall back to 3 |
 | `NIM_STREAMING_FORCE_V1_RUNNER` | Unset | Set `1` to force the vLLM V1 model runner; otherwise leave runner selection to vLLM |
 
-The speculation controls apply only when streaming is enabled and the engine
-has a DFlash speculative configuration. They do not independently enable
-speculation when `NIM_USE_DFLASH=false`. N-gram replaces DFlash because DFlash
-is currently not supported for streaming. Both V1 and V2 model runners support the
+The speculation controls apply only when streaming is enabled. For Edge, which
+has no [DFlash](#speculative-decoding), set `NIM_STREAMING_SPEC_METHOD=none`
+explicitly: with the method unset,
+`NIM_USE_DFLASH=0` disables streaming speculation in updated images, but older
+images default streaming to DFlash. Both V1 and V2 model runners support the
 streaming path, so pinning V1 is not required for normal operation.
 
 Inspect `GET /v1/streaming/config` for the served model and default retention
@@ -325,6 +331,7 @@ Leave these at their defaults unless you have measured a need.
 | `NIM_MODEL_PROFILE` | Both | Empty | Pin an exact profile ID from the current image |
 | `NIM_VIDEO_SAVE_QUALITY` | Generator | `7` | VP9 output quality 1-9; affects encoding, not diffusion |
 | `NIM_ENABLE_TORCH_COMPILE` | Generator | `true` | Enable the compilation path |
+| `NIM_CACHE_BACKEND` | Generator | Edge-DROID: `none`; other variants: `sea_cache` | Diffusion cache; `none` disables SeaCache (leave `NIM_CACHE_CONFIG` unset) |
 | `NIM_LINEAR_BACKEND` | Generator | Quantized: `cutlass`; BF16: unset | `auto`, `cutlass`, `flashinfer_cutlass`, `flashinfer_cutedsl`, or `torch` for quantized DiT linear layers; an incompatible backend fails at model load |
 | `NIM_TRITON_LOG_VERBOSE` | Generator | `0` | Backend log verbosity for diagnosis |
 | `NIM_MAX_SEQUENCE_LENGTH` | Generator | `5120` | Startup prompt-token sequence length |

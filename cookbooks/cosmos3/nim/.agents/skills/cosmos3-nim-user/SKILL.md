@@ -108,6 +108,7 @@ diagnostic only, with explicit operator confirmation and before/after evidence.
 | --- | --- | --- | --- |
 | Text-to-image, text-to-video, image-to-video, video-to-video | Generator | `generation.md` | `examples/t2i.py`, `t2v.py`, `i2v.py`, `v2v.py` |
 | Forward, policy, or inverse dynamics | Generator | `action.md` | `examples/action.py` |
+| Edge-/Nano-DROID action-only policy | Generator (`edge-droid` or `nano-droid`) | `action.md` | `examples/policy_droid.py` |
 | Controlled video generation | Generator | `transfer.md` | `examples/transfer.py` |
 | Image or video understanding | Reasoner | `reasoning.md` | `examples/reasoner.py` |
 | Responses API | Reasoner | `reasoning.md` | `examples/reasoner_responses.py` |

@@ -14,16 +14,19 @@ Choose the model; the NIM selects a compatible profile and precision (see
 | Runtime | Model | Supported use |
 | --- | --- | --- |
 | Generator | `nano` | General-purpose Generator tasks |
+| Generator | `edge-droid` | DROID policy with action-only output; BF16 only |
 | Generator | `nano-droid` | DROID policy with action-only output; BF16 only |
 | Generator | `super` | General-purpose Generator tasks |
 | Generator | `super-t2i` | Full-step T2I only |
 | Generator | `super-t2i-4step` | Four-step T2I only |
 | Generator | `super-i2v` | Full-step I2V only |
 | Generator | `super-i2v-4step` | Four-step I2V only |
+| Reasoner | `edge` | Image/video reasoning; BF16 or FP8 only |
 | Reasoner | `nano` | Image/video reasoning |
 | Reasoner | `super` | Image/video reasoning |
 
-A Generator specialist rejects requests for other tasks. After startup,
+A Generator specialist rejects requests for other tasks. Edge has no
+general-purpose Generator. After startup,
 [verify the selection](deployment.md#verify-the-selection).
 
 ### Practical model recommendation
@@ -158,6 +161,7 @@ only to the general-purpose `nano` and `super` variants.
 
 | Variant group | Precision | Model offload | Guardrails during diffusion | GPUs | Generation minimum VRAM/device | Host RAM guidance | Transfer minimum VRAM/device |
 | --- | --- | --- | --- | ---: | ---: | ---: | ---: |
+| `edge-droid` | BF16 | None | Resident | 1, 2, 4, 8 | 15 GiB profile floor | Validate on host | Not supported |
 | `nano` | BF16 | None | Resident | 1, 2, 4, 8 | 58 GiB | 40 GiB | 64 GiB |
 | `nano` | BF16 | Layer | Offloaded | 1 | 31 GiB | 64 GiB | 35 GiB |
 | `nano` | FP8 | None | Resident | 1, 2, 4, 8 | 44 GiB | 40 GiB | 50 GiB |
@@ -174,8 +178,12 @@ only to the general-purpose `nano` and `super` variants.
 The 31-GiB Nano layer-offload rows target 32-GB client GPUs such as the
 GeForce RTX 5090, which does not meet their 35-GiB Transfer minimum.
 
-> **Host RAM:** Values for non-offloading rows (Generator and Reasoner) are
-> empirical practical minimums on discrete-GPU hosts. The profiles' own
+> **Host RAM:** Values for non-offloading Nano and Super rows (Generator and
+> Reasoner) are empirical practical minimums on discrete-GPU hosts. Edge rows
+> (`edge-droid`, `edge`) are profile-selection floors, not measured
+> requirements: confirm them and their system-memory admission tags in the image
+> manifest, and validate host RAM and GPU headroom for the actual context,
+> media, and concurrency. The profiles' own
 > admission check is only 16 GiB so startup is not blocked; passing it does not
 > satisfy the practical value. Offload rows carry a profile floor (Nano 64 GiB,
 > Super 150 GiB) with no separate practical minimum established. A container
@@ -188,12 +196,12 @@ configuration is validated for the deployment.
 
 ## Reasoner configurations
 
-## Reasoner configurations
-
 Reasoner does not use Generator latency/throughput or model-offload selectors:
 
 | Model | Precision | GPUs | Tensor parallelism | Minimum VRAM/device | Practical host RAM minimum | Minimum compute capability |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
+| `edge` | BF16 | 1 | 1 | 12 GiB profile floor | Validate on host | 8.0 |
+| `edge` | FP8 | 1 | 1 | 12 GiB profile floor | Validate on host | 8.9 |
 | `nano` | BF16 | 1 | 1 | 23.1 GiB | 24 GiB | 8.0 |
 | `nano` | FP8 | 1 | 1 | 23.1 GiB | 18 GiB | 8.9 |
 | `nano` | NVFP4 | 1 | 1 | 23.1 GiB | 18 GiB | 10.0 |

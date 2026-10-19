@@ -44,7 +44,8 @@ a compatible profile, as described in
 | Video-to-video | Generator | Prompt + video | MP4 video | [Generation](generation.md#video-to-video) |
 | Forward dynamics | Generator | Image + action trajectory | Rollout video | [Action](action.md#forward-dynamics) |
 | Policy | Generator | Image + task/state | Video + predicted action | [Action](action.md#policy) |
-| Nano-DROID policy | Generator | Image + task/current state | Predicted action | [Action](action.md#nano-droid-policy) |
+| Nano-DROID policy | Generator | Image + task/current state | Predicted action | [Action](action.md#edge-droid-and-nano-droid-policy) |
+| Edge-DROID policy | Generator | Composed camera views + task/current state | Predicted action | [Action](action.md#edge-droid-and-nano-droid-policy) |
 | Inverse dynamics | Generator | Video | Video + predicted action | [Action](action.md#inverse-dynamics) |
 | Video Transfer | Generator | Prompt + spatial control | Controlled MP4 video | [Transfer](transfer.md) |
 | Image/video reasoning | Reasoner | Media + text | Text or structured result | [Reasoning](reasoning.md) |
@@ -98,9 +99,9 @@ uv run python examples/reasoner.py --case image_caption
 
 Specialist variants accept only their task: run
 [`t2i_4step.py`](examples/t2i_4step.py),
-[`i2v_4step.py`](examples/i2v_4step.py), or the
-[Nano-DROID request](action.md#nano-droid-policy) only against the matching
-variant. Examples save outputs under the ignored `examples/outputs/` directory.
+[`i2v_4step.py`](examples/i2v_4step.py), or
+[`policy_droid.py`](action.md#edge-droid-and-nano-droid-policy) only against the
+matching variant. Examples save outputs under the ignored `examples/outputs/` directory.
 
 Validate the selected configuration with representative requests before
 production use.

@@ -15,15 +15,23 @@ enabled.
 
 First complete the [prerequisites](dynamo_deployment.md#prerequisites) and
 [namespace and cache setup](dynamo_deployment.md#prepare-the-namespace-and-cache).
-If reusing a cache, set `claimName` in the streaming YAML to
-`<existing-cache-pvc>`. Replace all `<angle-bracket>` values before applying.
+Complete the shared [model-download step](dynamo_deployment.md#download-model-artifacts)
+before starting workers. If reusing a cache, set `spec.pvcs[0].name` and
+`ReasonerWorker.volumeMounts[0].name` in the streaming YAML, plus the download
+Job's PVC `claimName`, to `<existing-cache-pvc>`. Keep `create: false`.
+Replace all `<angle-bracket>` values before applying.
+
+This manifest adapts the tested regular deployment's `v1alpha1` services schema,
+resources, shared cache, and operator-managed worker health probes. Streaming
+sessions were not exercised by the supplied working-deployment files; validate
+the adapter and session requests below against your chosen image.
 
 ## Set the NIM image
 
 In [`reasoner_with_streaming.yaml`](reasoner_with_streaming.yaml), replace
 both occurrences of `<nim-image-build>` with the same available Cosmos3 NIM
 image address, including its tag or digest. The image must include
-`/opt/nim/streaming/dynamo/`.
+`/opt/nim/streaming/dynamo/`. Use the same image in the download Job.
 
 The frontend runs `/opt/nim/.venv/bin/python -m streaming.dynamo.frontend`
 from `/opt/nim`. It serves streaming configuration and REST sessions and forwards
@@ -38,22 +46,54 @@ streaming pool still uses the separate `NIM_DYNAMO_STREAMING_ENDPOINT` setting.
 See [Dynamo worker configuration](../configuration.md#run-nim-as-a-dynamo-worker)
 and [Dynamo streaming configuration](../configuration.md#dynamo-streaming)
 for environment variables, defaults, precedence, and timeouts.
-The source pins Dynamo `1.5.0.dev20260902`; the graph's operator runtime
-override remains `1.5.0`.
+The tested image bundled Dynamo `1.5.0.dev20260902`; the graph's operator runtime
+override remains `1.5.0`. Verify compatibility for your image/operator pairing.
+
+Both manifests use the same Bash launch style (`set -euo pipefail` followed
+by `exec`), explicit Kubernetes discovery, scheduling tolerations, and shared
+worker environment values. Streaming uses the NIM image and its Python
+environment for the frontend in place of the regular pinned Dynamo image,
+changes the frontend module, enables
+`NIM_ENABLE_STREAMING`, disables asynchronous scheduling, and adds the shared
+streaming endpoint to the frontend and workers.
 
 The YAML sets synchronous scheduling explicitly and uses the same
 `NIM_DYNAMO_STREAMING_ENDPOINT` on frontend and workers. Keep that value
 identical; use a distinct endpoint for each separate model pool.
 
+## Use Edge Reasoner
+
+Edge supports the same REST session API in BF16 and FP8. In both
+`model-download.yaml` and the streaming manifest's `ReasonerWorker`, set:
+
+```yaml
+- name: NIM_MODEL_VARIANT
+  value: edge
+- name: NIM_PRECISION
+  value: fp8  # or bf16
+- name: NIM_USE_DFLASH
+  value: '0'
+- name: NIM_STREAMING_SPEC_METHOD
+  value: none
+```
+
+Replace the existing variant and precision entries rather than adding duplicates.
+Keep the image, cache, and GPU selectors aligned between the Job and workers.
+Edge does not support DFlash in this version. Set the streaming method explicitly
+to `none` so images that default streaming to DFlash do not request a draft.
+The shared frontend needs no model-specific change; the client discovers the
+Edge model from `/v1/streaming/config`. Use a separate streaming endpoint if
+running Edge alongside a Nano or Super pool.
+
 ## Deploy and check
 
 Run from `cookbooks/cosmos3/nim/dynamo`. If your image uses another registry,
-configure its credentials and replace both `imagePullSecrets` entries with
-`<your-image-pull-secret>`.
+configure its credentials and replace the `imagePullSecrets` entries in both
+services and the download Job with `<your-image-pull-secret>`.
 
 ```bash
-kubectl -n cosmos3 apply -f reasoner_with_streaming.yaml
-kubectl -n cosmos3 get pods \
+kubectl -n "$NAMESPACE" apply -f reasoner_with_streaming.yaml
+kubectl -n "$NAMESPACE" get pods \
   -l nvidia.com/dynamo-graph-deployment-name=cosmos3-reasoner -w
 ```
 
@@ -149,8 +189,8 @@ not the shared frontend's routes.
 
 ## Scale or stop
 
-Set `ReasonerWorker.replicas` to `<worker-count>` in the streaming YAML and
-apply that file again. Each replica needs the shared
+Set `spec.services.ReasonerWorker.replicas` to `<worker-count>` in the streaming
+YAML and apply that file again. Each replica needs the shared
 [resources and cache](dynamo_deployment.md#prerequisites). Scaling down or
 replacing workers loses their active sessions; session state does not migrate.
 Set the count to `0` to release the GPUs while retaining the frontend and cache;
@@ -159,7 +199,9 @@ restore a positive count and wait for readiness before sending more requests.
 To stop serving while keeping the cache PVC and secrets:
 
 ```bash
-kubectl -n cosmos3 delete -f reasoner_with_streaming.yaml
+kubectl -n "$NAMESPACE" delete -f reasoner_with_streaming.yaml
 ```
 
-Stop the port-forward with Ctrl+C.
+Deleting the graph interrupts active requests and loses active sessions. Run
+the delete command only when you intend to stop serving. Stop the port-forward
+with Ctrl+C.

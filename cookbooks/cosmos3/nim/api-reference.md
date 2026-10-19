@@ -148,7 +148,7 @@ A specialist action-only policy can return:
 
 In that case both `b64_image` and `b64_video` are absent or null. Clients must
 branch on the fields actually present rather than assuming every non-T2I
-request has `b64_video`. See [Nano-DROID policy](action.md#nano-droid-policy).
+request has `b64_video`. See [Edge-/Nano-DROID policy](action.md#edge-droid-and-nano-droid-policy).
 
 ## Errors and live schema
 

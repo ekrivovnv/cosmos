@@ -11,8 +11,8 @@ task.
 > [Support matrix](support-matrix.md).
 
 Start the NIM with [Deployment](deployment.md). General Action models return
-visual rollouts for all three modes; the Nano-DROID specialist serves policy
-only and returns actions without media.
+visual rollouts for all three modes; the Edge-DROID and Nano-DROID specialists
+serve policy only and return actions without media.
 
 ## Understand an action sequence
 
@@ -52,8 +52,8 @@ AV actions are 9D (translation plus 6D rotation); UMI and DROID are a 9D
 end-effector pose plus a gripper value. The API checks only domain and width;
 units, normalization, frames, gripper conventions, and denormalization belong to
 the checkpoint, so apply its published transforms before driving hardware.
-Nano-DROID's 8-wide output is its own contract, not a truncated DROID 10D
-action.
+The DROID specialists' 8-wide output is their own contract, not a truncated
+DROID 10D action.
 
 ## Cadence and visual geometry
 
@@ -170,14 +170,22 @@ Before physical execution, enforce your own joint and workspace bounds,
 collision checks, timing limits, and emergency stops; a valid response is not
 authorization to execute.
 
-## Nano-DROID policy
+## Edge-DROID and Nano-DROID policy
 
-Nano-DROID is a specialist policy checkpoint selected with:
+Edge-DROID and Nano-DROID are BF16-only specialist policy checkpoints with the
+same action-only request contract. Choose one at startup from an image whose
+manifest includes the matching Generator profile:
 
 ```bash
 -e NIM_MODEL_TYPE=generator \
--e NIM_MODEL_VARIANT=nano-droid
+-e NIM_MODEL_VARIANT=edge-droid \
+-e NIM_PRECISION=bf16 \
+-e NIM_CACHE_BACKEND=none
 ```
+
+Use `NIM_MODEL_VARIANT=nano-droid` for Nano-DROID. `NIM_CACHE_BACKEND=none`
+disables SeaCache; guardrails stay enabled. Neither variant serves DROID
+forward or inverse dynamics.
 
 Its request uses the same `POST /v1/infer` API as other Generator tasks:
 
@@ -209,8 +217,22 @@ actions of width 8 and defaults to 4 steps, guidance `3.0`, and flow shift
 `5.0`; those and `seed` are overridable.
 
 The response is action-only, with no `b64_image` or `b64_video` (see the
-[response example](api-reference.md#generator-response)). No runnable case
-ships yet; it awaits a public DROID observation.
+[response example](api-reference.md#generator-response)).
+
+After readiness, run the [policy client](examples/policy_droid.py):
+
+```bash
+uv run python examples/policy_droid.py
+```
+
+It composes the first frame of each camera in the public
+[`droid_lerobot_example`](../generator/action/assets/droid_lerobot_example)
+(wrist view above the two exterior views), sends the matching first-frame
+joint/gripper state, and saves the composed image and the validated `[32, 8]`
+action under `examples/outputs/`. It does not execute robot actions. The
+[vLLM-Omni policy notebook](../generator/action/run_policy_with_vllm_omni.ipynb)
+uses the same sample with a different direct-vLLM `/v1/videos` API; do not copy
+its payload.
 
 ## Inverse dynamics
 
@@ -263,7 +285,8 @@ object:
 `data` is shortened here; real responses have every row in `shape`. Before
 use, check that `shape` matches `data`, that rows, width, `raw_action_dim`,
 `action_mode`, and `domain_id` match the request, and that values are finite.
-[Nano-DROID](#nano-droid-policy) returns the same object without media.
+[Edge-/Nano-DROID policy](#edge-droid-and-nano-droid-policy) returns the same
+object without media.
 
 ## Action parameter reference
 

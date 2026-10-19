@@ -8,6 +8,9 @@ Completions and Responses APIs. These workflows require a running **Reasoner**
 model; `/v1/infer` is a Generator endpoint and is not used here. See
 [Deployment](deployment.md) to select and launch a Reasoner model.
 
+The same clients work with `edge`, `nano`, and `super`; launch Edge with the
+[Edge experiments](deployment.md#edge-experiments) selectors.
+
 For stateful reasoning over successive video frames, see
 [Streaming video](streaming.md). Its [example client](streaming.md#example-client)
 is bundled in this cookbook and uses the same pinned environment and `NIM_URL`
@@ -35,7 +38,8 @@ localhost, but the OpenAI client requires a non-empty placeholder such as
 
 ## Discover the served model
 
-Do not hard-code the served model ID:
+Do not hard-code the served model ID (for example, Edge serves
+`nvidia/cosmos3-edge-reasoner`):
 
 ```python
 import requests
@@ -105,7 +109,7 @@ The catalog was validated on Super BF16 (hardware floor in the
 `temperature=0.7`, `top_p=0.8`, `top_k=20`, `presence_penalty=0`, and
 `repetition_penalty=1` (plus `seed=0` where the vLLM notebook sets it) unless
 it records an override; the runner only warns on another variant, so do not
-present a Nano result as Super-validated.
+present an Edge or Nano result as Super-validated.
 
 ### Artifacts and validation boundaries
 
@@ -225,7 +229,8 @@ tags, which appear in `message.content` as ordinary text.
 ## Reasoner DFlash
 
 Nano and Super Reasoner use their bundled DFlash drafts by default; set
-`NIM_USE_DFLASH=0` to run target-only. Requests do not change. See
+`NIM_USE_DFLASH=0` to run target-only, and always for Edge, which has no
+DFlash. Requests do not change. See
 [Speculative decoding](configuration.md#speculative-decoding) and
 [Reasoner checkpoint](bring-your-own-checkpoint.md#reasoner-checkpoint).
 
