@@ -152,13 +152,9 @@ precomputed control video.
 ### Control guidance behavior
 
 When control and text guidance are both active, the control term is scaled by
-`control_guidance` alone; 2.0.0 images also multiplied it by `guidance_scale`.
-With the edge-family defaults, the effective control coefficient is therefore
-1.5 instead of 4.5. Request defaults are unchanged, but combined-guidance
-outputs differ from 2.0.0, so do not compare them with 2.0.0 quality baselines.
-To approximate the earlier strength, multiply the earlier `control_guidance` by
-`guidance_scale`, up to the 10.0 maximum. `control_guidance=1.0` disables the
-extra control-guidance branch.
+`control_guidance` alone; with the edge-family defaults the effective control
+coefficient is 1.5. `control_guidance=1.0` disables the extra control-guidance
+branch.
 
 Current defaults by family (explicit valid values override them; recheck on
 another image):

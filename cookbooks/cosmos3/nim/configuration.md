@@ -104,12 +104,11 @@ manifest lacks; a selection that matches no profile fails at startup. Without
 them, the Generator uses as many visible GPUs as a compatible profile supports
 (1, 2, 4, or 8). There is no one-GPU `throughput` profile, and model or layer
 offload is available only on one GPU. To keep the Generator on fewer GPUs,
-limit `--gpus` or set `n_gpus` in `NIM_TAGS_SELECTOR`.
+expose fewer GPUs with `--gpus`.
 
 On an integrated GPU with unified host/device memory (DGX Spark/GB10, Jetson
 AGX Thor), the NIM treats 70% of the shared pool as GPU memory for profile
-floors and as the default Reasoner `NIM_GPU_MEMORY_UTILIZATION`. This image
-ignores the earlier `NIM_UNIFIED_MEMORY_HOST_RESERVE_GIB`.
+floors and as the default Reasoner `NIM_GPU_MEMORY_UTILIZATION`.
 
 A shorthand variable that conflicts with `NIM_TAGS_SELECTOR` is a startup
 error; use the `model_variant` tag to filter by model. Exact tags and profile
@@ -145,8 +144,7 @@ requests](operations.md#long-running-requests).
 
 The selected profile owns guardrail residency; choose it with the
 `text_guard_offload` and `video_guard_offload` selector keys under
-[Advanced profile controls](#advanced-profile-controls). This image ignores the
-earlier `NIM_OFFLOAD_TEXT_GUARDRAIL` and `NIM_OFFLOAD_VIDEO_GUARDRAIL`. See
+[Advanced profile controls](#advanced-profile-controls). See
 [Guardrails](operations.md#guardrails) for what each layer does.
 
 ### Diffusion cache, attention, and VAE decode

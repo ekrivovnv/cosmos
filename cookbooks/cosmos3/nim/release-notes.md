@@ -29,8 +29,10 @@ Image: `nvcr.io/nim/nvidia/cosmos3:2.1.0`.
 ### Behavior changes
 
 - **Transfer guidance**: with control and text guidance both active, the
-  control term is no longer also multiplied by `guidance_scale`, so
-  combined-guidance outputs differ from 2.0.0; see
+  control term is no longer also multiplied by `guidance_scale` (effective
+  edge-family coefficient 1.5 instead of 4.5), so combined-guidance outputs
+  differ from 2.0.0 baselines. To approximate the 2.0.0 strength, multiply the
+  previous `control_guidance` by `guidance_scale`, up to the 10.0 maximum; see
   [Control guidance behavior](transfer.md#control-guidance-behavior).
 - **Generator performance defaults**: SeaCache is on for every Generator
   variant except Edge-DROID, SageAttention 2.2 is the default on compute

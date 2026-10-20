@@ -72,8 +72,7 @@ On unified-memory systems, Generator uses only rows with
 
 On unified-memory systems, **effective shared memory** is 70% of the
 device-reported total; the rest stays with the host. The same share is the
-default Reasoner `NIM_GPU_MEMORY_UTILIZATION`. This image ignores the earlier
-`NIM_UNIFIED_MEMORY_HOST_RESERVE_GIB`.
+default Reasoner `NIM_GPU_MEMORY_UTILIZATION`.
 
 | Runtime/profile | Effective shared-memory floor | Unified-memory policy |
 | --- | ---: | --- |

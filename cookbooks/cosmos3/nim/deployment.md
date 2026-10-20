@@ -129,8 +129,7 @@ export NIM_GPU_MEMORY_UTILIZATION=0.60
 ```
 
 If you set a value, pass `-e NIM_GPU_MEMORY_UTILIZATION` in every Reasoner
-preflight and launch command on that system. Do not set it for Generator. This
-image ignores the earlier `NIM_UNIFIED_MEMORY_HOST_RESERVE_GIB`; see
+preflight and launch command on that system. Do not set it for Generator. See
 [Reasoner context and scheduling](configuration.md#context-and-scheduling).
 
 ## Run the pre-download profile preflight
