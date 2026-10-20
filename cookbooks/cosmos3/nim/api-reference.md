@@ -26,7 +26,7 @@ Reasoner completion APIs, and a Reasoner profile does not serve `/v1/infer`.
 
 Reasoner features are in
 [Reasoning](reasoning.md#final-answers-instructions-and-tool-calls). Check the
-active `model_type` and `inference_endpoint` in `/v1/metadata`; other framework
+active `model_type` and `inference_endpoint` in `/v1/metadata`. Other framework
 endpoints are in
 [Inspect the Running Service](operations.md#inspect-the-running-service).
 
@@ -36,7 +36,7 @@ The Generator serves `POST /v1/infer`. It accepts one synchronous JSON object
 and rejects unknown fields. Every request must set `model_mode` to identify the
 task.
 
-`NIM_MODEL_VARIANT` chooses the checkpoint at container start; `model_mode`
+`NIM_MODEL_VARIANT` chooses the checkpoint at container start, and `model_mode`
 chooses the task per request.
 
 | `model_mode` | Task | `input_reference` |
@@ -54,7 +54,7 @@ The task guides define the remaining required inputs and invalid combinations.
 
 ### Common Generator Request Fields
 
-Defaults are for video / text-to-image (T2I); Transfer and Action defaults are
+Defaults are for video / text-to-image (T2I). Transfer and Action defaults are
 on their pages.
 
 | Field | Type | Video / T2I Default | Applies To |
@@ -86,28 +86,31 @@ Integer and finite-number fields use strict JSON types. For example, `"35"`,
 ## Media Inputs
 
 Generator image and video inputs (`input_reference` and Transfer control
-videos) accept:
+videos) can be supplied in the following ways:
 
-- raw base64;
-- a MIME-aware data URL such as `data:image/jpeg;base64,...` or
-  `data:video/mp4;base64,...`; and
-- an HTTP(S) URL when `NIM_ALLOW_URL_INPUT` is enabled (the default).
+- Raw base64
+- A MIME-aware data URL such as `data:image/jpeg;base64,...` or
+  `data:video/mp4;base64,...`
+- An HTTP(S) URL when `NIM_ALLOW_URL_INPUT` is enabled (the default)
 
 A data URL must use `;base64` and an `image/*` or `video/*` MIME type matching
 the field. An HTTP(S) URL is fetched with a 30-second timeout and must respond
 with a `Content-Type` of `image/*` or `video/*`. Generic
 `application/octet-stream` is accepted for video only when the URL or
-`Content-Disposition` names an `.mp4` file. Prefer data URLs; remote inputs
+`Content-Disposition` names an `.mp4` file. Prefer data URLs. Remote inputs
 need container network access and can time out or change.
 
 Input videos must use an MP4/MOV, Matroska/WebM, FLV, or AVI container with
-H.264, H.265/HEVC, MPEG-4 Part 2, VP8, VP9, or AV1; other codecs return HTTP
+H.264, H.265/HEVC, MPEG-4 Part 2, VP8, VP9, or AV1. Other codecs return HTTP
 422. Decode paths and image formats are in the
 [Support Matrix](support-matrix.md#media-and-codecs).
 
-Size caps: image-to-video (I2V) images 20,000,000 encoded characters;
-video-to-video (V2V) decoded video 75 MB; Transfer limits are in
-[Transfer](transfer.md#media-and-output).
+Generation inputs have these size caps:
+
+- Image-to-video (I2V) images: 20,000,000 encoded characters
+- Video-to-video (V2V) decoded video: 75 MB
+
+Transfer limits are in [Transfer](transfer.md#media-and-output).
 
 ## Generator Response
 
@@ -130,12 +133,12 @@ Video modes return:
 ```
 
 Media fields are raw base64 (JPEG for T2I, VP9-in-MP4 for video), not data or
-file URLs; inactive fields are omitted or null. Only general Policy and inverse
+file URLs. Inactive fields are omitted or null. Only general Policy and inverse
 dynamics return video plus an
 [action object](action.md#response-action-object).
 
 A specialist action-only policy can return the following response. The `data`
-array is shortened to one row here; a complete response has 32 rows of eight
+array is shortened to one row here. A complete response has 32 rows of eight
 values, matching `shape: [32, 8]`:
 
 ```json
@@ -161,7 +164,7 @@ Policy](action.md#edge-droid-and-nano-droid-policy).
 A request for the other runtime's primary route returns HTTP 404 with the
 common NIM error envelope naming the active runtime and its endpoint. Refer to
 [Errors](operations.md#errors) and
-[Troubleshooting](operations.md#troubleshooting); do not automate on exact
+[Troubleshooting](operations.md#troubleshooting). Do not automate on exact
 error-message text.
 
 Save the active runtime's OpenAPI document:

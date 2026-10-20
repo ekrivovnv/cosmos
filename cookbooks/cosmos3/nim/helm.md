@@ -13,6 +13,8 @@ for regular Dynamo and Dynamo with streaming, and require the Dynamo operator.
 
 ## Prerequisites
 
+Before you start, make sure you have the following:
+
 - A Kubernetes cluster with GPU nodes that match a row in the
   [Support Matrix](support-matrix.md), with the
   [NVIDIA GPU Operator](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/)
@@ -95,21 +97,22 @@ Adjust it for the chosen configuration:
 
 - **Model and GPUs:** Change `NIM_MODEL_VARIANT`, `NIM_PERF_PROFILE`, and
   `nvidia.com/gpu` together using the
-  [Generator Profiles](support-matrix.md#generator-profiles). The
-  GPU count does not select a GPU type; use `nodeSelector` or `affinity` to
-  target eligible GPU nodes, and `tolerations` if those nodes are tainted. On
-  nodes with MIG enabled, request the MIG resource instead of
-  `nvidia.com/gpu`, for example `nvidia.com/mig-4g.24gb: 2`.
-- **Cache size:** `220Gi` is a starting size for large model files. Set `persistence.storageClass` if the
-  cluster has no default storage class.
+  [Generator Profiles](support-matrix.md#generator-profiles). The GPU count
+  does not select a GPU type. Use `nodeSelector` or `affinity` to target
+  eligible GPU nodes, and `tolerations` if those nodes are tainted. On nodes
+  with MIG enabled, request the MIG resource instead of `nvidia.com/gpu`, for
+  example `nvidia.com/mig-4g.24gb: 2`.
+- **Cache size:** `220Gi` is a starting size for large model files. Set
+  `persistence.storageClass` if the cluster has no default storage class.
 - **Memory:** A pod memory limit counts as system memory during profile
-  selection. Keep any limit at or above the system-memory floor of the selected row.
+  selection. Keep any limit at or above the system-memory floor of the
+  selected row.
 - **Shared memory:** The chart mounts a memory-backed `emptyDir` at `/dev/shm`
   by default. `sharedMemory.sizeLimit: 16Gi` matches the 16 GiB that the Docker
   launch allocates.
 - **Pod user:** The chart runs the pod as UID and GID 1000 with
   `fsGroup: 1000` (`podSecurityContext`). The cache volume must be writable by
-  that user; storage that ignores `fsGroup`, such as some NFS exports and
+  that user. Storage that ignores `fsGroup`, such as some NFS exports and
   `hostPath` directories, needs matching ownership.
 
 Set these through chart values rather than `env`:
@@ -143,16 +146,15 @@ env:
 ```
 
 On DGX Spark/GB10 or Jetson AGX Thor nodes, the NIM defaults
-`NIM_GPU_MEMORY_UTILIZATION` to `0.70`; set a lower value only from host
-measurements; refer to
-[Set the Reasoner Memory
-Share](deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems).
+`NIM_GPU_MEMORY_UTILIZATION` to `0.70`. Set a lower value only from host
+measurements. Refer to
+[Set the Reasoner Memory Share](deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems).
 
 ### OpenTelemetry
 
 To export traces and metrics over OTLP, add these entries to `env`. The
-endpoint assumes an OpenTelemetry Collector DaemonSet that listens on host
-port 4318; change `OTEL_EXPORTER_OTLP_ENDPOINT` for other collector layouts:
+endpoint assumes an OpenTelemetry Collector DaemonSet that listens on host port
+4318. Change `OTEL_EXPORTER_OTLP_ENDPOINT` for other collector layouts:
 
 ```yaml
   - name: NIM_ENABLE_OTEL
@@ -176,7 +178,8 @@ can expand it.
 
 ### Other Chart Features
 
-The chart README documents these optional features; all are off by default:
+The chart README documents the following optional features, which are all off
+by default:
 
 - **Prometheus metrics:** Set `metrics.serviceMonitor.enabled: true` to create
   a Prometheus Operator `ServiceMonitor` that scrapes `/v1/metrics` on the
@@ -185,9 +188,9 @@ The chart README documents these optional features; all are off by default:
   `ingress.tls`. The NIM does not authenticate requests, so protect any
   ingress outside the cluster.
 - **Autoscaling:** `autoscaling.enabled` with `minReplicas`, `maxReplicas`, and
-  `metrics`. CPU and memory metrics are of limited use for scaling a NIM; use
+  `metrics`. CPU and memory metrics are of limited use for scaling a NIM. Use
   custom metrics, for example through `prometheus-adapter`. Each new replica
-  must download or mount the model before it becomes ready; refer to
+  must download or mount the model before it becomes ready. Refer to
   [Storage and Scaling](#storage-and-scaling).
 
 ## Install
@@ -203,7 +206,7 @@ kubectl get pods -w
 Cold download, materialization, and model load can take much longer than pod
 startup. Send requests only after the pod reports `Ready`. Kubernetes restarts
 the container if it is not ready within `startupProbe.initialDelaySeconds` plus
-`startupProbe.failureThreshold` × `startupProbe.periodSeconds`; raise
+`startupProbe.failureThreshold` × `startupProbe.periodSeconds`. Raise
 `failureThreshold` for slow first downloads.
 
 ## Verify
@@ -215,7 +218,7 @@ handle authentication. Port-forward the Service for testing:
 kubectl port-forward service/cosmos3-nim-wfm 8000:http-api
 ```
 
-In another terminal:
+In another terminal, check readiness and metadata:
 
 ```bash
 export NIM_URL=http://localhost:8000
@@ -229,7 +232,7 @@ Confirm that metadata reports `generator` and `/v1/infer`, or `reasoner` and
 
 ## Storage and Scaling
 
-The chart supports these cache options; use only one:
+The chart supports the following cache options. Use only one of them:
 
 | Option | Values | Notes |
 | --- | --- | --- |
@@ -241,13 +244,13 @@ The chart supports these cache options; use only one:
 
 Set `replicaCount` for a fixed number of replicas. With the default
 StatefulSet, you can pre-populate caches by scaling up to the maximum replica
-count once and then scaling down; the retained claims let later scale-ups
+count once and then scaling down. The retained claims let later scale-ups
 start without a new download.
 
 With `statefulSet.enabled: false` and a `ReadWriteOnce` volume, scaling or
 rolling upgrades beyond one pod are likely to fail. Use a `ReadWriteMany`
-storage class or writable direct NFS. Without persistence, the cache is an `emptyDir` and every pod
-start downloads the model again.
+storage class or writable direct NFS. Without persistence, the cache is an
+`emptyDir` and every pod start downloads the model again.
 
 ## Troubleshooting
 
@@ -272,8 +275,8 @@ longer needed.
 ## Chart Parameters
 
 These are the `nim-wfm` chart values used with the chart version pinned on this
-page (1.3.0); run `helm show values "nim-wfm-${NIM_WFM_VERSION}.tgz"` for the
-authoritative list.
+page (1.3.0). For the authoritative list, run
+`helm show values "nim-wfm-${NIM_WFM_VERSION}.tgz"`.
 
 ### Deployment Parameters
 

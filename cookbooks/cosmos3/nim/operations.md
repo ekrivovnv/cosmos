@@ -14,7 +14,7 @@ and [Configuration](configuration.md) for environment variables.
 | `/v1/health/live` | HTTP process is alive | Model artifacts are loaded or inference can run |
 | `/v1/health/ready` | Selected backend reports ready after startup work | Every capability/media case has passed a basic verification test |
 
-Check both:
+Check both probes:
 
 ```bash
 export NIM_URL=${NIM_URL:-http://localhost:8000}
@@ -24,13 +24,13 @@ curl -i "$NIM_URL/v1/health/ready"
 
 Both runtimes return `{"object": "health.response", "message": "Service is
 ready", "status": "ready"}` for readiness, and `"Service is live"` / `"live"`
-for liveness. Treat the HTTP status as the primary result; failed probes are
+for liveness. Treat the HTTP status as the primary result. Failed probes are
 non-2xx.
 
 Cold startup can include NGC download, cache materialization, engine build,
-model load, and warmup, so a live-but-not-ready interval is expected; size
+model load, and warmup, so a live-but-not-ready interval is expected. Size
 orchestrator startup budgets for it. Profile selection reads each visible GPU's
-free memory once, before materialization: a competing allocation can cause a
+free memory once, before materialization. A competing allocation can cause a
 lower-memory fallback or startup failure, and later changes do not trigger
 reselection.
 
@@ -42,6 +42,8 @@ Use the active runtime rather than launch-time assumptions:
 curl -fsS "$NIM_URL/v1/metadata" | python3 -m json.tool
 ```
 
+Each endpoint answers a different operational question:
+
 | Endpoint | Operational Question |
 | --- | --- |
 | `/v1/metadata` | Which `model_type`, primary `inference_endpoint`, profile/checkpoint, and Generator `model_variant` did the NIM report? |
@@ -51,8 +53,8 @@ curl -fsS "$NIM_URL/v1/metadata" | python3 -m json.tool
 | `/v1/license` | Where is the bundled product license information? |
 | `/openapi.json` | Which routes and schemas does this active runtime expose? |
 
-To print the selected profile's ID and manifest tags (`/v1/manifest` embeds
-the YAML manifest in `manifest_file`), initialize the
+`/v1/manifest` embeds the YAML manifest in `manifest_file`. To print the
+selected profile's ID and manifest tags, initialize the
 [pinned client environment](prerequisites.md#initialize-the-example-environment)
 and run:
 
@@ -60,18 +62,18 @@ and run:
 uv run python examples/inspect_profile.py
 ```
 
-Profile IDs and tags are image-specific; do not copy them to another image.
+Profile IDs and tags are image-specific. Do not copy them to another image.
 
 ## Logging
 
 Set log level, JSON-line output, backend verbosity, and Reasoner request-body
 logging with the [Server and Logging](configuration.md#server-and-logging) and
 [Advanced Settings](configuration.md#advanced-settings) variables. At `INFO`,
-request prompts are redacted; at `DEBUG`, full prompts are logged, so use
+request prompts are redacted. At `DEBUG`, full prompts are logged, so use
 `DEBUG` only during diagnosis and treat its logs as sensitive. Never log
 secrets or raw media data URLs.
 
-For a Docker container:
+To read recent logs, run the command for your container:
 
 ```bash
 docker logs --since 10m cosmos3-generator
@@ -80,7 +82,7 @@ docker logs --since 10m cosmos3-reasoner
 
 ## Metrics
 
-Scrape `$NIM_URL/v1/metrics`; refer to [Monitoring](monitoring.md) for Prometheus
+Scrape `$NIM_URL/v1/metrics`. Refer to [Monitoring](monitoring.md) for Prometheus
 and Grafana setup and the metric families of each runtime.
 
 ## Long-Running Requests
@@ -89,7 +91,7 @@ Generator `/v1/infer` requests are synchronous: the connection stays quiet
 until inference and serialization finish, which alone does not mean a hang.
 The backend queue-plus-execution ceiling is
 [`NIM_TRITON_REQUEST_TIMEOUT`](configuration.md#generator-configuration),
-default 30 minutes, and a longer client timeout does not extend it; for the
+default 30 minutes. A longer client timeout does not extend it. For the
 60-minute Transfer client, launch the Generator with
 `-e NIM_TRITON_REQUEST_TIMEOUT=3600000000`. Before retrying a quiet request,
 check the container logs and GPU activity rather than readiness, and avoid
@@ -100,7 +102,7 @@ blind retries that duplicate expensive work.
 On DGX Spark, Jetson AGX Thor, and other unified-memory systems, [inspect
 current memory](prerequisites.md#inspect-unified-memory-capacity-and-current-state)
 to tell a capacity failure from a temporary one. For a current-memory failure,
-stop the competing workload and rerun preflight; do not clear the page cache,
+stop the competing workload and rerun preflight. Do not clear the page cache,
 delete the NIM model cache, or reboot as routine recovery.
 
 ## Guardrails
@@ -116,7 +118,7 @@ Generator guardrails are an input-prompt blocklist and a Qwen3Guard text guard
 | `NIM_ENABLE_SIGLIP_GUARDRAILS` | true | Per-frame safety classifier when output visual guardrails are enabled |
 
 A blocked request returns HTTP 422 and no usable partial output. Text checks run
-on the prompt that reaches generation; when prompt upsampling is enabled, that
+on the prompt that reaches generation. When prompt upsampling is enabled, that
 is the upsampled prompt.
 
 Disabling controls can reduce safety/privacy protections and can violate
@@ -128,7 +130,7 @@ deployment policy. Do so only for an approved, isolated diagnostic:
 -e NIM_ENABLE_SIGLIP_GUARDRAILS=0
 ```
 
-Disabling video guardrails also disables SigLIP; disabling SigLIP alone keeps
+Disabling video guardrails also disables SigLIP. Disabling SigLIP alone keeps
 the face path. Generator bring your own checkpoint (BYOC) does not replace the
 NIM-owned guardrails.
 
@@ -136,29 +138,30 @@ NIM-owned guardrails.
 
 Startup fails if the feature is enabled without endpoint, model, key, or
 required templates. At request time, external failures log a warning and
-generation continues with the original prompt. When debugging, confirm:
+generation continues with the original prompt. When debugging, confirm the
+following:
 
-- the configured URL is OpenAI-compatible and reaches `/v1/chat/completions`;
-- the model supports image input when upsampling image-to-video (I2V);
-  text-to-image (T2I) and text-to-video (T2V) send text only;
-- the external secret is present but not logged;
-- timeout and token limits suit the endpoint; and
-- provider-specific fields are placed in
+- The configured URL is OpenAI-compatible and reaches `/v1/chat/completions`.
+- The model supports image input when upsampling image-to-video (I2V).
+  Text-to-image (T2I) and text-to-video (T2V) send text only.
+- The external secret is present but not logged.
+- Timeout and token limits suit the endpoint.
+- Provider-specific fields are placed in
   `NIM_PROMPT_UPSAMPLING_EXTRA_BODY` only when that endpoint accepts them.
 
 ## Production Checks
 
-Before accepting traffic:
+Before accepting traffic, complete these checks:
 
-- require readiness, not only liveness;
-- start with enough free memory on every participating GPU and review any
-  profile-fallback warning;
-- record version, active model, profile/checkpoint metadata, and image digest;
-- verify the intended Generator or Reasoner route exists in live OpenAPI;
-- send one small representative request for each enabled capability;
-- confirm output decoding and artifact storage permissions;
-- confirm logs do not contain secrets or unbounded media/request bodies;
-- scrape metrics and test alerts if metrics are part of the SLO.
+- Require readiness, not only liveness.
+- Start with enough free memory on every participating GPU and review any
+  profile-fallback warning.
+- Record version, active model, profile/checkpoint metadata, and image digest.
+- Verify the intended Generator or Reasoner route exists in live OpenAPI.
+- Send one small representative request for each enabled capability.
+- Confirm output decoding and artifact storage permissions.
+- Confirm logs do not contain secrets or unbounded media/request bodies.
+- Scrape metrics and test alerts if metrics are part of the SLO.
 
 ## Errors
 
@@ -255,5 +258,5 @@ For DFlash and checkpoint-source failures, refer to [BYOC](#byoc).
 
 Refer to [Bring Your Own Checkpoint Common
 Failures](bring-your-own-checkpoint.md#common-failures). A long first start
-with a new engine or remote checkpoint is expected; keep a writable persistent
+with a new engine or remote checkpoint is expected. Keep a writable persistent
 cache and wait for readiness.

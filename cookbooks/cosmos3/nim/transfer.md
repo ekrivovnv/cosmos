@@ -31,7 +31,8 @@ At least one control must be enabled. Control media uses the same
 ## Run the Examples
 
 The script has five precomputed cases with matching prompts, control media,
-geometry, and seeds; run one at a time, as each is an expensive generation.
+geometry, and seeds. Run one at a time, because each is an expensive
+generation.
 
 Transfer is compute-intensive: use a high-throughput discrete GPU such as an
 RTX PRO 6000 Blackwell 96 GB or H100 80 GB. DGX Spark can meet the memory
@@ -40,7 +41,7 @@ floors but is much slower and not recommended. Check memory against
 
 The client allows 60 minutes per request, but the backend defaults to 30. To
 match, add `-e NIM_TRITON_REQUEST_TIMEOUT=3600000000` (microseconds) to the
-Generator launch and restart; refer to
+Generator launch and restart. Refer to
 [Long-Running Requests](operations.md#long-running-requests).
 
 Install the [client tooling](prerequisites.md#client-tooling). Then, from the
@@ -128,11 +129,11 @@ omit the nested control video:
 }
 ```
 
-`"edge": true` and `"blur": true` select the corresponding derived control
-with preset `medium`; they require `input_reference`. A preset applies
+The `"edge": true` and `"blur": true` settings select the corresponding derived
+control with preset `medium`. They require `input_reference`. A preset applies
 only to a derived control and cannot accompany nested `video`.
 
-Depth, segmentation, and WSM cannot be derived by the server; supply a
+Depth, segmentation, and WSM cannot be derived by the server. Supply a
 precomputed control video.
 
 ## Tune Transfer Parameters
@@ -146,18 +147,18 @@ precomputed control video.
 | `<control>.control_weight` | Finite number `>= 0`; enabled weights need a positive sum | 1.0 |
 
 `num_first_chunk_conditional_frames > 0` requires `input_reference`.
-`control_weight` belongs inside a control object; refer to
+The `control_weight` field belongs inside a control object. Refer to
 [Combine Multiple Controls](#combine-multiple-controls).
 
 ### Control Guidance Behavior
 
 When control and text guidance are both active, the control term is scaled by
-`control_guidance` alone; with the edge-family defaults the effective control
+`control_guidance` alone. With the edge-family defaults, the effective control
 coefficient is 1.5. `control_guidance=1.0` disables the extra control-guidance
 branch.
 
-Current defaults by family (explicit valid values override them; recheck on
-another image):
+The following table lists the current defaults by family. Explicit valid
+values override them. Recheck them on another image.
 
 | Request Family | Frames | FPS | Steps | Guidance | Flow Shift | Control Guidance |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -169,11 +170,11 @@ The example script uses a 121-frame chunk, or 101 for WSM.
 
 ## Combine Multiple Controls
 
-A `transfer` object can enable several controls; mixed requests use the edge
-family defaults. Each control object (`edge`, `blur`, `depth`, `seg`, `wsm`)
-accepts an optional relative `control_weight`, normalized across the enabled
-controls. This example gives edge and depth normalized weights of 0.25 and
-0.75:
+A `transfer` object can enable several controls. Mixed requests use the
+edge-family defaults. Each control object (`edge`, `blur`, `depth`, `seg`,
+`wsm`) accepts an optional relative `control_weight`, normalized across the
+enabled controls. This example gives edge and depth normalized weights of 0.25
+and 0.75:
 
 ```json
 {
@@ -193,9 +194,10 @@ controls. This example gives edge and depth normalized weights of 0.25 and
 ```
 
 An omitted weight, `"edge": true`, and `"blur": true` use 1.0. A zero weight is
-accepted only when another enabled control has a positive weight. This guide does not validate any combination, so use one
-control per request unless yours is validated, and only combine controls that
-are spatially and temporally aligned.
+accepted only when another enabled control has a positive weight. This guide
+does not validate any combination. Use one control per request unless yours is
+validated, and only combine controls that are spatially and temporally
+aligned.
 
 ## Transfer VRAM Admission
 
@@ -207,23 +209,31 @@ override, refer to [Transfer Headroom](support-matrix.md#transfer-headroom).
 ## Media and Output
 
 Control videos and video `input_reference` values accept up to 100,000,000
-encoded characters; refer to [Media Inputs](api-reference.md#media-inputs) for
+encoded characters. Refer to [Media Inputs](api-reference.md#media-inputs) for
 formats, codecs, and URL rules.
+
+Transfer media must also meet these requirements:
 
 - The source video and each control video must have at least `num_frames`
   frames (WSM control: `num_frames - 1`).
 - Their aspect ratio must be within 5% of the requested output shape.
 - The decoded source and control videos together are capped at 225,000,000
-  bytes; each single video is also capped at 75,000,000 bytes.
+  bytes. Each single video is also capped at 75,000,000 bytes.
 
 The response is `b64_video` plus `action: null`.
 
 ## Validation and Common Failures
 
-Besides the failures below, Transfer rejects V2V fields
-(`condition_frame_indexes_vision`, `condition_video_keep`) and `action_params`,
-a nested precomputed edge/blur video combined with its preset, and a negative
-or non-finite `control_weight` or enabled weights without a positive sum.
+Besides the failures in the table, Transfer rejects requests that contain any
+of the following:
+
+- V2V fields (`condition_frame_indexes_vision`, `condition_video_keep`) or
+  `action_params`
+- A nested precomputed edge/blur video combined with its preset
+- A negative or non-finite `control_weight`
+- Enabled weights without a positive sum
+
+Use this table to fix common failures:
 
 | Failure | Fix |
 | --- | --- |

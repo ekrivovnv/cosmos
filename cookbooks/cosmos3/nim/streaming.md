@@ -20,16 +20,16 @@ for enablement, capacity, and idle timeouts.
 
 For a shared Dynamo frontend, use the [Dynamo streaming deployment](dynamo/dynamo_with_streaming.md)
 and the client's `--backend dynamo --transport rest` mode. Dynamo supports REST
-sessions and config GET; WebSocket is unsupported. In this mode, the client
+sessions and config GET. WebSocket is unsupported. In this mode, the client
 checks only the shared frontend's `/health`, `/v1/models`, and
-`/v1/streaming/config`; it needs no worker URLs or private metadata access.
+`/v1/streaming/config`. It needs no worker URLs or private metadata access.
 Standalone NIM mode retains its readiness, runtime metadata, and selected-profile
 checks.
 
-Nano and Super streaming default to DFlash speculation when DFlash is enabled;
-set `NIM_STREAMING_SPEC_METHOD=ngram` for GPU n-gram speculation or `none` to
-disable it. Edge works with the same clients, which discover its model ID;
-launch it with `NIM_USE_DFLASH=0` and `NIM_STREAMING_SPEC_METHOD=none`, in
+Nano and Super streaming default to DFlash speculation when DFlash is enabled.
+Set `NIM_STREAMING_SPEC_METHOD=ngram` for GPU n-gram speculation or `none` to
+disable it. Edge works with the same clients, which discover its model ID.
+Launch Edge with `NIM_USE_DFLASH=0` and `NIM_STREAMING_SPEC_METHOD=none`, in
 standalone ([Deploy Edge Models](deployment.md#deploy-edge-models)) or
 [Dynamo](dynamo/dynamo_with_streaming.md#use-edge-reasoner) mode. Refer to
 [Advanced Streaming Controls](configuration.md#advanced-streaming-controls).
@@ -66,7 +66,7 @@ uv run python examples/streaming.py --transport rest \
   --video /path/to/clip.mp4 --fps 2 --frame-format base64
 ```
 
-Useful options:
+The client accepts these commonly used options:
 
 | Flag | Use |
 | --- | --- |
@@ -82,7 +82,7 @@ Useful options:
 
 The client prints per-frame results and does not save artifacts. WebSocket
 supports `--frame-format binary` (the default) and `base64`. REST uses JSON
-with `image_b64` and defaults to `base64`; the client rejects an explicit
+with `image_b64` and defaults to `base64`. The client rejects an explicit
 `--transport rest --frame-format binary` before contacting the endpoint.
 
 **Standalone NIM REST limitation:** raw image bodies currently fail with HTTP 415
@@ -90,10 +90,10 @@ with `image_b64` and defaults to `base64`; the client rejects an explicit
 streaming REST handler accepts binary images. Use JSON/base64 for REST, or
 WebSocket for binary frames. This does not affect WebSocket binary streaming.
 The Dynamo adapter and worker proxy support raw image bodies as well as
-JSON/base64; this example client uses JSON/base64 for REST on both backends.
+JSON/base64. This example client uses JSON/base64 for REST on both backends.
 
 WebSocket disconnects release the session. REST mode attempts to delete it
-after success, an error, or Ctrl+C; it stops on the first error without
+after success, an error, or Ctrl+C. It stops on the first error without
 retrying frames. REST frame calls have a 1,800-second timeout, and create/delete
 calls use 30 seconds. These are client ceilings, not expected latency.
 
@@ -137,7 +137,7 @@ To change the retained frame window for one session, pass, for example,
 `"retention":{"max_video_segments":4}`. Inspect the effective `retention`
 returned at creation. Larger windows can be refused if they exceed the
 engine's individual or shared encoder budget. Advanced retention changes are
-also checked against model context and position limits; keep the remaining
+also checked against model context and position limits. Keep the remaining
 defaults unless your workload requires tuning.
 
 The retention object supports these fields:
@@ -194,7 +194,7 @@ sending the next. Deletion returns `session_id`, `frames`, and `closed: true`.
 
 Connect to `ws://localhost:8000/v1/streaming/ws`, or `wss://` behind TLS.
 One connection owns one session. All control messages and every server reply
-are JSON **text** messages; only image payloads in binary mode are WebSocket
+are JSON **text** messages. Only image payloads in binary mode are WebSocket
 **binary** messages. Session IDs are returned for identification, but are not
 sent with subsequent messages: the connection identifies the session.
 
@@ -216,7 +216,7 @@ sequenceDiagram
 
 Wait for `created` before sending images, and wait for each frame reply before
 sending the next image. A reply contains the complete answer for that frame.
-The server processes messages sequentially; submitting ahead can queue stale
+The server processes messages sequentially. Submitting ahead can queue stale
 video frames. Closing the socket instead of sending `delete` also releases
 session resources, but the client cannot rely on receiving a final reply.
 
@@ -252,8 +252,8 @@ format, close the session and create a new one. There is no update, resume,
 or application-level ping operation. WebSocket control ping/pong frames are
 handled by the WebSocket stack, not by a JSON `op`.
 
-**Binary frame.** Send the JPEG/PNG file bytes as one binary WebSocket message;
-there is no `op`, filename, timestamp, session ID, or base64 prefix. Each image
+**Binary frame.** Send the JPEG/PNG file bytes as one binary WebSocket message.
+There is no `op`, filename, timestamp, session ID, or base64 prefix. Each image
 is limited to 8 MiB. The server decodes the image, processes it in the session,
 and returns a JSON `frame` reply.
 
@@ -265,7 +265,7 @@ and returns a JSON `frame` reply.
 
 Use raw base64, without a `data:image/...;base64,` prefix. Do not switch between
 binary and base64 messages within a session. A format mismatch, unknown `op`,
-or second `create` produces a recoverable protocol error; it does not update
+or second `create` produces a recoverable protocol error. It does not update
 the session.
 
 **Delete.** The same JSON text message closes either frame format:
@@ -319,13 +319,13 @@ With `fatal: false`, correct the message and continue using the session.
 With `fatal: true`, stop sending and open a new connection before creating a
 new session. Invalid initial messages and admission failures are fatal, as
 are missing/dead sessions during frame processing. These close with WebSocket
-code `1008`; unexpected internal failures send a fatal `500` error and close
+code `1008`. Unexpected internal failures send a fatal `500` error and close
 with `1011`. Normal explicit deletion closes with `1000`. Do not assume that a
 `closed` message arrives after a fatal error or network disconnect.
 
 ## Frame Replies
 
-REST returns a JSON object; WebSocket adds `"op":"frame"`. A representative
+REST returns a JSON object. WebSocket adds `"op":"frame"`. A representative
 reply has this shape (text and counts depend on the input):
 
 ```json
@@ -348,7 +348,7 @@ reply has this shape (text and counts depend on the input):
 of token deltas. `ttft_s` measures submission to first output text and
 `latency_s` measures submission to completion, in seconds. Optional stage
 timings report image decoding, prompt construction/preprocessing, engine work,
-and queue waiting in milliseconds. Timing fields can be null; they are server
+and queue waiting in milliseconds. Timing fields can be null. They are server
 measurements, not client round-trip latency or promised performance.
 
 ## Errors and Session Cleanup
@@ -372,8 +372,8 @@ status. WebSocket error messages are described [above](#server-messages).
 | `500` | Server-side failure; inspect service logs and readiness before retrying |
 
 Without the enable flag, the Reasoner does not register the streaming routes.
-If routes exist but streaming state is unavailable, handlers can return `501`;
-check startup logs, readiness, runtime, and image selection.
+If routes exist but streaming state is unavailable, handlers can return `501`.
+Check startup logs, readiness, runtime, and image selection.
 
 Close WebSocket connections or explicitly delete REST sessions when finished.
 [Idle timeouts](configuration.md#streaming-video-sessions) are a cleanup

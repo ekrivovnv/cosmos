@@ -28,10 +28,10 @@ commands.
 
 Reasoner rejects `NIM_PERF_PROFILE`, including `profile=` in
 `NIM_TAGS_SELECTOR`, with a startup error. Edge Reasoner has BF16 and FP8
-profiles; Edge-DROID and Nano-DROID have BF16 profiles only. There is no
+profiles. Edge-DROID and Nano-DROID have BF16 profiles only. There is no
 general-purpose Edge Generator.
 The NIM chooses the best compatible profile for these settings and the visible
-GPUs; a normal deployment does not need a profile ID.
+GPUs. A normal deployment does not need a profile ID.
 
 ### GPU Selection
 
@@ -45,10 +45,9 @@ nvidia-smi -L
 Expose specific GPUs instead of `--gpus all`, for example
 `--gpus '"device=0,1"'` or `--gpus '"device=GPU-<uuid>"'`. Expose a GPU count
 listed in the [Generator](support-matrix.md#generator-profiles) or
-[Reasoner](support-matrix.md#reasoner-profiles) profiles, all of a
-single model ([mixed GPUs are not
-supported](support-matrix.md#gpu-architecture-and-topology)); extra GPUs sit
-idle.
+[Reasoner](support-matrix.md#reasoner-profiles) profiles. Extra GPUs sit
+idle. Expose GPUs of a single model, because [mixed GPUs are not
+supported](support-matrix.md#gpu-architecture-and-topology).
 
 Do not pass `-e CUDA_VISIBLE_DEVICES`: the NIM sets it for its worker
 processes, so a passed value can place work outside the intended GPUs.
@@ -82,8 +81,7 @@ Use these only when automatic model selection is not sufficient:
 | --- | --- | --- |
 | `NIM_TAGS_SELECTOR` | Empty | Filter by comma-separated exact manifest tags as `key=value` pairs; refer to the valid keys below |
 
-`NIM_TAGS_SELECTOR` accepts only these keys; any other key is an error. Values
-are lowercased.
+`NIM_TAGS_SELECTOR` lowercases its values and accepts only the following keys:
 
 | Key | Meaning | Runtime |
 | --- | --- | --- |
@@ -100,7 +98,7 @@ are lowercased.
 `nim_dp`.
 
 Selectors filter the image's existing profiles and cannot create a layout the
-manifest lacks; a selection that matches no profile fails at startup. Without
+manifest lacks. A selection that matches no profile fails at startup. Without
 them, the Generator uses as many visible GPUs as a compatible profile supports
 (1, 2, 4, or 8). There is no one-GPU `throughput` profile, and model or layer
 offload is available only on one GPU. To keep the Generator on fewer GPUs,
@@ -111,7 +109,7 @@ AGX Thor), the NIM treats 70% of the shared pool as GPU memory for profile
 floors and as the default Reasoner `NIM_GPU_MEMORY_UTILIZATION`.
 
 A shorthand variable that conflicts with `NIM_TAGS_SELECTOR` is a startup
-error; use the `model_variant` tag to filter by model. Exact tags and profile
+error. Use the `model_variant` tag to filter by model. Exact tags and profile
 IDs are tied to an image release. For the offload, memory-headroom, and
 profile-pin variables, refer to [Advanced Settings](#advanced-settings).
 
@@ -124,8 +122,8 @@ profile-pin variables, refer to [Advanced Settings](#advanced-settings).
 | `NIM_ALLOW_URL_INPUT` | `true` | Allow HTTP(S) image, video, and Transfer inputs; set `false` to require encoded input |
 | `NIM_TRITON_REQUEST_TIMEOUT` | 30 minutes (`1800000000` microseconds) | Set the queue-plus-execution timeout in microseconds |
 
-Client HTTP timeouts do not change this backend ceiling; refer to [Long-Running
-Requests](operations.md#long-running-requests).
+Client HTTP timeouts do not change this backend ceiling. Refer to
+[Long-Running Requests](operations.md#long-running-requests).
 
 ### Startup and Execution
 
@@ -142,7 +140,7 @@ Requests](operations.md#long-running-requests).
 | `NIM_ENABLE_SIGLIP_GUARDRAILS` | `true` | Enable the output-frame safety classifier |
 | `NIM_QWEN3GUARD_MAX_INPUT_TOKENS` | `8192` | Set the text guardrail's maximum input tokens; minimum 512 |
 
-The selected profile owns guardrail residency; choose it with the
+The selected profile owns guardrail residency. Choose it with the
 `text_guard_offload` and `video_guard_offload` selector keys under
 [Advanced Profile Controls](#advanced-profile-controls). Refer to
 [Guardrails](operations.md#guardrails) for what each layer does.
@@ -153,25 +151,28 @@ These performance defaults are validated startup settings, not request fields.
 If you notice a quality issue in a specific workload, try
 `NIM_CACHE_BACKEND=none` and `NIM_VAE_FAST_PATH=lossless`.
 
+The defaults work as follows:
+
 - **SeaCache** reuses transformer results across denoising steps. It is on for
-  every Generator variant except `edge-droid`; set `NIM_CACHE_BACKEND` to
+  every Generator variant except `edge-droid`. Set `NIM_CACHE_BACKEND` to
   `sea_cache` or `none` to change that. `NIM_CACHE_CONFIG` overrides individual
   fields as JSON, for example
-  `-e NIM_CACHE_CONFIG='{"sea_threshold": 0.20, "sea_max_consecutive_cached": 1}'`
-  (defaults: `sea_threshold=0.25`, `sea_residual_order=1`,
-  `sea_max_consecutive_cached=2`, `sea_power_exp=3.0`;
-  `sea_max_consecutive_cached=0` means no limit). Startup logs the effective
-  settings.
+  `-e NIM_CACHE_CONFIG='{"sea_threshold": 0.20, "sea_max_consecutive_cached": 1}'`.
+  The defaults are `sea_threshold=0.25`, `sea_residual_order=1`,
+  `sea_max_consecutive_cached=2`, and
+  `sea_power_exp=3.0`. Setting `sea_max_consecutive_cached=0` means no limit.
+  Startup logs the effective settings.
 - **SageAttention 2.2** is the default on compute capability 8.0 through 9.x
-  unless the profile uses sequence parallelism; NVIDIA Blackwell GPUs and
+  unless the profile uses sequence parallelism. NVIDIA Blackwell GPUs and
   sequence-parallel profiles use automatic selection.
   `DIFFUSION_ATTENTION_BACKEND` overrides the default.
-- **Variational autoencoder (VAE) decode**: `NIM_VAE_FAST_PATH=channels_last`
-  (default) is the fastest path; `lossless` keeps the reference decoder output
-  and `off` uses the reference decoder. On a replica spanning several GPUs,
-  decode is sharded (`NIM_ENABLE_VAE_PARALLELISM`); disabling it can raise
-  per-GPU memory, and a larger `NIM_VAE_SPATIAL_TEMPORAL_CHUNK_SIZE` raises peak
-  memory and can change rounding.
+- **Variational autoencoder (VAE) decode** defaults to
+  `NIM_VAE_FAST_PATH=channels_last`, the fastest path. The `lossless` value
+  keeps the reference decoder output, and `off` uses the reference decoder. On
+  a replica spanning several GPUs, decode is sharded
+  (`NIM_ENABLE_VAE_PARALLELISM`). Disabling it can raise per-GPU memory. A
+  larger `NIM_VAE_SPATIAL_TEMPORAL_CHUNK_SIZE` raises peak memory and can
+  change rounding.
 
 ### Prompt Upsampling
 
@@ -201,6 +202,8 @@ Change controls one at a time and measure the effect.
 | --- | --- | --- |
 | `NIM_OPTIMIZATION_PRESET` | Unset | Reasoner only: apply the experimental `TTFT` or `TPOT` starting configuration (case-insensitive); Generator rejects it |
 
+The presets configure these variables:
+
 | Preset | `NIM_USE_DFLASH` | `NIM_MAX_NUM_BATCHED_TOKENS` | `NIM_DISABLE_CHUNKED_MM_INPUT` |
 | --- | --- | --- | --- |
 | `TTFT` | `0` | `32768` with at least 70 GiB of GPU memory; otherwise `16384` | Unchanged (`true`) |
@@ -208,7 +211,7 @@ Change controls one at a time and measure the effect.
 
 On profiles with tensor parallelism above 1, both presets also set
 `NIM_MM_ENCODER_TP_MODE=data`, which replicates the vision encoder and splits
-media across TP ranks. An explicitly set variable wins over the preset; on
+media across TP ranks. An explicitly set variable wins over the preset. On
 Edge, set `NIM_USE_DFLASH=0` with `TPOT`.
 
 ### Speculative Decoding
@@ -219,9 +222,9 @@ Edge, set `NIM_USE_DFLASH=0` with `TPOT`.
 | `NIM_DFLASH_MODEL_PATH` | Empty | Nano or Super Reasoner: use an independent absolute local DFlash directory containing `config.json` and `model.safetensors`; refer to [Local Directory](bring-your-own-checkpoint.md#local-directory) for the mount |
 
 DFlash is on by default for Nano and Super Reasoner and does not change the
-request API; set `NIM_USE_DFLASH=0` to disable it (Generator rejects an
-explicit enable). Edge Reasoner does not support DFlash in this version: it
-defaults to `NIM_USE_DFLASH=0` and rejects `1`; set
+request API. Set `NIM_USE_DFLASH=0` to disable it (Generator rejects an
+explicit enable). Edge Reasoner does not support DFlash in this version. It
+defaults to `NIM_USE_DFLASH=0` and rejects `1`. For Edge, set
 `NIM_STREAMING_SPEC_METHOD=none` when [streaming](#advanced-streaming-controls)
 is enabled.
 `NIM_DFLASH_MODEL_PATH` accepts only an absolute local path, not `hf://`, and
@@ -244,7 +247,7 @@ is enabled.
 
 Prefer request-level `media_io_kwargs` over the operator-wide
 `NIM_MEDIA_IO_KWARGS`. Unchunked multimodal input, the default, can raise peak
-GPU memory; set `NIM_DISABLE_CHUNKED_MM_INPUT=0` only after measuring memory,
+GPU memory. Set `NIM_DISABLE_CHUNKED_MM_INPUT=0` only after measuring memory,
 latency, and throughput.
 
 ### Streaming Video Sessions
@@ -268,15 +271,15 @@ scheduling. It raises the engine's image budget to at least
 `2 × NIM_STREAMING_MAX_SESSIONS × NIM_STREAMING_MAX_VIDEO_SEGMENTS`, or 32 image
 slots with the defaults. This floor can override a lower
 `NIM_MAX_IMAGES_PER_PROMPT`. Increasing either streaming limit increases
-encoder-cache memory requirements; reduce the limits if startup lacks memory
+encoder-cache memory requirements. Reduce the limits if startup lacks memory,
 and validate representative requests before increasing concurrency. These
 engine changes also affect ordinary requests on the same container.
 
-Accepted frames refresh session activity; a frame in flight is not reaped.
+Accepted frames refresh session activity. A frame in flight is not reaped.
 WebSocket disconnects release the session, while REST clients should explicitly
 delete it rather than rely on the shorter idle timeout. Increase the relevant
 timeout for feeds with long pauses. Per-session `retention` and `sampling`
-belong in the creation request; retention overrides remain subject to shared
+belong in the creation request. Retention overrides remain subject to shared
 capacity and model-context admission checks.
 
 #### Advanced Streaming Controls
@@ -291,7 +294,7 @@ Leave these at their defaults unless diagnosing or tuning a measured workload:
 
 The speculation controls apply only when streaming is enabled. For Edge, which
 has no [DFlash](#speculative-decoding), set `NIM_STREAMING_SPEC_METHOD=none`
-explicitly: with the method unset,
+explicitly. With the method unset,
 `NIM_USE_DFLASH=0` disables streaming speculation in updated images, but older
 images default streaming to DFlash. Both V1 and V2 model runners support the
 streaming path, so pinning V1 is not required for normal operation.
@@ -319,7 +322,7 @@ Use the available NIM image `<nim-image-build>` and start
 The NIM selects and loads the model, launches a Dynamo vLLM worker and a private
 frontend, and exposes the NIM HTTP API. Keep the usual model-selection,
 cache, and authentication settings from [Essential Configuration](#essential-configuration).
-The shared frontend is a separate service; it does not need worker enablement
+The shared frontend is a separate service. It does not need worker enablement
 or a GPU.
 
 | Name | Default | Use |
@@ -361,9 +364,9 @@ The NIM worker selects its private streaming frontend automatically.
 | `DYN_HTTP_HOST`, `DYN_HTTP_PORT` | `0.0.0.0`, `8000` | Streaming adapter listener defaults; explicit `--http-host` and `--http-port` arguments take precedence |
 | `DYN_TLS_CERT_PATH`, `DYN_TLS_KEY_PATH` | Unset | Optional certificate and key paths for TLS on the streaming adapter; set both together, or use `--tls-cert-path` and `--tls-key-path` |
 
-The adapter's `--streaming-endpoint` flag overrides its environment endpoint;
-keep it aligned with the workers. Use aggregated workers with a local encoder;
-disaggregated prefill/decode and remote encoders are unsupported. The
+The adapter's `--streaming-endpoint` flag overrides its environment endpoint.
+Keep it aligned with the workers. Use aggregated workers with a local encoder.
+Disaggregated prefill/decode and remote encoders are unsupported. The
 [streaming capacity, retention, idle-timeout, and engine controls](#streaming-video-sessions)
 also apply. Streaming forces synchronous scheduling and disables the multimodal
 processor cache. The request timeout above is separate from

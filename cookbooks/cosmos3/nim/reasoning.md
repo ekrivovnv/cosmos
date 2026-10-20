@@ -5,10 +5,10 @@ SPDX-License-Identifier: OpenMDW-1.1 -->
 
 Use this page for Cosmos3 Reasoner requests through OpenAI-compatible Chat
 Completions and Responses APIs. These workflows require a running **Reasoner**
-model; `/v1/infer` is a Generator endpoint and is not used here. Refer to
+model. `/v1/infer` is a Generator endpoint and is not used here. Refer to
 [Deployment](deployment.md) to select and launch a Reasoner model.
 
-The same clients work with `edge`, `nano`, and `super`; launch Edge with the
+The same clients work with `edge`, `nano`, and `super`. Launch Edge with the
 selectors in [Deploy Edge Models](deployment.md#deploy-edge-models).
 
 For stateful reasoning over successive video frames, refer to
@@ -31,7 +31,7 @@ curl -fsS "$NIM_URL/v1/models" | python3 -m json.tool
 ```
 
 Confirm that metadata reports `model_type` as `reasoner` and
-`inference_endpoint` as `/v1/chat/completions`; health and `/v1/models` alone do
+`inference_endpoint` as `/v1/chat/completions`. Health and `/v1/models` alone do
 not prove that the URL reaches the Reasoner. The NIM needs no API key on
 localhost, but the OpenAI client requires a non-empty placeholder such as
 `not-used`.
@@ -67,14 +67,16 @@ print(model)
 media, prompt, sampling, output contract, and review criteria for each case,
 and `examples/reasoner.py` sends them to the NIM.
 
-List or inspect cases without a running endpoint (`--format json` emits
-machine-readable output; the default is YAML):
+List or inspect cases without a running endpoint. The default output is YAML,
+and `--format json` emits machine-readable output:
 
 ```bash
 uv run python examples/reasoner.py --list-cases
 uv run python examples/reasoner.py --describe trajectory_2d
 uv run python examples/reasoner.py --describe trajectory_2d --format json
 ```
+
+The catalog groups its cases into these categories:
 
 | Category | Cases |
 | --- | --- |
@@ -94,7 +96,7 @@ uv run python examples/reasoner.py --case image_caption
 
 Every video case requests 4 frames per second (FPS) sampling, and all cases read
 the answer from `message.content`. `--case all` sends all 18 requests
-sequentially and takes substantial time; use it for deliberate catalog
+sequentially and takes substantial time. Use it for deliberate catalog
 validation, not as a first request:
 
 ```bash
@@ -105,16 +107,16 @@ uv run python examples/reasoner.py --case all
 
 The catalog was validated on Super BF16 (hardware floor in the
 [Support Matrix](support-matrix.md#reasoner-profiles)) with
-`NIM_USE_DFLASH=0` and `NIM_VIDEO_PRUNING_RATE=0`. Every case explicitly sends
-`temperature=0.7`, `top_p=0.8`, `top_k=20`, `presence_penalty=0`, and
-`repetition_penalty=1` (plus `seed=0` where the vLLM notebook sets it) unless
-it records an override; the runner only warns on another variant, so do not
-present an Edge or Nano result as Super-validated.
+`NIM_USE_DFLASH=0` and `NIM_VIDEO_PRUNING_RATE=0`. Unless a case records an
+override, it explicitly sends `temperature=0.7`, `top_p=0.8`, `top_k=20`,
+`presence_penalty=0`, and `repetition_penalty=1`. Cases also send `seed=0`
+where the vLLM notebook sets it. The runner only warns on another variant, so
+do not present an Edge or Nano result as Super-validated.
 
 ### Artifacts and Validation Boundaries
 
 Each run prints the answer and writes `examples/outputs/reasoner_<case>/`.
-Validation only checks that JSON parses; review semantics yourself.
+Validation only checks that JSON parses. Review semantics yourself.
 
 ## Image Reasoning With Chat Completions
 
@@ -163,7 +165,7 @@ large data URLs in a request file, not shell arguments.
 
 Use `video_url` content and pass NIM request extensions through `extra_body`.
 Input videos can be at most 3,840 pixels wide and 2,160 pixels tall, so portrait
-4K is also rejected; larger videos return HTTP 422, so downscale them first:
+4K is also rejected. Larger videos return HTTP 422, so downscale them first:
 
 ```python
 import base64
@@ -201,7 +203,7 @@ Run the complete example:
 uv run python examples/reasoner.py --case video_caption
 ```
 
-Prefer data URLs; a client-side `file://` URL does not reach the container.
+Prefer data URLs. A client-side `file://` URL does not reach the container.
 
 ## Use the Responses API
 
@@ -214,21 +216,21 @@ uv run python examples/reasoner_responses.py
 ```
 
 Requests need a non-empty model and use the Chat Completions sampling defaults.
-Read the answer from `response.output_text`. `store=false` is the default;
-retrieval, cancellation, background responses, and `previous_response_id` need
+Read the answer from `response.output_text`. `store=false` is the default.
+Retrieval, cancellation, background responses, and `previous_response_id` need
 response storage, which is disabled by default. Use Chat Completions for video.
 
 ## Final Answers, Instructions, and Tool Calls
 
 Both APIs map a `developer` turn to a system instruction. Chat Completions
 supports OpenAI tool definitions with automatic tool choice in the Hermes
-format, and requires `top_logprobs` to be an integer or null (one is requested
-when `logprobs=true` and it is omitted). Some prompts ask for literal `<think>`
-tags, which appear in `message.content` as ordinary text.
+format. It requires `top_logprobs` to be an integer or null. If `logprobs=true`
+and `top_logprobs` is omitted, one is requested. Some prompts ask for literal
+`<think>` tags, which appear in `message.content` as ordinary text.
 
 ## Reasoner DFlash
 
-Nano and Super Reasoner use their bundled DFlash drafts by default; set
+Nano and Super Reasoner use their bundled DFlash drafts by default. Set
 `NIM_USE_DFLASH=0` to run target-only. Edge has no DFlash and rejects
 `NIM_USE_DFLASH=1`. Requests do not change. Refer to
 [Speculative Decoding](configuration.md#speculative-decoding) and
@@ -244,26 +246,26 @@ The service supplies these values when omitted:
 | `top_p` | 0.8 | `(0, 1]` |
 | `top_k` | 20 | `-1` or integer `>= 1` |
 
-The service does not inject a default `max_tokens`; send `max_tokens`
+The service does not inject a default `max_tokens`. Send `max_tokens`
 explicitly.
 
 `top_k`, `media_io_kwargs`, `structured_outputs`, guided-output fields, and
-`nvext` are request extensions; with the OpenAI client, put them in
-`extra_body`. Set video sampling per request with `media_io_kwargs`; the
+`nvext` are request extensions. With the OpenAI client, put them in
+`extra_body`. Set video sampling per request with `media_io_kwargs`. The
 example requests 4 FPS. Video-token pruning is enabled by default at a rate of
-`0.6`, using `vidcom2` unless another method is selected; set
+`0.6`, using `vidcom2` unless another method is selected. Set
 `NIM_VIDEO_PRUNING_RATE=0` or `NIM_VIDEO_PRUNING_RATE=none` to disable it.
 Media limits and pruning settings are under
 [Reasoner Configuration](configuration.md#reasoner-configuration).
 
 ### Text-Only Requests
 
-This guide covers image and video input only; validate text-only workflows
+This guide covers image and video input only. Validate text-only workflows
 yourself.
 
 ## Structured Output
 
-Prefer the standard OpenAI `response_format` JSON-schema shape; the service
+Prefer the standard OpenAI `response_format` JSON-schema shape. The service
 enforces it with guided decoding:
 
 ```json
@@ -317,14 +319,14 @@ Responses requests use the native `text.format` shape instead:
 }
 ```
 
-By default the catalog extracts the first JSON value from `message.content`;
-add `--guided-output` to use JSON Schema enforcement. Do not recover structured
+By default the catalog extracts the first JSON value from `message.content`.
+Add `--guided-output` to use JSON Schema enforcement. Do not recover structured
 results with a regular expression over prose or Markdown fences.
 
 ## Prompting Patterns
 
-All task families use the same Chat Completions endpoint; task names do not
-select separate routes:
+All task families use the same Chat Completions endpoint. Task names do not
+select separate routes. The prompt intent for each task is as follows:
 
 | Task | Prompt Intent |
 | --- | --- |
@@ -356,6 +358,8 @@ The catalog reuses the exact user prompts from the
 run and are not golden NIM output.
 
 ## Errors
+
+Reasoner requests commonly fail as follows:
 
 | Status/Symptom | Meaning | Action |
 | --- | --- | --- |

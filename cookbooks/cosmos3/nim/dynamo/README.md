@@ -18,13 +18,13 @@ Both use [model-cache.yaml](model-cache.yaml), the
 [model-download Job](model-download.yaml), and a Dynamo operator serving the
 `nvidia.com/v1alpha1` `spec.services` schema. Both use the same NIM image for
 the download Job and workers. The regular frontend uses the pinned Dynamo
-image; the streaming frontend uses the NIM image. The regular manifest follows
-the supplied working deployment; streaming requires separate session validation.
-Use the available Cosmos3 NIM image address for each `<nim-image-build>`
-placeholder in your chosen variant and the download Job.
+image. The streaming frontend uses the NIM image. The regular manifest follows
+the supplied working deployment. Streaming requires separate session
+validation. Use the available Cosmos3 NIM image address for each
+`<nim-image-build>` placeholder in your chosen variant and the download Job.
 Replace `<angle-bracket>` placeholders before applying. These are alternative
-manifests for the same `cosmos3-reasoner` deployment; apply only one. Switching
-variants replaces pods and loses active streaming sessions.
+manifests for the same `cosmos3-reasoner` deployment, so apply only one.
+Switching variants replaces pods and loses active streaming sessions.
 
 Here, **streaming** means persistent video sessions, not token streaming in a
 Chat Completions response. The Dynamo video-session path uses REST only.
