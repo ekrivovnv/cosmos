@@ -5,25 +5,25 @@ SPDX-License-Identifier: OpenMDW-1.1 -->
 
 This page lists launch-time environment variables. Start with the
 model-selection variables and keep automatic defaults unless the workload
-requires an override. See [Deployment](deployment.md) for complete Docker
+requires an override. Refer to [Deployment](deployment.md) for complete Docker
 commands.
 
-## Essential configuration
+## Essential Configuration
 
-### Authentication and cache
+### Authentication and Cache
 
 | Name | Default | Use |
 | --- | --- | --- |
 | `NGC_API_KEY` | Empty | Download required model and runtime artifacts when they are not already cached |
 | `NIM_CACHE_PATH` | `/opt/nim/.cache` | Set the writable in-container artifact cache |
 
-### Choose the runtime and model
+### Choose the Runtime and Model
 
 | Name | Default | Use |
 | --- | --- | --- |
 | `NIM_MODEL_TYPE` | `generator` | Select `generator` or `reasoner` |
 | `NIM_MODEL_VARIANT` | `nano` preference | Select `nano` or `super` for either runtime; Reasoner also accepts `edge`, and Generator also accepts `edge-droid`, `nano-droid`, `super-t2i`, `super-t2i-4step`, `super-i2v`, and `super-i2v-4step` |
-| `NIM_PRECISION` | Generator: FP8 preference; Reasoner: GPU-derived preference | Optionally pin a precision available in the image; see [Precision selection](deployment.md#precision-selection) |
+| `NIM_PRECISION` | Generator: FP8 preference; Reasoner: GPU-derived preference | Optionally pin a precision available in the image; refer to [Precision Selection](deployment.md#precision-selection) |
 | `NIM_PERF_PROFILE` | `latency` | Generator only: choose `latency` or `throughput` |
 
 Reasoner rejects `NIM_PERF_PROFILE`, including `profile=` in
@@ -33,7 +33,7 @@ general-purpose Edge Generator.
 The NIM chooses the best compatible profile for these settings and the visible
 GPUs; a normal deployment does not need a profile ID.
 
-### GPU selection
+### GPU Selection
 
 The GPUs exposed by Docker `--gpus` are the visible GPUs that automatic
 selection considers. List host GPUs with their indexes and UUIDs:
@@ -44,8 +44,8 @@ nvidia-smi -L
 
 Expose specific GPUs instead of `--gpus all`, for example
 `--gpus '"device=0,1"'` or `--gpus '"device=GPU-<uuid>"'`. Expose a GPU count
-listed in the [Generator](support-matrix.md#generator-configurations) or
-[Reasoner](support-matrix.md#reasoner-configurations) configurations, all of a
+listed in the [Generator](support-matrix.md#generator-profiles) or
+[Reasoner](support-matrix.md#reasoner-profiles) profiles, all of a
 single model ([mixed GPUs are not
 supported](support-matrix.md#gpu-architecture-and-topology)); extra GPUs sit
 idle.
@@ -53,7 +53,7 @@ idle.
 Do not pass `-e CUDA_VISIBLE_DEVICES`: the NIM sets it for its worker
 processes, so a passed value can place work outside the intended GPUs.
 
-### Bring your own checkpoint
+### Bring Your Own Checkpoint
 
 | Name | Default | Use |
 | --- | --- | --- |
@@ -61,12 +61,12 @@ processes, so a passed value can place work outside the intended GPUs.
 | `NIM_DISABLE_MODEL_DOWNLOAD` | `false` | Disable profile download for a completely local Reasoner override; incompatible with Reasoner `hf://` and rejected for Generator |
 | `HF_TOKEN` | Empty | Authenticate to a private Hugging Face repository named by `NIM_MODEL_PATH` |
 
-To override the DFlash draft, see `NIM_DFLASH_MODEL_PATH` under [Speculative
-decoding](#speculative-decoding). See [Bring your own
-checkpoint](bring-your-own-checkpoint.md) for layouts, mounts, and
+To override the DFlash draft, refer to `NIM_DFLASH_MODEL_PATH` under
+[Speculative Decoding](#speculative-decoding). Refer to [Bring Your Own
+Checkpoint](bring-your-own-checkpoint.md) for layouts, mounts, and
 compatibility checks.
 
-### Server and logging
+### Server and Logging
 
 | Name | Default | Use |
 | --- | --- | --- |
@@ -74,13 +74,13 @@ compatibility checks.
 | `NIM_LOG_LEVEL` | `INFO` | Set the service logging threshold |
 | `NIM_LOGGING_JSONL` | `false` | Emit JSON-line logs |
 
-## Advanced profile controls
+## Advanced Profile Controls
 
 Use these only when automatic model selection is not sufficient:
 
 | Name | Default | Use |
 | --- | --- | --- |
-| `NIM_TAGS_SELECTOR` | Empty | Filter by comma-separated exact manifest tags as `key=value` pairs; see the valid keys below |
+| `NIM_TAGS_SELECTOR` | Empty | Filter by comma-separated exact manifest tags as `key=value` pairs; refer to the valid keys below |
 
 `NIM_TAGS_SELECTOR` accepts only these keys; any other key is an error. Values
 are lowercased.
@@ -113,21 +113,21 @@ floors and as the default Reasoner `NIM_GPU_MEMORY_UTILIZATION`.
 A shorthand variable that conflicts with `NIM_TAGS_SELECTOR` is a startup
 error; use the `model_variant` tag to filter by model. Exact tags and profile
 IDs are tied to an image release. For the offload, memory-headroom, and
-profile-pin variables, see [Advanced settings](#advanced-settings).
+profile-pin variables, refer to [Advanced Settings](#advanced-settings).
 
-## Generator configuration
+## Generator Configuration
 
-### Input and output
+### Input and Output
 
 | Name | Default | Use |
 | --- | --- | --- |
 | `NIM_ALLOW_URL_INPUT` | `true` | Allow HTTP(S) image, video, and Transfer inputs; set `false` to require encoded input |
 | `NIM_TRITON_REQUEST_TIMEOUT` | 30 minutes (`1800000000` microseconds) | Set the queue-plus-execution timeout in microseconds |
 
-Client HTTP timeouts do not change this backend ceiling; see [Long-running
-requests](operations.md#long-running-requests).
+Client HTTP timeouts do not change this backend ceiling; refer to [Long-Running
+Requests](operations.md#long-running-requests).
 
-### Startup and execution
+### Startup and Execution
 
 | Name | Default | Use |
 | --- | --- | --- |
@@ -144,10 +144,10 @@ requests](operations.md#long-running-requests).
 
 The selected profile owns guardrail residency; choose it with the
 `text_guard_offload` and `video_guard_offload` selector keys under
-[Advanced profile controls](#advanced-profile-controls). See
+[Advanced Profile Controls](#advanced-profile-controls). Refer to
 [Guardrails](operations.md#guardrails) for what each layer does.
 
-### Diffusion cache, attention, and VAE decode
+### Diffusion Cache, Attention, and VAE Decode
 
 These performance defaults are validated startup settings, not request fields.
 If you notice a quality issue in a specific workload, try
@@ -163,7 +163,7 @@ If you notice a quality issue in a specific workload, try
   `sea_max_consecutive_cached=0` means no limit). Startup logs the effective
   settings.
 - **SageAttention 2.2** is the default on compute capability 8.0 through 9.x
-  unless the profile uses sequence parallelism; Blackwell GPUs and
+  unless the profile uses sequence parallelism; NVIDIA Blackwell GPUs and
   sequence-parallel profiles use automatic selection.
   `DIFFUSION_ATTENTION_BACKEND` overrides the default.
 - **VAE decode**: `NIM_VAE_FAST_PATH=channels_last` (default) is the fastest
@@ -173,7 +173,7 @@ If you notice a quality issue in a specific workload, try
   raise per-GPU memory, and a larger `NIM_VAE_SPATIAL_TEMPORAL_CHUNK_SIZE`
   raises peak memory and can change rounding.
 
-### Prompt upsampling
+### Prompt Upsampling
 
 Prompt upsampling is optional and applies only to Generator T2I, T2V, and I2V.
 It sends the request to an operator-provided OpenAI-compatible endpoint.
@@ -190,11 +190,11 @@ It sends the request to an operator-provided OpenAI-compatible endpoint.
 Endpoint, model, and key are required when the feature is enabled. A request-time
 external failure logs a warning and continues with the original prompt.
 
-## Reasoner configuration
+## Reasoner Configuration
 
 Change controls one at a time and measure the effect.
 
-### Optimization presets
+### Optimization Presets
 
 | Name | Default | Use |
 | --- | --- | --- |
@@ -210,12 +210,12 @@ On profiles with tensor parallelism above 1, both presets also set
 media across TP ranks. An explicitly set variable wins over the preset; on
 Edge, set `NIM_USE_DFLASH=0` with `TPOT`.
 
-### Speculative decoding
+### Speculative Decoding
 
 | Name | Default | Use |
 | --- | --- | --- |
 | `NIM_USE_DFLASH` | `true` for Nano/Super Reasoner; `false` for Edge | Use the bundled Nano or Super DFlash draft; set `false` to run the target model without speculative decoding |
-| `NIM_DFLASH_MODEL_PATH` | Empty | Nano or Super Reasoner: use an independent absolute local DFlash directory containing `config.json` and `model.safetensors`; see [Local directory](bring-your-own-checkpoint.md#local-directory) for the mount |
+| `NIM_DFLASH_MODEL_PATH` | Empty | Nano or Super Reasoner: use an independent absolute local DFlash directory containing `config.json` and `model.safetensors`; refer to [Local Directory](bring-your-own-checkpoint.md#local-directory) for the mount |
 
 DFlash is on by default for Nano and Super Reasoner and does not change the
 request API; set `NIM_USE_DFLASH=0` to disable it (Generator rejects an
@@ -227,14 +227,14 @@ is enabled.
 `NIM_DFLASH_CONFIG` requires DFlash enabled and cannot set the `method` or
 `model` keys.
 
-### Context and scheduling
+### Context and Scheduling
 
 | Name | Default | Use |
 | --- | --- | --- |
 | `NIM_MAX_MODEL_LEN` | `-1` (auto) | Let the runtime choose a context length, bounded by the checkpoint limit of 262,144 tokens |
-| `NIM_GPU_MEMORY_UTILIZATION` | Discrete GPU: `0.93`, capped to leave `NIM_GPU_MEMORY_HEADROOM_GIB` free; unified memory: `0.70` | Set the Reasoner GPU-memory target in `(0,1]`; startup warns when it exceeds current free memory but does not reduce it. On DGX Spark/GB10 and Jetson AGX Thor, lower it only from host measurements; see [Set the Reasoner memory share](deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems) |
+| `NIM_GPU_MEMORY_UTILIZATION` | Discrete GPU: `0.93`, capped to leave `NIM_GPU_MEMORY_HEADROOM_GIB` free; unified memory: `0.70` | Set the Reasoner GPU-memory target in `(0,1]`; startup warns when it exceeds current free memory but does not reduce it. On DGX Spark/GB10 and Jetson AGX Thor, lower it only from host measurements; refer to [Set the Reasoner Memory Share](deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems) |
 
-### Caching and multimodal processing
+### Caching and Multimodal Processing
 
 | Name | Default | Use |
 | --- | --- | --- |
@@ -246,7 +246,7 @@ Prefer request-level `media_io_kwargs` over the operator-wide
 GPU memory; set `NIM_DISABLE_CHUNKED_MM_INPUT=0` only after measuring memory,
 latency, and throughput.
 
-### Streaming video sessions
+### Streaming Video Sessions
 
 Set `NIM_MODEL_TYPE=reasoner` and `NIM_ENABLE_STREAMING=true` to enable the
 WebSocket and REST session APIs in standalone NIM. In [Dynamo mode](#dynamo-streaming),
@@ -278,7 +278,7 @@ timeout for feeds with long pauses. Per-session `retention` and `sampling`
 belong in the creation request; retention overrides remain subject to shared
 capacity and model-context admission checks.
 
-#### Advanced streaming controls
+#### Advanced Streaming Controls
 
 Leave these at their defaults unless diagnosing or tuning a measured workload:
 
@@ -297,27 +297,27 @@ streaming path, so pinning V1 is not required for normal operation.
 
 Inspect `GET /v1/streaming/config` for the served model and default retention
 and sampling policy. Standalone NIM and the Dynamo streaming adapter expose
-this route. See [Streaming](streaming.md) for session requests and error handling,
-and [Dynamo REST streaming](dynamo/dynamo_with_streaming.md#stream-video-frames-over-rest)
+this route. Refer to [Streaming](streaming.md) for session requests and error handling,
+and [Dynamo REST Streaming](dynamo/dynamo_with_streaming.md#stream-video-frames-over-rest)
 for the client's shared-frontend checks, which require no worker URLs or metadata.
 
-### API behavior
+### API Behavior
 
 | Name | Default | Use |
 | --- | --- | --- |
 | `NIM_DISABLE_LOG_REQUESTS` | `true` | Keep Reasoner request bodies out of logs |
 | `NIM_DISABLE_RESPONSES_ROUTE` | `false` | Remove Responses routes when set to `true` |
 
-## Dynamo configuration
+## Dynamo Configuration
 
-### Run NIM as a Dynamo worker
+### Run NIM as a Dynamo Worker
 
 Use the available NIM image `<nim-image-build>` and start
 `/opt/nim/start_server.sh` with `NIM_MODEL_TYPE=reasoner` and
 `NIM_DYNAMO_WORKER=true`. Generator profiles do not support Dynamo worker mode.
 The NIM selects and loads the model, launches a Dynamo vLLM worker and a private
 frontend, and exposes the NIM HTTP API. Keep the usual model-selection,
-cache, and authentication settings from [Essential configuration](#essential-configuration).
+cache, and authentication settings from [Essential Configuration](#essential-configuration).
 The shared frontend is a separate service; it does not need worker enablement
 or a GPU.
 
@@ -345,7 +345,7 @@ NIM_DISCOVERY_BACKEND={"async_scheduling":true,"discovery_backend":"kubernetes",
 NIM_DISCOVERY_BACKEND={"async_scheduling":false,"discovery_backend":"kubernetes","enable_multimodal":true}
 ```
 
-### Dynamo streaming
+### Dynamo Streaming
 
 Set `NIM_ENABLE_STREAMING=1` alongside `NIM_DYNAMO_WORKER=true` on workers.
 Use the same `<nim-image-build>` image for the shared frontend, running
@@ -373,10 +373,10 @@ ownership does not depend on the Chat Completions affinity TTL.
 frontend and worker NIM endpoints. The streaming adapter and enabled worker NIM
 proxy expose `GET /v1/streaming/config` and the REST session routes. The stock
 `dynamo.frontend` launcher does not attach these streaming routes.
-See [Dynamo with streaming](dynamo/dynamo_with_streaming.md) for the manifest
+Refer to [Dynamo With Streaming](dynamo/dynamo_with_streaming.md) for the manifest
 and REST request examples.
 
-## Advanced settings
+## Advanced Settings
 
 Leave these at their defaults unless you have measured a need.
 
@@ -387,7 +387,7 @@ Leave these at their defaults unless you have measured a need.
 | `NIM_MODEL_PROFILE` | Both | Empty | Pin an exact profile ID from the current image |
 | `NIM_VIDEO_SAVE_QUALITY` | Generator | `7` | VP9 output quality 1-9; affects encoding, not diffusion |
 | `NIM_ENABLE_TORCH_COMPILE` | Generator | `true` | Enable the compilation path |
-| `NIM_CACHE_BACKEND` | Generator | Edge-DROID: `none`; other variants: `sea_cache` | Diffusion cache: `sea_cache`, `cache_dit`, or `none`; see [Diffusion cache, attention, and VAE decode](#diffusion-cache-attention-and-vae-decode) |
+| `NIM_CACHE_BACKEND` | Generator | Edge-DROID: `none`; other variants: `sea_cache` | Diffusion cache: `sea_cache`, `cache_dit`, or `none`; refer to [Diffusion Cache, Attention, and VAE Decode](#diffusion-cache-attention-and-vae-decode) |
 | `NIM_CACHE_CONFIG` | Generator | Empty object | Override individual diffusion-cache settings as JSON; rejected when the backend is `none` |
 | `DIFFUSION_ATTENTION_BACKEND` | Generator | `SAGE_ATTN` on compute capability 8.0 through 9.x without sequence parallelism; otherwise automatic | Override the diffusion attention backend |
 | `NIM_VAE_FAST_PATH` | Generator | `channels_last` | VAE decode path: `channels_last`, `lossless`, or `off` |
@@ -397,7 +397,7 @@ Leave these at their defaults unless you have measured a need.
 | `NIM_TRITON_LOG_VERBOSE` | Generator | `0` | Backend log verbosity for diagnosis |
 | `NIM_MAX_SEQUENCE_LENGTH` | Generator | `5120` | Startup prompt-token sequence length |
 | `NIM_ALLOW_UNSAFE_TRANSFER` | Generator | `false` | Bypass Transfer's VRAM admission check for an approved diagnostic; can fail with OOM |
-| `NIM_DFLASH_BF16_KV_CACHE` | Reasoner | `false` on Hopper; `true` otherwise | BF16 DFlash KV cache; can improve acceptance but uses more memory |
+| `NIM_DFLASH_BF16_KV_CACHE` | Reasoner | `false` on NVIDIA Hopper; `true` otherwise | BF16 DFlash KV cache; can improve acceptance but uses more memory |
 | `NIM_DFLASH_CONFIG` | Reasoner | Empty object | Extra vLLM DFlash speculative-config fields as JSON |
 | `NIM_MAX_NUM_BATCHED_TOKENS` | Reasoner | `16384` with unchunked multimodal input; otherwise `8192` | Scheduler token budget; unchunked multimodal input enforces at least `16384` |
 | `NIM_MAX_NUM_SEQS` | Reasoner | `256` | Maximum scheduled sequences |
@@ -411,7 +411,7 @@ Leave these at their defaults unless you have measured a need.
 | `NIM_VIDEO_PRUNING_METHOD` | Reasoner | `vidcom2` | `vidcom2` or `evs` when pruning is enabled |
 | `NIM_GUIDED_DECODING_BACKEND` | Reasoner | `xgrammar` | Structured-output backend |
 
-## Secret handling
+## Secret Handling
 
 Inject `NGC_API_KEY`, `HF_TOKEN`, and `NIM_PROMPT_UPSAMPLING_API_KEY` as
 separate secrets through the deployment environment, never through source

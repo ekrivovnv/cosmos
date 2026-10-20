@@ -1,7 +1,7 @@
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 SPDX-License-Identifier: OpenMDW-1.1 -->
 
-# Stream video frames with the Cosmos3 NIM Reasoner
+# Stream Video Frames With the Cosmos3 NIM Reasoner
 
 The streaming API maintains a reasoning session across a sequence of image
 frames. Your client decodes or captures the video, sends one JPEG or PNG at a
@@ -14,7 +14,8 @@ disconnecting releases its resources. REST provides the same session behavior
 for clients that cannot maintain a WebSocket connection.
 
 [Deploy the Cosmos3 NIM Reasoner](deployment.md) with `NIM_ENABLE_STREAMING=true` using
-an image with streaming support. See [Streaming video session settings](configuration.md#streaming-video-sessions)
+an image with streaming support. Refer to [Streaming Video
+Sessions](configuration.md#streaming-video-sessions)
 for enablement, capacity, and idle timeouts.
 
 For a shared Dynamo frontend, use the [Dynamo streaming deployment](dynamo/dynamo_with_streaming.md)
@@ -29,11 +30,11 @@ Nano and Super streaming default to DFlash speculation when DFlash is enabled;
 set `NIM_STREAMING_SPEC_METHOD=ngram` for GPU n-gram speculation or `none` to
 disable it. Edge works with the same clients, which discover its model ID;
 launch it with `NIM_USE_DFLASH=0` and `NIM_STREAMING_SPEC_METHOD=none`, in
-standalone ([Edge experiments](deployment.md#edge-experiments)) or
-[Dynamo](dynamo/dynamo_with_streaming.md#use-edge-reasoner) mode. See
-[Advanced streaming controls](configuration.md#advanced-streaming-controls).
+standalone ([Deploy Edge Models](deployment.md#deploy-edge-models)) or
+[Dynamo](dynamo/dynamo_with_streaming.md#use-edge-reasoner) mode. Refer to
+[Advanced Streaming Controls](configuration.md#advanced-streaming-controls).
 
-## Example client
+## Example Client
 
 Initialize the [pinned client environment](prerequisites.md#initialize-the-example-environment)
 and run commands from `cookbooks/cosmos3/nim`. The
@@ -111,7 +112,7 @@ All paths use the same host and port as the Reasoner API.
 WebSocket routes are not described by OpenAPI. The REST endpoints and
 WebSocket endpoint share session capacity and admission checks.
 
-### Session configuration
+### Session Configuration
 
 REST creation accepts the following JSON fields. WebSocket creation adds
 `"op":"create"` and optionally `"frame_format":"binary"` or `"base64"`.
@@ -128,7 +129,7 @@ REST creation accepts the following JSON fields. WebSocket creation adds
 Sampling defaults are `max_tokens: 24`, `temperature: 0.3`, `top_p: 0.9`,
 `repetition_penalty: 1.1`, and `frequency_penalty: 0.0`. `max_tokens` bounds
 each reply, not the entire session. At most one of `guided_json`,
-`guided_choice`, or `guided_regex` may constrain the replies. For example,
+`guided_choice`, or `guided_regex` can constrain the replies. For example,
 `"sampling":{"max_tokens":24,"guided_choice":["clear","hazard"]}`
 requests a classification for each frame.
 
@@ -157,7 +158,7 @@ the server's policy. Admission also requires `max_session_tokens + max_tokens`
 to remain below the engine context limit, and `max_session_tokens` to remain
 below the re-prefill position threshold.
 
-## REST example: create, send frames, close
+## Run a REST Session
 
 Prepare two local image files, `frame1.jpg` and `frame2.jpg`, from your feed.
 Run this Bash example with `NIM_URL` set as above. It uses cURL and Python's
@@ -189,7 +190,7 @@ Send frames with `Content-Type: application/json` and
 Use raw base64 without a data-URL prefix. Wait for each frame response before
 sending the next. Deletion returns `session_id`, `frames`, and `closed: true`.
 
-## WebSocket message formats and flow
+## WebSocket Message Formats and Flow
 
 Connect to `ws://localhost:8000/v1/streaming/ws`, or `wss://` behind TLS.
 One connection owns one session. All control messages and every server reply
@@ -219,9 +220,9 @@ The server processes messages sequentially; submitting ahead can queue stale
 video frames. Closing the socket instead of sending `delete` also releases
 session resources, but the client cannot rely on receiving a final reply.
 
-### Client messages
+### Client Messages
 
-| Message | Wire format | When to send |
+| Message | Wire Format | When to Send |
 | --- | --- | --- |
 | `create` | JSON text with session configuration | First message, exactly once per connection |
 | Binary frame | Raw JPEG/PNG bytes, without a JSON envelope | After `created`, when `frame_format` is `binary` |
@@ -229,7 +230,7 @@ session resources, but the client cannot rely on receiving a final reply.
 | `delete` | JSON text with `op: "delete"` | After the last reply, to close the session explicitly |
 
 **Create.** `system_prompt` is required. All other session fields and sampling
-controls are listed in [Session configuration](#session-configuration).
+controls are listed in [Session Configuration](#session-configuration).
 `frame_format` defaults to `binary`. The initial message may omit `op` (the
 server defaults it to `create`), but clients should send it explicitly:
 
@@ -273,12 +274,12 @@ the session.
 {"op": "delete"}
 ```
 
-### Server messages
+### Server Messages
 
 | `op` | Fields | Meaning |
 | --- | --- | --- |
 | `created` | `session_id`, `model`, `fps`, `retention`, `frame_format` | Session accepted; effective retention and negotiated image format |
-| `frame` | `frame_index`, `text`, `finish_reason`, `token_count`, timing fields | Completed answer to one image; see [Frame replies](#frame-replies) |
+| `frame` | `frame_index`, `text`, `finish_reason`, `token_count`, timing fields | Completed answer to one image; refer to [Frame Replies](#frame-replies) |
 | `closed` | `session_id`, `frames`, `closed` | Session released; `frames` counts answered frames and `closed` is `true` |
 | `error` | `message`, `code`, `fatal` | Protocol, admission, or processing error; `code` is HTTP-style, not a WebSocket close code |
 
@@ -322,7 +323,7 @@ code `1008`; unexpected internal failures send a fatal `500` error and close
 with `1011`. Normal explicit deletion closes with `1000`. Do not assume a
 `closed` message will arrive after a fatal error or network disconnect.
 
-## Frame replies
+## Frame Replies
 
 REST returns a JSON object; WebSocket adds `"op":"frame"`. A representative
 reply has this shape (text and counts depend on the input):
@@ -350,7 +351,7 @@ timings report image decoding, prompt construction/preprocessing, engine work,
 and queue waiting in milliseconds. Timing fields can be null; they are server
 measurements, not client round-trip latency or promised performance.
 
-## Errors and session cleanup
+## Errors and Session Cleanup
 
 Each frame is limited to **8 MiB** of encoded image bytes (the JPEG/PNG file
 bytes, before base64 expansion). Invalid image data is rejected. Both
@@ -360,7 +361,7 @@ REST session errors use
 `{"error":{"message":"...","code":400}}` with the corresponding HTTP
 status. WebSocket error messages are described [above](#server-messages).
 
-| Code | Meaning and action |
+| Code | Meaning and Action |
 | --- | --- |
 | `400` | Invalid configuration, image, or protocol message; correct the request |
 | `404` | Unknown model or missing/expired session; verify the model or create a new session |
@@ -377,5 +378,5 @@ check startup logs, readiness, runtime, and image selection.
 Close WebSocket connections or explicitly delete REST sessions when finished.
 [Idle timeouts](configuration.md#streaming-video-sessions) are a cleanup
 backstop. Expired or disconnected sessions cannot be resumed: create a new
-one. Do not resubmit a timed-out frame while its original request may still
-be running.
+one. Do not resubmit a timed-out frame while its original request is still
+running.

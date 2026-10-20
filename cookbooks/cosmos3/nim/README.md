@@ -13,7 +13,7 @@ contains two runtimes, but each container runs only one:
 
 > Deployment commands pin the current release image,
 > `nvcr.io/nim/nvidia/cosmos3:2.1.0`; compatible configurations are in the
-> [Support matrix](support-matrix.md).
+> [Support Matrix](support-matrix.md).
 
 ## Architecture
 
@@ -21,20 +21,20 @@ Cosmos3 is a Mixture-of-Transformers (MoT) world foundation model with two
 jointly trained towers that share latent representations: a **Reasoner**
 (vision-language) tower that grounds the prompt, and a **Generator** (world
 simulator) tower that produces the output, such as video. The Generator runtime
-uses both towers; the Reasoner runtime serves understanding. For details, see
+uses both towers; the Reasoner runtime serves understanding. For details, refer to
 the
 [Cosmos3 technical report](https://research.nvidia.com/labs/cosmos-lab/cosmos3/technical-report.pdf).
 
 ![Cosmos3 Mixture-of-Transformers architecture with Reasoner and Generator towers](../cosmos3-model-architecture.png)
 
-## Choose what to run
+## Choose What to Run
 
 Choose a runtime, a model variant (`NIM_MODEL_VARIANT`), optionally a
 precision, and for Generator a latency or throughput objective; the NIM selects
 a compatible profile, as described in
-[How selection works](deployment.md#how-selection-works).
+[How Selection Works](deployment.md#how-selection-works).
 
-## Choose a task
+## Choose a Task
 
 | Task | Runtime | Input | Output | Guide |
 | --- | --- | --- | --- | --- |
@@ -55,12 +55,12 @@ a compatible profile, as described in
 Local examples publish either runtime at `http://localhost:8000`; remove the
 active example container before launching the other runtime on the same port.
 
-## Get started
+## Get Started
 
-### Use an existing NIM endpoint
+### Use an Existing NIM Endpoint
 
 If an administrator already deployed the NIM, install and initialize the
-[client tooling](prerequisites.md#client-tooling), then set the service URL:
+[Client Tooling](prerequisites.md#client-tooling), then set the service URL:
 
 ```bash
 cd cookbooks/cosmos3/nim
@@ -85,17 +85,17 @@ For a Reasoner:
 uv run python examples/reasoner.py --case image_caption
 ```
 
-### Deploy the NIM yourself
+### Deploy the NIM Yourself
 
 1. Verify the GPU host against [Prerequisites](prerequisites.md).
 2. Choose a compatible model and hardware configuration from the
-   [Support matrix](support-matrix.md).
+   [Support Matrix](support-matrix.md).
 3. Follow [Deployment](deployment.md) to authenticate, pull the image, run the
    preflight, and launch Generator or Reasoner. On DGX Spark or Jetson AGX
    Thor, the NIM applies a 70%
    [unified-memory share](deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems)
    automatically.
-4. Return to [Use an existing NIM endpoint](#use-an-existing-nim-endpoint) to
+4. Return to [Use an Existing NIM Endpoint](#use-an-existing-nim-endpoint) to
    verify the service and run the first request.
 
 Specialist variants accept only their task: run
@@ -107,7 +107,7 @@ matching variant. Examples save outputs under the ignored `examples/outputs/` di
 Validate the selected configuration with representative requests before
 production use.
 
-## AI-assisted usage
+## AI-Assisted Usage
 
 Open this directory in a compatible coding assistant to get guided help with
 host preparation, deployment, endpoint verification, request selection, and
@@ -116,43 +116,43 @@ pages and examples as their source of truth and default to read-only assistance.
 
 ## Documentation
 
-### Deploy and configure
+### Deploy and Configure
 
 - [Prerequisites](prerequisites.md)
 - [Deployment](deployment.md)
 - [Configuration](configuration.md)
-- [Support matrix](support-matrix.md)
-- [Helm deployment](helm.md)
-- [Dynamo overview](dynamo/README.md)
-- [Dynamo deployment](dynamo/dynamo_deployment.md)
-- [Dynamo with streaming](dynamo/dynamo_with_streaming.md)
-- [Bring your own checkpoint](bring-your-own-checkpoint.md)
+- [Support Matrix](support-matrix.md)
+- [Helm Deployment](helm.md)
+- [Dynamo Overview](dynamo/README.md)
+- [Dynamo Deployment](dynamo/dynamo_deployment.md)
+- [Dynamo With Streaming](dynamo/dynamo_with_streaming.md)
+- [Bring Your Own Checkpoint](bring-your-own-checkpoint.md)
 
 ### Use the APIs
 
-- [API reference](api-reference.md)
+- [API Reference](api-reference.md)
 - [Generation](generation.md)
 - [Reasoning](reasoning.md)
-- [Streaming video](streaming.md)
+- [Streaming Video](streaming.md)
 - [Action](action.md)
 - [Transfer](transfer.md)
-- [Python examples](examples/)
+- [Python Examples](examples/)
 
 ### Operate
 
-- [Operations and troubleshooting](operations.md)
-- [Monitoring with Prometheus and Grafana](monitoring.md)
-- [Release notes](release-notes.md)
-- [License and notices](license.md)
+- [Operations and Troubleshooting](operations.md)
+- [Monitoring With Prometheus and Grafana](monitoring.md)
+- [Release Notes](release-notes.md)
+- [License and Notices](license.md)
 - [Acknowledgements](acknowledgements/README.md)
 
-## Safety, license, and notices
+## Safety, License, and Notices
 
 Generator guardrails are enabled by default. Disabling them can remove
-content-policy and face-privacy protections; see
+content-policy and face-privacy protections; refer to
 [Guardrails](operations.md#guardrails).
 
-See [License and notices](license.md) for the terms. This cookbook is licensed
+Refer to [License and Notices](license.md) for the terms. This cookbook is licensed
 under the repository [LICENSE](../../../LICENSE). The running NIM serves its
 license at `/v1/license`; the image also contains product terms, notices,
 component licenses, and the package-modification source described in
@@ -169,7 +169,7 @@ Want to learn more about NIMs? Join the
 to get free access to self-hosting NVIDIA NIMs and microservices on up to 16
 GPUs on any infrastructure: cloud, data center, or personal workstation.
 
-Once you join the free NVIDIA Developer Program, you can access NIMs through the
+After you join the free NVIDIA Developer Program, you can access NIMs through the
 [NVIDIA API Catalog](https://build.nvidia.com/explore/discover) at any time. For
 enterprise-grade security, support, and API stability, select the option to
 access NIM through our free 90-day NVIDIA AI Enterprise Trial with a business

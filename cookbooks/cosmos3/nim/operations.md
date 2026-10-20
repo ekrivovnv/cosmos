@@ -1,15 +1,15 @@
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 SPDX-License-Identifier: OpenMDW-1.1 -->
 
-# Operate and troubleshoot the Cosmos3 NIM
+# Operate and Troubleshoot the Cosmos3 NIM
 
 Interpret health, inspect the selected profile, configure logging and
-guardrails, and diagnose failures. See [Deployment](deployment.md) for launch
+guardrails, and diagnose failures. Refer to [Deployment](deployment.md) for launch
 and [Configuration](configuration.md) for environment variables.
 
-## Health and startup
+## Health and Startup
 
-| Probe | Healthy meaning | It does not prove |
+| Probe | Healthy Meaning | Not Verified |
 | --- | --- | --- |
 | `/v1/health/live` | HTTP process is alive | Model artifacts are loaded or inference can run |
 | `/v1/health/ready` | Selected backend reports ready after startup work | Every capability/media case has passed a smoke test |
@@ -34,7 +34,7 @@ free memory once, before materialization: a competing allocation can cause a
 lower-memory fallback or startup failure, and later changes do not trigger
 reselection.
 
-## Inspect the running service
+## Inspect the Running Service
 
 Use the active runtime rather than launch-time assumptions:
 
@@ -42,7 +42,7 @@ Use the active runtime rather than launch-time assumptions:
 curl -fsS "$NIM_URL/v1/metadata" | python3 -m json.tool
 ```
 
-| Endpoint | Operational question |
+| Endpoint | Operational Question |
 | --- | --- |
 | `/v1/metadata` | Which `model_type`, primary `inference_endpoint`, profile/checkpoint, and Generator `model_variant` did the NIM report? |
 | `/v1/models` | Which model ID should the Reasoner client send? This endpoint alone does not identify the active runtime. |
@@ -65,8 +65,8 @@ Profile IDs and tags are image-specific; do not copy them to another image.
 ## Logging
 
 Set log level, JSON-line output, backend verbosity, and Reasoner request-body
-logging with the [Server and logging](configuration.md#server-and-logging) and
-[Advanced settings](configuration.md#advanced-settings) variables. At `INFO`,
+logging with the [Server and Logging](configuration.md#server-and-logging) and
+[Advanced Settings](configuration.md#advanced-settings) variables. At `INFO`,
 request prompts are redacted; at `DEBUG`, full prompts are logged, so use
 `DEBUG` only during diagnosis and treat its logs as sensitive. Never log
 secrets or raw media data URLs.
@@ -80,10 +80,10 @@ docker logs --since 10m cosmos3-reasoner
 
 ## Metrics
 
-Scrape `$NIM_URL/v1/metrics`; see [Monitoring](monitoring.md) for Prometheus
+Scrape `$NIM_URL/v1/metrics`; refer to [Monitoring](monitoring.md) for Prometheus
 and Grafana setup and the metric families of each runtime.
 
-## Long-running requests
+## Long-Running Requests
 
 Generator `/v1/infer` requests are synchronous: the connection stays quiet
 until inference and serialization finish, which alone does not mean a hang.
@@ -95,7 +95,7 @@ default 30 minutes, and a longer client timeout does not extend it; for the
 check the container logs and GPU activity rather than readiness, and avoid
 blind retries that duplicate expensive work.
 
-## Unified-memory diagnostics
+## Unified-Memory Diagnostics
 
 On DGX Spark, Jetson AGX Thor, and other unified-memory systems, [inspect
 current memory](prerequisites.md#inspect-unified-memory-capacity-and-current-state)
@@ -109,7 +109,7 @@ Generator guardrails are an input-prompt blocklist and a Qwen3Guard text guard
 (text switch), plus output face detection with blur and a SigLIP content check
 (video switches). The Reasoner has no NIM-provided guardrails.
 
-| Variable | Current default | Effect |
+| Variable | Current Default | Effect |
 | --- | --- | --- |
 | `NIM_ENABLE_TEXT_GUARDRAILS` | true | Input-prompt blocklist and text classifier path |
 | `NIM_ENABLE_VIDEO_GUARDRAILS` | true | Output image/video face-privacy guardrail path |
@@ -119,7 +119,7 @@ A blocked request returns HTTP 422 and no usable partial output. Text checks run
 on the prompt that reaches generation; when prompt upsampling is enabled, that
 is the upsampled prompt.
 
-Disabling controls can reduce safety/privacy protections and may violate
+Disabling controls can reduce safety/privacy protections and can violate
 deployment policy. Do so only for an approved, isolated diagnostic:
 
 ```bash
@@ -131,7 +131,7 @@ deployment policy. Do so only for an approved, isolated diagnostic:
 Disabling video guardrails also disables SigLIP; disabling SigLIP alone keeps
 the face path. Generator BYOC does not replace the NIM-owned guardrails.
 
-## Prompt-upsampling diagnostics
+## Prompt-Upsampling Diagnostics
 
 Startup fails if the feature is enabled without endpoint, model, key, or
 required templates. At request time, external failures log a warning and
@@ -145,7 +145,7 @@ generation continues with the original prompt. When debugging, confirm:
 - provider-specific fields are placed in
   `NIM_PROMPT_UPSAMPLING_EXTRA_BODY` only when that endpoint accepts them.
 
-## Production checks
+## Production Checks
 
 Before accepting traffic:
 
@@ -165,7 +165,7 @@ Before accepting traffic:
 | --- | --- | --- | --- |
 | Generator | 422 | Schema, field, or media validation fails, or a guardrail blocks the request | Envelope, `"type": "UnprocessableEntityError"`; a validation `message` is `<field>: <message>`, with multiple errors joined by `; ` |
 | Generator, Reasoner | 404 | Missing route, including the other runtime's inference route | Envelope, `"type": "NotFoundError"` |
-| Generator | 500 | Unhandled or backend error | Plain string instead of the envelope (below) |
+| Generator | 500 | Unhandled or backend error | JSON object with a string-valued `error` field instead of the standard envelope (below) |
 | Reasoner | 400 | Request-shape or sampling-parameter validation fails | Envelope, `"type": "BadRequestError"` |
 | Reasoner | 422 | An error whose message concerns video, image, media, decode, or codec | Envelope, `"type": "UnprocessableEntityError"` |
 
@@ -199,17 +199,17 @@ Task-specific validation belongs to [Generation](generation.md),
 
 ## Troubleshooting
 
-### Startup and deployment
+### Startup and Deployment
 
-For Kubernetes Pod, volume, and probe failures, see [Helm
-troubleshooting](helm.md#troubleshooting).
+For Kubernetes Pod, volume, and probe failures, refer to [Helm
+Troubleshooting](helm.md#troubleshooting).
 
-| Symptom | Likely cause | Action |
+| Symptom | Likely Cause | Action |
 | --- | --- | --- |
 | Image pull unauthorized | Docker is not logged in or key lacks repository access | Review the complete [NGC authentication and credential-storage workflow](deployment.md#authenticate-to-ngc), then log in with `NGC_API_KEY` and literal `$oauthtoken` |
 | Artifact download fails | Container lacks `NGC_API_KEY`, entitlement, DNS/network, or storage | Verify key injection and NGC connectivity; inspect cache capacity/ownership |
 | Cache permission denied | Host mount is not writable by the container | Fix ownership/ACLs and retain a persistent writable `/opt/nim/.cache` |
-| No compatible profile | Compute capability, requested precision, total or free per-device VRAM, or system memory (container cgroup or host RAM below the profile's [system-memory floor](support-matrix.md#generator-configurations)) does not fit the selected model/precision/offload; on integrated GPUs, only 70% of the shared pool counts and offload profiles are not eligible; or the NVML/utility-capability availability probe failed | Run the [pre-download profile preflight](deployment.md#run-the-pre-download-profile-preflight), free unrelated GPU memory, raise the container memory limit, remove unnecessary pins, choose a smaller model or compatible precision, or use supported hardware; if the probe failed, verify the driver, Container Toolkit, GPU visibility, and utility capability |
+| No compatible profile | Compute capability, requested precision, total or free per-device VRAM, or system memory (container cgroup or host RAM below the profile's [system-memory floor](support-matrix.md#generator-profiles)) does not fit the selected model/precision/offload; on integrated GPUs, only 70% of the shared pool counts and offload profiles are not eligible; or the NVML/utility-capability availability probe failed | Run the [pre-download profile preflight](deployment.md#run-the-pre-download-profile-preflight), free unrelated GPU memory, raise the container memory limit, remove unnecessary pins, choose a smaller model or compatible precision, or use supported hardware; if the probe failed, verify the driver, Container Toolkit, GPU visibility, and utility capability |
 | Preflight passes but cold start fails | Host RAM is too low for the workload, or artifact download/materialization or runtime initialization failed | Preserve the failed container, inspect its logs, and compare host RAM with the support-matrix floors |
 | Conflicting selectors | A shorthand disagrees with `NIM_TAGS_SELECTOR` | Set each selector in one place and inspect the full launch environment |
 | Visible GPUs sit idle | Selected profile uses fewer GPUs than Docker exposed | Restrict `--gpus` or intentionally pin an available layout matching the desired count |
@@ -219,13 +219,13 @@ troubleshooting](helm.md#troubleshooting).
 | Wrong-runtime 404 | `NIM_URL` reaches Generator for a Reasoner request, or Reasoner for `/v1/infer` | Inspect `/v1/metadata`, then start the intended runtime or correct the URL |
 | `/dev/shm` or resource error | Shared memory/ulimits are too small | Apply the documented `--shm-size` and ulimits |
 
-### Generator and media
+### Generator and Media
 
-For Action and Transfer request failures, see [Action common
-failures](action.md#common-failures) and [Transfer validation and common
-failures](transfer.md#validation-and-common-failures).
+For Action and Transfer request failures, refer to [Action Common
+Failures](action.md#common-failures) and [Transfer Validation and Common
+Failures](transfer.md#validation-and-common-failures).
 
-| Symptom | Likely cause | Action |
+| Symptom | Likely Cause | Action |
 | --- | --- | --- |
 | HTTP 422, missing or invalid `model_mode` | The request does not identify a valid Generator task | Set one of the documented top-level modes |
 | Selected variant rejects request mode or sampling fields | A specialist received another mode, or a four-step request supplied model-owned controls | Select a compatible `NIM_MODEL_VARIANT`; omit `num_inference_steps`, `guidance_scale`, and `flow_shift` for four-step variants |
@@ -233,12 +233,12 @@ failures](transfer.md#validation-and-common-failures).
 | HTTP 422, frame or resolution | Request violates T2I/video cadence rules or supplies `num_frames` for Action | Recompute with the task tables; Action derives frames from its chunk size |
 | Content-policy 422 | Text or generated frames triggered guardrails | Rephrase and review content; disable only under approved diagnostic policy |
 | Backend 500/OOM | Profile fit or runtime workload exceeded available memory | Reduce workload/concurrency, choose Nano/offload, or use a larger supported GPU; retain logs |
-| Request/client timeout | Image or video generation exceeded client/backend timeout | See [Long-running requests](#long-running-requests); inspect NIM logs and runtime metrics |
+| Request/client timeout | Image or video generation exceeded client/backend timeout | Refer to [Long-Running Requests](#long-running-requests); inspect NIM logs and runtime metrics |
 | MP4 will not play | Player lacks VP9-in-MP4 support | Use `mpv`/`ffplay` or re-encode to H.264 |
 
 ### Reasoner
 
-| Symptom | Likely cause | Action |
+| Symptom | Likely Cause | Action |
 | --- | --- | --- |
 | Model not found | Client hard-coded the wrong served ID | Discover it through `/v1/models` |
 | HTTP 400 request error | Sampling, thinking controls, `top_logprobs`, or extension placement is invalid | Check current ranges, use strict JSON types, and place NIM extensions in `extra_body` |
@@ -248,11 +248,11 @@ failures](transfer.md#validation-and-common-failures).
 | Host OOM or near-zero `MemAvailable` on unified memory | The Reasoner memory share is too large for the shared host/device pool and the host workload | Remove any explicit `NIM_GPU_MEMORY_UTILIZATION` above the `0.70` default, or lower it from host measurements, then restart |
 | KV-cache/context OOM | Context, media tokens, batching, or concurrency is too large | Reduce media FPS and concurrency; the default unchunked multimodal path enforces a 16,384 batched-token minimum, so enable multimodal chunking with `NIM_DISABLE_CHUNKED_MM_INPUT=0` only after validation before lowering that budget |
 
-For DFlash and checkpoint-source failures, see [BYOC](#byoc).
+For DFlash and checkpoint-source failures, refer to [BYOC](#byoc).
 
 ### BYOC
 
-See [Bring your own checkpoint common
-failures](bring-your-own-checkpoint.md#common-failures). A long first start
+Refer to [Bring Your Own Checkpoint Common
+Failures](bring-your-own-checkpoint.md#common-failures). A long first start
 with a new engine or remote checkpoint is expected; keep a writable persistent
 cache and wait for readiness.

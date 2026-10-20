@@ -1,7 +1,7 @@
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 SPDX-License-Identifier: OpenMDW-1.1 -->
 
-# Cosmos3 NIM API reference
+# Cosmos3 NIM API Reference
 
 Use this compact reference for runtime routing, the shared Generator request
 envelope, media inputs, and the common Generator response. Task-specific rules
@@ -10,7 +10,7 @@ and examples live with each task workflow.
 > Check `/openapi.json` on the running Generator or Reasoner for routes supplied
 > by the active runtime and selected image.
 
-## Runtime and primary endpoints
+## Runtime and Primary Endpoints
 
 One selected profile starts one backend. A Generator profile does not serve
 Reasoner completion APIs, and a Reasoner profile does not serve `/v1/infer`.
@@ -22,13 +22,13 @@ Reasoner completion APIs, and a Reasoner profile does not serve `/v1/infer`.
 | Generator | `POST /v1/infer` with `transfer` | [Transfer](transfer.md) |
 | Reasoner | `POST /v1/chat/completions` | [Reasoning](reasoning.md) |
 | Reasoner | `POST /v1/responses` and optional state routes | [Reasoning](reasoning.md#use-the-responses-api) |
-| Reasoner (streaming enabled) | WebSocket `/v1/streaming/ws` and REST `/v1/streaming/*` | [Streaming endpoints](streaming.md#endpoints) |
+| Reasoner (streaming enabled) | WebSocket `/v1/streaming/ws` and REST `/v1/streaming/*` | [Streaming Endpoints](streaming.md#endpoints) |
 
 Reasoner features are in
 [Reasoning](reasoning.md#final-answers-instructions-and-tool-calls). Check the
 active `model_type` and `inference_endpoint` in `/v1/metadata`; other framework
 endpoints are in
-[Inspect the running service](operations.md#inspect-the-running-service).
+[Inspect the Running Service](operations.md#inspect-the-running-service).
 
 ## Generator: `POST /v1/infer`
 
@@ -51,11 +51,11 @@ chooses the task per request.
 
 The task guides define the remaining required inputs and invalid combinations.
 
-### Common Generator request fields
+### Common Generator Request Fields
 
 Defaults are for video / T2I; Transfer and Action defaults are on their pages.
 
-| Field | Type | Default (video / T2I) | Applies to |
+| Field | Type | Video / T2I Default | Applies To |
 | --- | --- | --- | --- |
 | `model_mode` | required enum | None | Selects one of the seven modes above |
 | `prompt` | string or null; maximum 20,000 characters | None | Required and non-empty for T2I/T2V; task-dependent otherwise |
@@ -65,7 +65,7 @@ Defaults are for video / T2I; Transfer and Action defaults are on their pages.
 | `guidance_scale` | finite number in `[1.0,7.0]` | `6.0` / `4.0` | Sampling when not owned by a specialist model |
 | `num_inference_steps` | integer in `[1,100]` | `35` / `50` | Sampling when not owned by a specialist model |
 | `flow_shift` | finite number greater than 0 | `10.0` / `3.0` | Sampling when not owned by a specialist model |
-| `resolution` | enum | `720` / `720_1_1` | Generation and Transfer; see [resolution keys](generation.md#resolution-keys) |
+| `resolution` | enum | `720` / `720_1_1` | Generation and Transfer; refer to [Resolution Keys](generation.md#resolution-keys) |
 | `num_frames` | integer | `189` / `1` | Generation and Transfer; Action derives it and rejects the field |
 | `fps` | finite number in `[1.0,60.0]` | `24.0` | Video tasks; retained but not encoded for T2I |
 | `condition_frame_indexes_vision` | integer array or null | `[0, 1]` | V2V only |
@@ -75,13 +75,13 @@ Defaults are for video / T2I; Transfer and Action defaults are on their pages.
 
 Empty or whitespace-only media strings are treated as absent.
 
-### Strict JSON types
+### Strict JSON Types
 
 Integer and finite-number fields use strict JSON types. For example, `"35"`,
 `35.0`, and `true` are not accepted spellings of integer
 `num_inference_steps=35`. Unknown nested fields are rejected too.
 
-## Media inputs
+## Media Inputs
 
 Generator image and video inputs (`input_reference` and Transfer control
 videos) accept:
@@ -101,12 +101,12 @@ need container network access and can time out or change.
 Input videos must use an MP4/MOV, Matroska/WebM, FLV, or AVI container with
 H.264, H.265/HEVC, MPEG-4 Part 2, VP8, VP9, or AV1; other codecs return HTTP
 422. Decode paths and image formats are in the
-[support matrix](support-matrix.md#media-and-codecs).
+[Support Matrix](support-matrix.md#media-and-codecs).
 
 Size caps: I2V images 20,000,000 encoded characters; V2V decoded video 75 MB;
 Transfer limits are in [Transfer](transfer.md#media-and-output).
 
-## Generator response
+## Generator Response
 
 A successful Generator response contains an image, a video, or—on a compatible
 specialist policy profile—an action without visual media. T2I returns:
@@ -131,7 +131,9 @@ file URLs; inactive fields are omitted or null. Only general Policy and inverse
 dynamics return video plus an
 [action object](action.md#response-action-object).
 
-A specialist action-only policy can return:
+A specialist action-only policy can return the following response. The `data`
+array is shortened to one row here; a complete response has 32 rows of eight
+values, matching `shape: [32, 8]`:
 
 ```json
 {
@@ -148,12 +150,13 @@ A specialist action-only policy can return:
 
 In that case both `b64_image` and `b64_video` are absent or null. Clients must
 branch on the fields actually present rather than assuming every non-T2I
-request has `b64_video`. See [Edge-/Nano-DROID policy](action.md#edge-droid-and-nano-droid-policy).
+request has `b64_video`. Refer to [Edge-/Nano-DROID
+Policy](action.md#edge-droid-and-nano-droid-policy).
 
-## Errors and live schema
+## Errors and Live Schema
 
 A request for the other runtime's primary route returns HTTP 404 with the
-common NIM error envelope naming the active runtime and its endpoint. See
+common NIM error envelope naming the active runtime and its endpoint. Refer to
 [Errors](operations.md#errors) and
 [Troubleshooting](operations.md#troubleshooting); do not automate on exact
 error-message text.

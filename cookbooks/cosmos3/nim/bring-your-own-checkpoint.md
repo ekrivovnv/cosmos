@@ -1,24 +1,24 @@
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 SPDX-License-Identifier: OpenMDW-1.1 -->
 
-# Bring your own Cosmos3 checkpoint
+# Bring Your Own Cosmos3 Checkpoint
 
 Use this page to replace the selected Generator or Reasoner checkpoint while
 preserving the Cosmos3 NIM server, profile selection, and runtime contract.
 
-## Supported boundary
+## Supported Boundary
 
 `NIM_MODEL_PATH` is the shared checkpoint-source variable:
 
-| Runtime | Accepted source | What the NIM still provides |
+| Runtime | Accepted Source | What the NIM Still Provides |
 | --- | --- | --- |
 | Generator | Absolute local directory or `hf://owner/repository[:revision]` | Server, profile, and Generator guardrail artifacts |
 | Reasoner | Absolute local directory or `hf://owner/repository[:revision]` | Server, selected runtime layout, and profile compatibility policy |
 | Nano or Super Reasoner DFlash draft | Absolute local directory only | Primary Reasoner checkpoint, server, and profile policy |
 
-## Generator checkpoint
+## Generator Checkpoint
 
-### Expected layout
+### Expected Layout
 
 The current Generator path expects this structural shape:
 
@@ -39,8 +39,8 @@ Generator contract is the BF16 `edge-droid` policy.
 
 ### Launch
 
-Add these options to the standard
-[Generator launch](deployment.md#launch-generator), with `BYOC_CHECKPOINT` set
+Add these options to the command in
+[Launch Generator](deployment.md#launch-generator), with `BYOC_CHECKPOINT` set
 to the host checkpoint directory:
 
 ```text
@@ -49,10 +49,10 @@ to the host checkpoint directory:
 ```
 
 Choose a variant, precision, and objective that match the checkpoint. The NIM
-still downloads Generator guardrail artifacts, so the cache must be writable
-(NGC access may be required) and `NIM_DISABLE_MODEL_DOWNLOAD=1` is rejected.
+still downloads Generator guardrail artifacts, so the cache must be writable,
+the NIM can still need NGC access, and `NIM_DISABLE_MODEL_DOWNLOAD=1` is rejected.
 
-### Hugging Face source
+### Hugging Face Source
 
 The Generator also accepts `hf://owner/repository[:revision]`, downloaded into
 the NIM cache. The repository root must contain the layout above, and the
@@ -69,9 +69,9 @@ Omit `:revision` to use `main`; pin a commit for reproducible deployments. Pass
 `HF_TOKEN` only for a private repository. Keep `NGC_API_KEY` and a writable
 cache for the guardrail artifacts.
 
-## Reasoner checkpoint
+## Reasoner Checkpoint
 
-### Local directory
+### Local Directory
 
 A local Reasoner checkpoint must use an absolute in-container path and contain,
 at minimum:
@@ -120,7 +120,7 @@ To train your own matching Cosmos3-Nano DFlash draft on a custom dataset, or
 after fine-tuning the Nano Reasoner target, follow the [Model Optimizer DFlash
 training recipe](https://github.com/NVIDIA/Model-Optimizer/blob/main/examples/speculative_decoding/recipes/train_dflash_cosmos3_nano.ipynb).
 
-### Hugging Face source
+### Hugging Face Source
 
 The Reasoner also accepts:
 
@@ -138,7 +138,7 @@ NIM cache.
 use, pre-download the checkpoint and use an absolute local path. The DFlash
 draft rule above still applies.
 
-## Verify the active checkpoint
+## Verify the Active Checkpoint
 
 After [readiness](deployment.md#wait-for-readiness), inspect metadata:
 
@@ -151,9 +151,9 @@ configured source; Generator metadata also reports `model_variant`. Confirm the
 selected profile, then compare a representative request with the checkpoint's
 validation baseline.
 
-## Common failures
+## Common Failures
 
-| Symptom | Likely cause | Action |
+| Symptom | Likely Cause | Action |
 | --- | --- | --- |
 | Local path does not exist | Host path was not mounted at the exact `NIM_MODEL_PATH` value | Align the read-only bind destination and environment path |
 | Required file missing | Checkpoint layout, tokenizer, processor, index, or weight shards are incomplete | Compare with the required layout and export again |
@@ -161,8 +161,8 @@ validation baseline.
 | Generator rejects disabled downloads | Generator still needs NIM-provided guardrails | Remove `NIM_DISABLE_MODEL_DOWNLOAD=1` and provide NGC/cache access |
 | Hugging Face source rejected offline | `hf://` requires download but downloads are disabled | Use an absolute pre-downloaded local path |
 | DFlash path is rejected | The draft path is relative, uses `hf://`, is not mounted, or lacks one of its two required files | Use an absolute local mount containing `config.json` and `model.safetensors` |
-| DFlash configuration is rejected | DFlash is disabled, DFlash is enabled on Edge (including through `NIM_OPTIMIZATION_PRESET=TPOT`), the draft does not match the Nano/Super target, or `NIM_DFLASH_CONFIG` sets reserved `method`/`model` keys | For Edge, leave `NIM_USE_DFLASH` unset or `0`; otherwise use the selected Reasoner's matching draft, keep DFlash enabled, and remove reserved keys; see [Speculative decoding](configuration.md#speculative-decoding) |
+| DFlash configuration is rejected | DFlash is disabled, DFlash is enabled on Edge (including through `NIM_OPTIMIZATION_PRESET=TPOT`), the draft does not match the Nano/Super target, or `NIM_DFLASH_CONFIG` sets reserved `method`/`model` keys | For Edge, leave `NIM_USE_DFLASH` unset or `0`; otherwise use the selected Reasoner's matching draft, keep DFlash enabled, and remove reserved keys; refer to [Speculative Decoding](configuration.md#speculative-decoding) |
 | Metadata shows `default` | Override was omitted, rejected, or applied to another container | Inspect launch environment, mounts, startup logs, and `/v1/metadata` |
 
-For broader startup, cache, GPU, and readiness diagnosis, see
+For broader startup, cache, GPU, and readiness diagnosis, refer to
 [Operations](operations.md#byoc).

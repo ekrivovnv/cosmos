@@ -1,29 +1,29 @@
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 SPDX-License-Identifier: OpenMDW-1.1 -->
 
-# Deploy the Cosmos3 NIM with Helm
+# Deploy the Cosmos3 NIM With Helm
 
 Use this page to deploy the Cosmos3 NIM on Kubernetes with the shared
 `nim-wfm` Helm chart. Model selection, hardware floors, and verification are
 the same as in [Deployment](deployment.md).
 
-For the experimental Reasoner Dynamo stack, see the
+For the experimental Reasoner Dynamo stack, refer to the
 [Dynamo deployment guides](dynamo/README.md). They provide separate plain YAML
 for regular Dynamo and Dynamo with streaming, and require the Dynamo operator.
 
 ## Prerequisites
 
 - A Kubernetes cluster with GPU nodes that match a row in the
-  [Support matrix](support-matrix.md), with the
+  [Support Matrix](support-matrix.md), with the
   [NVIDIA GPU Operator](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/)
   installed.
 - Helm and `kubectl` access to the target namespace. The commands below use the
   default namespace.
 - A storage class for the persistent model cache.
 - `NGC_API_KEY` exported as described in
-  [Network and NGC access](prerequisites.md#network-and-ngc-access).
+  [Network and NGC Access](prerequisites.md#network-and-ngc-access).
 
-## Create secrets
+## Create Secrets
 
 The chart needs an image pull secret and a generic secret with a key named
 `NGC_API_KEY`:
@@ -37,7 +37,7 @@ kubectl create secret generic ngc-api \
   --from-literal=NGC_API_KEY="$NGC_API_KEY"
 ```
 
-## Fetch the chart
+## Fetch the Chart
 
 This page uses `nim-wfm` chart version 1.3.0:
 
@@ -55,7 +55,7 @@ helm show readme "nim-wfm-${NIM_WFM_VERSION}.tgz"
 helm show values "nim-wfm-${NIM_WFM_VERSION}.tgz"
 ```
 
-## Configure values
+## Configure Values
 
 Save the following as `cosmos3-values.yaml`. It deploys the Nano Generator,
 optimized for latency, on one GPU:
@@ -95,7 +95,7 @@ Adjust it for the chosen configuration:
 
 - **Model and GPUs:** Change `NIM_MODEL_VARIANT`, `NIM_PERF_PROFILE`, and
   `nvidia.com/gpu` together using the
-  [Generator configurations](support-matrix.md#generator-configurations). The
+  [Generator Profiles](support-matrix.md#generator-profiles). The
   GPU count does not select a GPU type; use `nodeSelector` or `affinity` to
   target eligible GPU nodes, and `tolerations` if those nodes are tainted. On
   nodes with MIG enabled, request the MIG resource instead of
@@ -114,7 +114,7 @@ Adjust it for the chosen configuration:
 
 Set these through chart values rather than `env`:
 
-| Chart value | Replaces |
+| Chart Value | Replaces |
 | --- | --- |
 | `model.nimCache` | `NIM_CACHE_PATH` |
 | `model.ngcAPISecret` | `NGC_API_KEY` |
@@ -131,7 +131,7 @@ on a host with the same GPUs and selectors.
 ### Reasoner
 
 For Reasoner, replace `env` with the Reasoner selectors and choose the GPU
-count from the [Reasoner configurations](support-matrix.md#reasoner-configurations).
+count from the [Reasoner Profiles](support-matrix.md#reasoner-profiles).
 Reasoner does not use `NIM_PERF_PROFILE`:
 
 ```yaml
@@ -144,8 +144,9 @@ env:
 
 On DGX Spark/GB10 or Jetson AGX Thor nodes, the NIM defaults
 `NIM_GPU_MEMORY_UTILIZATION` to `0.70`; set a lower value only from host
-measurements; see
-[Set the Reasoner memory share](deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems).
+measurements; refer to
+[Set the Reasoner Memory
+Share](deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems).
 
 ### OpenTelemetry
 
@@ -173,21 +174,21 @@ port 4318; change `OTEL_EXPORTER_OTLP_ENDPOINT` for other collector layouts:
 `HOST_IP` must come before `OTEL_EXPORTER_OTLP_ENDPOINT` so that Kubernetes
 can expand it.
 
-### Other chart features
+### Other Chart Features
 
 The chart README documents these optional features; all are off by default:
 
 - **Prometheus metrics:** Set `metrics.serviceMonitor.enabled: true` to create
   a Prometheus Operator `ServiceMonitor` that scrapes `/v1/metrics` on the
-  `http-api` port. See [Metrics](operations.md#metrics).
+  `http-api` port. Refer to [Metrics](operations.md#metrics).
 - **Ingress:** `ingress.enabled`, `ingress.className`, `ingress.hosts`, and
   `ingress.tls`. The NIM does not authenticate requests, so protect any
   ingress outside the cluster.
 - **Autoscaling:** `autoscaling.enabled` with `minReplicas`, `maxReplicas`, and
   `metrics`. CPU and memory metrics are of limited use for scaling a NIM; use
   custom metrics, for example through `prometheus-adapter`. Each new replica
-  must download or mount the model before it becomes ready; see
-  [Storage and scaling](#storage-and-scaling).
+  must download or mount the model before it becomes ready; refer to
+  [Storage and Scaling](#storage-and-scaling).
 
 ## Install
 
@@ -224,9 +225,9 @@ curl -fsS "$NIM_URL/v1/metadata" | python3 -m json.tool
 
 Confirm that metadata reports `generator` and `/v1/infer`, or `reasoner` and
 `/v1/chat/completions`. Then run a first request from
-[Use an existing NIM endpoint](README.md#use-an-existing-nim-endpoint).
+[Use an Existing NIM Endpoint](README.md#use-an-existing-nim-endpoint).
 
-## Storage and scaling
+## Storage and Scaling
 
 The chart supports these cache options; use only one:
 
@@ -245,8 +246,7 @@ start without a new download.
 
 With `statefulSet.enabled: false` and a `ReadWriteOnce` volume, scaling or
 rolling upgrades beyond one pod are likely to fail. Use a `ReadWriteMany`
-storage class, manually cloned `ReadOnlyMany` volumes of a pre-filled cache,
-or direct NFS. Without persistence, the cache is an `emptyDir` and every pod
+storage class or writable direct NFS. Without persistence, the cache is an `emptyDir` and every pod
 start downloads the model again.
 
 ## Troubleshooting
@@ -255,10 +255,10 @@ start downloads the model again.
 | --- | --- |
 | Pod stays `Pending` | Run `kubectl describe pod <pod>` and check `Events` for insufficient GPUs, untolerated taints, or an unbound volume claim |
 | Pod restarts while preparing the model workspace | The startup probe ran out before the download finished; increase `startupProbe.failureThreshold` |
-| Scaling or upgrade fails with `statefulSet.enabled: false` | The cache volume is `ReadWriteOnce`; see [Storage and scaling](#storage-and-scaling) |
-| Profile selection fails | Compare GPU type, count, free memory, and pod memory limit with the [Support matrix](support-matrix.md); see [Troubleshooting](operations.md#troubleshooting) |
+| Scaling or upgrade fails with `statefulSet.enabled: false` | The cache volume is `ReadWriteOnce`; refer to [Storage and Scaling](#storage-and-scaling) |
+| Profile selection fails | Compare GPU type, count, free memory, and pod memory limit with the [Support Matrix](support-matrix.md); refer to [Troubleshooting](operations.md#troubleshooting) |
 
-## Remove the deployment
+## Remove the Deployment
 
 ```bash
 helm uninstall cosmos3
@@ -269,13 +269,13 @@ StatefulSet volume claims are retained by default and keep the model cache.
 Delete them and the `ngc-secret` and `ngc-api` secrets only when they are no
 longer needed.
 
-## Chart parameters
+## Chart Parameters
 
 These are the `nim-wfm` chart values used with the chart version pinned on this
 page (1.3.0); run `helm show values "nim-wfm-${NIM_WFM_VERSION}.tgz"` for the
 authoritative list.
 
-### Deployment parameters
+### Deployment Parameters
 
 | Name | Description | Value |
 | --- | --- | --- |
@@ -295,7 +295,7 @@ authoritative list.
 | `imagePullSecrets` | Specifies a list of secret names that are needed for the main container and any init containers. | |
 | `initContainers` | Specifies model init containers, if needed. | |
 | `initContainers.extraInit` | Fully specify any additional init containers your use case requires. | `[]` |
-| `nodeSelector` | Sets node selectors for the NIM -- for example `nvidia.com/gpu.present: "true"`. | `{}` |
+| `nodeSelector` | Sets node selectors for the NIM—for example `nvidia.com/gpu.present: "true"`. | `{}` |
 | `runtimeClassName` | Selects the container runtime class for workload pods. | `""` |
 | `priorityClassName` | Selects the Kubernetes priority class for workload pods. | `""` |
 | `topologySpreadConstraints` | Configures pod topology spreading. | `[]` |
@@ -316,10 +316,10 @@ authoritative list.
 | `serviceAccount.create` | Specifies whether a service account should be created. | `false` |
 | `serviceAccount.annotations` | Sets annotations to be added to the service account. | `{}` |
 | `serviceAccount.name` | Specifies the name of the service account to use. If it is not set and create is `true`, a name is generated using a `fullname` template. | `""` |
-| `statefulSet.enabled` | Enables `statefulset` deployment. Enabling `statefulSet` allows PVC templates for scaling. If using central PVC with RWX `accessMode`, this isn't needed. | `true` |
+| `statefulSet.enabled` | Enables `statefulset` deployment. Enabling `statefulSet` allows PVC templates for scaling. If using central PVC with RWX `accessMode`, this is not needed. | `true` |
 | `tolerations` | Specify tolerations for pod assignment. Allows the scheduler to schedule pods with matching taints. | |
 
-### Autoscaling parameters
+### Autoscaling Parameters
 
 Values used for creating a `Horizontal Pod Autoscaler`. If autoscaling is not
 enabled, the rest are ignored. NVIDIA recommends usage of the custom metrics
@@ -333,7 +333,7 @@ and memory are of limited use in scaling NIM.
 | `autoscaling.maxReplicas` | Specify maximum replicas for autoscaling. | `10` |
 | `autoscaling.metrics` | Array of metrics for autoscaling. | `[]` |
 
-### Ingress parameters
+### Ingress Parameters
 
 | Name | Description | Value |
 | --- | --- | --- |
@@ -346,7 +346,7 @@ and memory are of limited use in scaling NIM.
 | `ingress.hosts[0].paths[0].pathType` | Specify path type. | `ImplementationSpecific` |
 | `ingress.tls` | Specify list of pairs of TLS `secretName` and hosts. | `[]` |
 
-### Probe parameters
+### Probe Parameters
 
 | Name | Description | Value |
 | --- | --- | --- |
@@ -374,7 +374,7 @@ and memory are of limited use in scaling NIM.
 | `startupProbe.successThreshold` | Success threshold for `startupProbe`. | `1` |
 | `startupProbe.failureThreshold` | Failure threshold for `startupProbe`. | `180` |
 
-### Helm test parameters
+### Helm Test Parameters
 
 The readiness test always uses the HTTP management endpoint, including when
 gRPC inference is selected. The inference test is opt-in because request
@@ -401,7 +401,7 @@ payloads are model-specific, and it is only rendered for
 | `tests.inference.payload` | Request body sent by the inference Helm test. Required when the inference test is enabled. | `""` |
 | `tests.inference.expectedResponseField` | Optional response field required in the inference response. | `""` |
 
-### Metrics parameters
+### Metrics Parameters
 
 | Name | Description | Value |
 | --- | --- | --- |
@@ -414,7 +414,7 @@ payloads are model-specific, and it is only rendered for
 | `metrics.serviceMonitor.interval` | Optional Prometheus scrape interval. | `""` |
 | `metrics.serviceMonitor.scrapeTimeout` | Optional Prometheus scrape timeout. | `""` |
 
-### Models parameters
+### Models Parameters
 
 | Name | Description | Value |
 | --- | --- | --- |
@@ -434,7 +434,7 @@ payloads are model-specific, and it is only rendered for
 | `model.jsonLogging` | Turns JSON lines logging on or off. | `true` |
 | `model.logLevel` | Log level of the NIM service. Possible values are TRACE, DEBUG, INFO, WARNING, ERROR, and CRITICAL. | `INFO` |
 
-### Storage parameters
+### Storage Parameters
 
 | Name | Description | Value |
 | --- | --- | --- |
@@ -447,7 +447,7 @@ payloads are model-specific, and it is only rendered for
 | `persistence.stsPersistentVolumeClaimRetentionPolicy.whenScaled` | Specifies persistent volume claim retention policy when scaled. Only used with Stateful Set volume templates. | `Retain` |
 | `persistence.size` | Specifies the size of the persistent volume claim (for example 40Gi). | `50Gi` |
 | `persistence.annotations` | Adds annotations to the persistent volume claim. | `{}` |
-| `hostPath` | Configures model cache on local disk on the nodes using `hostPath` -- for special cases. You should understand the security implications before using this option. | |
+| `hostPath` | Configures model cache on local disk on the nodes using `hostPath`—for special cases. You should understand the security implications before using this option. | |
 | `hostPath.enabled` | Enable `hostPath`. | `false` |
 | `hostPath.path` | Specifies path on the node used as a `hostPath` volume. | `/model-store` |
 | `nfs` | Configures the model cache to sit on shared direct-mounted NFS. NOTE: you cannot set mount options using direct NFS mount to pods without a node-intalled nfsmount.conf. An NFS-based `PersistentVolumeClaim` is likely better in most cases. | |
@@ -456,7 +456,7 @@ payloads are model-specific, and it is only rendered for
 | `nfs.server` | Specify NFS server address. | `nfs-server.example.com` |
 | `nfs.readOnly` | Set to true to mount as read-only. | `false` |
 
-### Service parameters
+### Service Parameters
 
 | Name | Description | Value |
 | --- | --- | --- |

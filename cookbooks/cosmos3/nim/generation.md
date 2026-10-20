@@ -1,13 +1,13 @@
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 SPDX-License-Identifier: OpenMDW-1.1 -->
 
-# Generate images and videos with the Cosmos3 NIM
+# Generate Images and Videos With the Cosmos3 NIM
 
 Send text-to-image (T2I), text-to-video (T2V), image-to-video (I2V), and
 video-to-video (V2V) requests to a running **Generator** with synchronous JSON
-`POST /v1/infer`. Launch it with [deployment.md](deployment.md); the shared
+`POST /v1/infer`. Launch it with [Deployment](deployment.md); the shared
 request envelope is in the
-[API reference](api-reference.md#common-generator-request-fields).
+[API Reference](api-reference.md#common-generator-request-fields).
 
 ## Prerequisites
 
@@ -19,8 +19,8 @@ curl -f "$NIM_URL/v1/health/ready"
 ```
 
 Requests are synchronous and can stay quiet until done; the examples allow 30
-minutes, so do not retry a quiet connection (see
-[long-running requests](operations.md#long-running-requests)).
+minutes, so do not retry a quiet connection (refer to
+[Long-Running Requests](operations.md#long-running-requests)).
 
 Install the [client tooling](prerequisites.md#client-tooling), then run the
 examples from the cookbook directory. They use the included prompts and media
@@ -31,9 +31,9 @@ cd cookbooks/cosmos3/nim
 uv run python examples/t2i.py
 ```
 
-## Choose a modality
+## Choose a Modality
 
-| Modality | Example scenario | Conditioning input | Response field | Run |
+| Modality | Example Scenario | Conditioning Input | Response Field | Run |
 | --- | --- | --- | --- | --- |
 | T2I | Robot draping satin over a mannequin | None | `b64_image` | `uv run python examples/t2i.py` |
 | T2V | Robot cleaning a kitchen | None | `b64_video` | `uv run python examples/t2v.py` |
@@ -42,10 +42,10 @@ uv run python examples/t2i.py
 
 Standard scripts run on a general-purpose `nano` or `super` variant whose image
 includes the task; T2I and I2V also run on their full-step specialists.
-Four-step specialists need their own scripts (see
-[Specialist T2I and I2V variants](#specialist-t2i-and-i2v-variants)).
+Four-step specialists need their own scripts (refer to
+[Specialist T2I and I2V Variants](#specialist-t2i-and-i2v-variants)).
 
-## Text-to-image
+## Text-to-Image
 
 A T2I request has a non-empty `prompt`, no conditioning inputs, and exactly
 one output frame:
@@ -86,7 +86,7 @@ Image-to-image is not supported; use `image2video` to condition on an image.
 
 When their fields are omitted, T2I uses:
 
-| Field | T2I default |
+| Field | T2I Default |
 | --- | --- |
 | `resolution` | `720_1_1` (960 × 960) |
 | `negative_prompt` | Empty string |
@@ -97,7 +97,7 @@ When their fields are omitted, T2I uses:
 
 T2V, I2V, and V2V use these defaults when fields are omitted:
 
-| Field | Video default |
+| Field | Video Default |
 | --- | --- |
 | `resolution` | `720` (1280 × 720) |
 | `num_frames` | `189` |
@@ -116,7 +116,7 @@ When `negative_prompt` is omitted, the default depends on the request:
 Send `"negative_prompt": ""` to disable the built-in prompt. The `nano-droid`
 variant rejects `negative_prompt`.
 
-## Text-to-video
+## Text-to-Video
 
 A T2V request sets `model_mode` to `text2video`, has a non-empty `prompt`, and
 omits `input_reference`:
@@ -148,7 +148,7 @@ PY
 
 Full example: `uv run python examples/t2v.py`.
 
-## Image-to-video
+## Image-to-Video
 
 I2V accepts the conditioning image as raw base64, a MIME-aware data URL, or an
 allowed public HTTP(S) URL. A data URL preserves the media type and avoids
@@ -178,18 +178,18 @@ Full example: `uv run python examples/i2v.py`.
 `input_reference` is required (an image, up to 20,000,000 encoded characters).
 Use JPEG, PNG, or WebP; verify other formats on the deployed image.
 
-## Choose a video-conditioned workflow
+## Choose a Video-Conditioned Workflow
 
-| Intent | `model_mode` | Distinguishing input | Guide |
+| Intent | `model_mode` | Distinguishing Input | Guide |
 | --- | --- | --- | --- |
-| Animate a still image | `image2video` | Image `input_reference` | [Image-to-video](#image-to-video) |
-| Continue or transform a source video | `video2video` | Video `input_reference` plus optional V2V conditioning fields | [Video-to-video](#video-to-video) |
+| Animate a still image | `image2video` | Image `input_reference` | [Image-to-Video](#image-to-video) |
+| Continue or transform a source video | `video2video` | Video `input_reference` plus optional V2V conditioning fields | [Video-to-Video](#video-to-video) |
 | Follow an edge, blur, depth, segmentation, or WSM control | `video2video` | Non-empty `transfer`; top-level video only for a derived control | [Transfer](transfer.md) |
 | Estimate actions from an observed video | `inverse_dynamics` | Video `input_reference` plus `action_params` | [Action](action.md#inverse-dynamics) |
 
-Don't mix V2V fields, `transfer`, and `action_params` (HTTP 422).
+Do not mix V2V fields, `transfer`, and `action_params` (HTTP 422).
 
-## Video-to-video
+## Video-to-Video
 
 V2V sets `model_mode` to `video2video`, supplies a video in
 `input_reference`, and omits `transfer` and `action_params`:
@@ -218,16 +218,16 @@ empty list or a negative index returns HTTP 422. `condition_video_keep` takes
 frames from the `first` (default) or `last` part of the input.
 
 Decoded video is capped at 75 MB; data URLs add about one third to the JSON
-size. See [media inputs](api-reference.md#media-inputs) for codecs.
+size. Refer to [Media Inputs](api-reference.md#media-inputs) for codecs.
 
-## Specialist T2I and I2V variants
+## Specialist T2I and I2V Variants
 
 Super also ships task-specific variants. Each accepts only its task; select it
 before launch (`NIM_MODEL_VARIANT=super` is the general-purpose contract).
 Edge has no general-purpose, T2I, or I2V Generator; its only Generator variant
-is [Edge-DROID policy](action.md#edge-droid-and-nano-droid-policy).
+is [Edge-DROID Policy](action.md#edge-droid-and-nano-droid-policy).
 
-| Variant | Accepted request | Sampling behavior | Script |
+| Variant | Accepted Request | Sampling Behavior | Script |
 | --- | --- | --- | --- |
 | `super-t2i` | T2I only | Full-step; omitted `flow_shift` becomes `3.0` | `examples/t2i.py` |
 | `super-t2i-4step` | T2I only | Fixed four-step: steps `4`, guidance `1.0`, flow shift `1.0` | `examples/t2i_4step.py` |
@@ -239,25 +239,25 @@ Launch with the matching `NIM_MODEL_VARIANT`, then run the script with
 `guidance_scale`, and `flow_shift` (HTTP 422 otherwise); `seed` and other
 fields remain available.
 
-## Choose resolution, frames, and FPS
+## Choose Resolution, Frames, and FPS
 
-### Frame counts and limits
+### Frame Counts and Limits
 
 T2I uses exactly one frame. Video accepts any integer from 25 through the tier
 maximum; the service generates the next native `1 + 4k` count (VAE temporal
 compression 4) and trims to exactly `num_frames`.
 
-| Resolution tier | Maximum frames |
+| Resolution Tier | Maximum Frames |
 | --- | ---: |
 | `256` | 397 |
 | `480` | 297 |
 | `720` | 197 |
 
-### Resolution keys
+### Resolution Keys
 
 Bare keys alias the 16:9 shape of their tier (width × height):
 
-| Aspect | `256` tier | `480` tier | `720` tier |
+| Aspect | `256` Tier | `480` Tier | `720` Tier |
 | --- | --- | --- | --- |
 | Bare / `_16_9` | `320 × 192` | `832 × 480` | `1280 × 720` |
 | `_1_1` | `256 × 256` | `640 × 640` | `960 × 960` |
@@ -265,17 +265,17 @@ Bare keys alias the 16:9 shape of their tier (width × height):
 | `_4_3` | `320 × 256` | `736 × 544` | `1104 × 832` |
 | `_3_4` | `256 × 320` | `544 × 736` | `832 × 1104` |
 
-### FPS and denoising steps
+### FPS and Denoising Steps
 
 `fps` accepts 1–60 (10–30 recommended); video duration is about
 `num_frames / fps` seconds. Fractional `fps` reaches the model and encoder
 unchanged; only prompt-upsampling text rounds it. More `num_inference_steps`
 costs more latency.
 
-## Media inputs
+## Media Inputs
 
 Data-URL and URL rules, size caps, and accepted codecs are in the
-[API reference](api-reference.md#media-inputs).
+[API Reference](api-reference.md#media-inputs).
 
 ## Reproducibility
 
@@ -283,14 +283,14 @@ Set a non-negative integer `seed` when comparing runs; omitted, the service
 picks one. The same seed is not guaranteed bit-identical across NIM releases,
 model artifacts, precisions, or hardware layouts.
 
-## Optional prompt upsampling
+## Optional Prompt Upsampling
 
 Operators can enable prompt upsampling for T2I, T2V, and I2V (not V2V, Action,
 or Transfer); it keeps the request's resolution, aspect, duration, and FPS,
-and falls back to the original prompt on failure. See
-[configuration.md](configuration.md#prompt-upsampling).
+and falls back to the original prompt on failure. Refer to
+[Prompt Upsampling](configuration.md#prompt-upsampling).
 
-## Output and playback
+## Output and Playback
 
 T2I returns raw JPEG base64 in `b64_image`; video modes return raw base64
 VP9-in-MP4 in `b64_video`. The inactive media field is omitted. Examples write
@@ -311,15 +311,15 @@ ffmpeg -i examples/outputs/t2v_robot_kitchen.mp4 -c:v libx264 -crf 18 \
   -pix_fmt yuv420p examples/outputs/t2v_robot_kitchen-h264.mp4
 ```
 
-## Common failures
+## Common Failures
 
-| Symptom | Likely cause | Action |
+| Symptom | Likely Cause | Action |
 | --- | --- | --- |
-| HTTP 422, field or mode | Unknown field, missing `model_mode`, or fields that conflict with the mode | Set the explicit mode and send only its fields ([API reference](api-reference.md)) |
+| HTTP 422, field or mode | Unknown field, missing `model_mode`, or fields that conflict with the mode | Set the explicit mode and send only its fields ([API Reference](api-reference.md)) |
 | HTTP 422, frame count | `num_frames` is not an integer, is fewer than 25 for video, or exceeds its tier ceiling | Pick an integer within the resolution-tier range |
 | HTTP 422, reference mismatch | `input_reference` is missing, forbidden, or does not match `model_mode` | Omit it for text modes; provide the required image/video for conditioned modes |
 | URL media fails | URL inputs are disabled, unreachable from the container, or rejected by the decoder | Use a data URL and verify `NIM_ALLOW_URL_INPUT` |
 | Request times out in the client | Generation exceeded the client timeout, not necessarily the server timeout | Use the examples' 30-minute timeout and inspect NIM logs |
 | MP4 does not play | Player lacks VP9-in-MP4 support | Use `ffplay` or re-encode to H.264 with the declared FFmpeg tooling |
 
-For service-level diagnosis, see [operations.md](operations.md#troubleshooting).
+For service-level diagnosis, refer to [Troubleshooting](operations.md#troubleshooting).

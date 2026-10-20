@@ -1,23 +1,23 @@
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 SPDX-License-Identifier: OpenMDW-1.1 -->
 
-# Control video generation with Cosmos3 Transfer
+# Control Video Generation With Cosmos3 Transfer
 
 Guide Generator output with edge, blur, depth, segmentation, or
 world-space-map (WSM) video controls: send `POST /v1/infer` with
 `model_mode=video2video` and a top-level `transfer` object.
 
 > Confirm control and model availability for the selected image in the
-> [Support matrix](support-matrix.md).
+> [Support Matrix](support-matrix.md).
 
 Start a compatible Generator with [Deployment](deployment.md) and begin with
 one precomputed control. To choose between V2V, Transfer, and inverse
-dynamics, see
-[Choose a video-conditioned workflow](generation.md#choose-a-video-conditioned-workflow).
+dynamics, refer to
+[Choose a Video-Conditioned Workflow](generation.md#choose-a-video-conditioned-workflow).
 
-## Control types
+## Control Types
 
-| Control | Precomputed video | Server-derived from `input_reference` | Preset |
+| Control | Precomputed Video | Derived by Server | Preset |
 | --- | --- | --- | --- |
 | `edge` | Yes | Yes | `very_low`, `low`, `medium`, `high`, `very_high` |
 | `blur` | Yes | Yes | `none`, `very_low`, `low`, `medium`, `high`, `very_high` |
@@ -28,7 +28,7 @@ dynamics, see
 At least one control must be enabled. Control media uses the same
 [media input rules](api-reference.md#media-inputs) as `input_reference`.
 
-## Run the examples
+## Run the Examples
 
 The script has five precomputed cases with matching prompts, control media,
 geometry, and seeds; run one at a time, as each is an expensive generation.
@@ -36,12 +36,12 @@ geometry, and seeds; run one at a time, as each is an expensive generation.
 Transfer is compute-intensive: use a high-throughput discrete GPU such as an
 RTX PRO 6000 Blackwell 96 GB or H100 80 GB. DGX Spark can meet the memory
 floors but is much slower and not recommended. Check memory against
-[Transfer headroom](support-matrix.md#transfer-headroom).
+[Transfer Headroom](support-matrix.md#transfer-headroom).
 
 The client allows 60 minutes per request, but the backend defaults to 30. To
 match, add `-e NIM_TRITON_REQUEST_TIMEOUT=3600000000` (microseconds) to the
-Generator launch and restart; see
-[long-running requests](operations.md#long-running-requests).
+Generator launch and restart; refer to
+[Long-Running Requests](operations.md#long-running-requests).
 
 Install the [client tooling](prerequisites.md#client-tooling). Then, from the
 repository root, enter the cookbook directory before running a case:
@@ -67,7 +67,7 @@ Replace `derived_edge` with `derived_blur` to use a derived blur control. The
 script needs a general-purpose `nano` or `super` variant and writes
 `examples/outputs/transfer_<case>.mp4`.
 
-## Precomputed control
+## Precomputed Control
 
 Put the control media inside the matching nested object. A server-local file
 path is not accepted as control media:
@@ -99,7 +99,7 @@ path is not accepted as control media:
 Replace `edge` with `blur`, `depth`, `seg`, or `wsm` and provide the matching
 control.
 
-## Advanced: derive edge or blur
+## Derive Edge or Blur Controls
 
 For server-derived controls, send the source video in `input_reference` and
 omit the nested control video:
@@ -135,9 +135,9 @@ only to a derived control and cannot accompany nested `video`.
 Depth, segmentation, and WSM cannot be derived by the server; supply a
 precomputed control video.
 
-## Advanced tuning
+## Tune Transfer Parameters
 
-| Field | Constraint | Current effective default |
+| Field | Constraint | Current Effective Default |
 | --- | --- | --- |
 | `control_guidance` | Number `[0.0,10.0]` | 1.5 generally, 2.0 segmentation-only, 3.0 WSM-only |
 | `num_video_frames_per_chunk` | Integer `>= 1` | 93 generally, 101 WSM-only |
@@ -146,10 +146,10 @@ precomputed control video.
 | `<control>.control_weight` | Finite number `>= 0`; enabled weights need a positive sum | 1.0 |
 
 `num_first_chunk_conditional_frames > 0` requires `input_reference`.
-`control_weight` belongs inside a control object; see
-[Advanced multiple controls](#advanced-multiple-controls).
+`control_weight` belongs inside a control object; refer to
+[Combine Multiple Controls](#combine-multiple-controls).
 
-### Control guidance behavior
+### Control Guidance Behavior
 
 When control and text guidance are both active, the control term is scaled by
 `control_guidance` alone; with the edge-family defaults the effective control
@@ -159,7 +159,7 @@ branch.
 Current defaults by family (explicit valid values override them; recheck on
 another image):
 
-| Request family | Frames | FPS | Steps | Guidance | Flow shift | Control guidance |
+| Request Family | Frames | FPS | Steps | Guidance | Flow Shift | Control Guidance |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | Edge, blur, depth, or mixed | 121 | 30 | 50 | 3.0 | 10.0 | 1.5 |
 | Segmentation-only | 121 | 30 | 50 | 3.0 | 10.0 | 2.0 |
@@ -167,7 +167,7 @@ another image):
 
 The example script uses a 121-frame chunk, or 101 for WSM.
 
-## Advanced multiple controls
+## Combine Multiple Controls
 
 A `transfer` object can enable several controls; mixed requests use the edge
 family defaults. Each control object (`edge`, `blur`, `depth`, `seg`, `wsm`)
@@ -197,17 +197,17 @@ accepted only when another enabled control has a positive weight. This guide doe
 control per request unless yours is validated, and only combine controls that
 are spatially and temporally aligned.
 
-## Transfer VRAM admission
+## Transfer VRAM Admission
 
 A ready deployment can serve generation but reject Transfer when GPU headroom
-is too small; use a larger GPU or lower-VRAM configuration (see
-[Transfer headroom](support-matrix.md#transfer-headroom), including the
+is too small; use a larger GPU or lower-VRAM configuration (refer to
+[Transfer Headroom](support-matrix.md#transfer-headroom), including the
 `NIM_ALLOW_UNSAFE_TRANSFER` diagnostic override).
 
-## Media and output
+## Media and Output
 
 Control videos and video `input_reference` values accept up to 100,000,000
-encoded characters; see [media inputs](api-reference.md#media-inputs) for
+encoded characters; refer to [Media Inputs](api-reference.md#media-inputs) for
 formats, codecs, and URL rules.
 
 - The source video and each control video must have at least `num_frames`
@@ -218,7 +218,7 @@ formats, codecs, and URL rules.
 
 The response is `b64_video` plus `action: null`.
 
-## Validation and common failures
+## Validation and Common Failures
 
 Besides the failures below, Transfer rejects V2V fields
 (`condition_frame_indexes_vision`, `condition_video_keep`) and `action_params`,
@@ -232,4 +232,4 @@ or non-finite `control_weight` or enabled weights without a positive sum.
 | Control/output lengths are incompatible | Recheck the output frame count, chunk size, and conditional frame values |
 | Transfer is disabled while T2V works | Selected configuration fits T2V but GPU headroom is below Transfer overhead; use a larger GPU or lower-VRAM configuration |
 
-For service-level failures, see [operations.md](operations.md#troubleshooting).
+For service-level failures, refer to [Troubleshooting](operations.md#troubleshooting).

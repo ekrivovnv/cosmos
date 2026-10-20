@@ -1,17 +1,17 @@
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 SPDX-License-Identifier: OpenMDW-1.1 -->
 
-# Deploy Cosmos3 Reasoner with Dynamo
+# Deploy Cosmos3 Reasoner With Dynamo
 
 Run a Dynamo frontend with Cosmos3 Reasoner workers on Kubernetes. This
 example uses a pinned Dynamo frontend image and a Cosmos3 NIM worker image,
 launching `python3 -m dynamo.frontend` for
 Chat Completions, with round-robin routing and session affinity. It starts
 two Nano FP8 workers, each on one GPU, with persistent video sessions disabled.
-For those sessions, use [Dynamo with streaming](dynamo_with_streaming.md).
+For those sessions, use [Dynamo With Streaming](dynamo_with_streaming.md).
 
 For required worker environment variables, discovery, and proxy settings,
-see [Dynamo configuration](../configuration.md#dynamo-configuration), including
+refer to [Dynamo Configuration](../configuration.md#dynamo-configuration), including
 [running NIM as a Dynamo worker](../configuration.md#run-nim-as-a-dynamo-worker).
 
 The manifests use the tested operator's `nvidia.com/v1alpha1` API and
@@ -45,7 +45,7 @@ every cookbook client against that deployment. Validate those paths separately.
   frontend requests another 4 CPUs and 8 GiB (limits: 8 CPUs and 16 GiB).
   These are deployment resource settings, not profile memory floors; verify
   each GPU and effective host/container RAM against the
-  [support matrix](../support-matrix.md). Do not add memory across GPUs.
+  [Support Matrix](../support-matrix.md). Do not add memory across GPUs.
 - A ReadWriteMany (RWX) storage class and a 200 GiB model cache writable by
   the image's user with group 1000. All workers and the download Job must be
   able to mount it; workers must be able to download model artifacts if needed.
@@ -54,7 +54,7 @@ every cookbook client against that deployment. Validate those paths separately.
   image-specific profile selection and downloads artifacts without serving.
   Its memory limit is not evidence that a serving worker fits that limit.
 - `kubectl`, cURL, Python 3, and an exported `NGC_API_KEY` with image and model
-  access; see [Network and NGC access](../prerequisites.md#network-and-ngc-access).
+  access; refer to [Network and NGC Access](../prerequisites.md#network-and-ngc-access).
 
 Both services and the download Job tolerate the `nvidia.com/gpu` taint and
 the `kubernetes.io/arch=arm64:NoSchedule` taint. They leave node architecture
@@ -80,7 +80,7 @@ before use; remove those guardrail overrides or set them to `1` to enable the
 checks. Disabled warmup means Ready does not establish representative inference
 has completed. Do not copy a cold-start duration as an expected startup time.
 
-## Prepare the namespace and cache
+## Prepare the Namespace and Cache
 
 Run commands from `cookbooks/cosmos3/nim/dynamo`, with the intended Kubernetes
 context selected. Set your namespace (also export it in terminals used below).
@@ -112,7 +112,7 @@ Set the download Job's `volumes[].persistentVolumeClaim.claimName` to the same
 claim. The cache mounts at `/opt/nim/.cache` without a subdirectory. A storage class
 using `WaitForFirstConsumer` can leave the PVC Pending until the download Job or workers are scheduled.
 
-## Download model artifacts
+## Download Model Artifacts
 
 Set `<nim-image-build>` and the profile selectors in
 [`model-download.yaml`](model-download.yaml) to match the workers, then run:
@@ -141,10 +141,10 @@ kubectl -n "$NAMESPACE" get pods \
   -l nvidia.com/dynamo-graph-deployment-name=cosmos3-reasoner -w
 ```
 
-## Check the deployment
+## Check the Deployment
 
 Wait for the frontend and worker pods to become Ready, then stop the watch
-with Ctrl+C. Cold startup still includes model loading and may download any
+with Ctrl+C. Cold startup still includes model loading and can download any
 missing artifacts.
 The worker deliberately leaves system-port probes and `DYN_SYSTEM_PORT` to the
 operator; do not replace them with NIM HTTP liveness probes. Inspect the generated
@@ -173,7 +173,7 @@ port-forward a worker pod to a different local port to inspect those endpoints.
 Check each worker's readiness and match `selectedModelProfileId` from metadata
 to `/v1/manifest`, using [inspect_profile.py](../examples/inspect_profile.py).
 
-## Send a request
+## Send a Request
 
 The frontend serves `/v1/chat/completions`. Discover the model ID rather than
 assuming it matches the Kubernetes resource name:
@@ -186,11 +186,11 @@ curl -fsS "$NIM_URL/v1/chat/completions" \
   -d "{\"model\":\"$MODEL\",\"messages\":[{\"role\":\"user\",\"content\":\"Describe how a robot can avoid obstacles.\"}],\"max_tokens\":128}"
 ```
 
-See [Reasoning](../reasoning.md) for image/video request formats. The frontend
+Refer to [Reasoning](../reasoning.md) for image/video request formats. The frontend
 uses Dynamo's API, including OpenAI `response_format`; NIM-specific aliases
 are handled by the worker's NIM proxy. The frontend does not expose NIM
 metadata. The Python Reasoner and Responses examples require a worker NIM URL;
-see [Run the cookbook clients](#run-the-cookbook-clients). Older experimental
+refer to [Run the Cookbook Clients](#run-the-cookbook-clients). Older experimental
 worker images can also omit `model_type` and
 `inference_endpoint` from `/v1/metadata`, so cookbook clients requiring those
 fields reject those workers before inference. Use a worker image that exposes
@@ -215,7 +215,7 @@ The worker NIM proxy also forwards Responses creation unless
 frontend's own route. Check the selected frontend build and operator settings
 when a route is absent.
 
-## Run the cookbook clients
+## Run the Cookbook Clients
 
 `inspect_profile.py`, `reasoner.py`, and `reasoner_responses.py` use the worker's
 NIM metadata and model endpoints. Use these commands with either deployment
@@ -253,7 +253,7 @@ namespace prefix in the worker container. A Responses
 `Model not found` error does not mean the Responses route is absent. Successful
 requests through the shared frontend do not validate the worker proxy's routes.
 
-## Scale or stop
+## Scale or Stop
 
 To add workers, set `spec.services.ReasonerWorker.replicas` to `<worker-count>` in
 [`reasoner.yaml`](reasoner.yaml) and apply it again. Each

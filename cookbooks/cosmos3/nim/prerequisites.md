@@ -5,35 +5,35 @@ SPDX-License-Identifier: OpenMDW-1.1 -->
 
 Prepare and verify a host before pulling or launching the Cosmos3 NIM;
 per-configuration GPU, VRAM, and host RAM requirements are in the
-[support matrix](support-matrix.md).
+[Support Matrix](support-matrix.md).
 
-## Hardware requirements
+## Hardware Requirements
 
-| Requirement | Current requirement |
+| Requirement | Current Requirement |
 | --- | --- |
 | CPU architecture | The release image provides `amd64` and `arm64` variants; use the variant selected by the container runtime |
 | GPU compute capability | Generator: BF16 `>=8.0`, FP8 `>=8.9`; Reasoner: BF16 `>=8.0`, FP8 `>=8.9`, NVFP4 `>=10.0` |
-| GPU count and per-device VRAM | See the [Generator](support-matrix.md#generator-configurations) and [Reasoner](support-matrix.md#reasoner-configurations) tables |
-| Host RAM | System-memory floor per configuration, enforced by profile selection, in the [Generator](support-matrix.md#generator-configurations) and [Reasoner](support-matrix.md#reasoner-configurations) tables; treat it as a minimum for the workload |
+| GPU count and per-device VRAM | Refer to the [Generator](support-matrix.md#generator-profiles) and [Reasoner](support-matrix.md#reasoner-profiles) tables |
+| Host RAM | System-memory floor per configuration, enforced by profile selection, in the [Generator](support-matrix.md#generator-profiles) and [Reasoner](support-matrix.md#reasoner-profiles) tables; treat it as a minimum for the workload |
 | Free disk | Provision for the image, selected model artifacts, materialization, and outputs; no single workload-independent floor is documented |
 | Container shared memory | The Docker reference launch allocates 16 GiB; validate the requirement for the selected media workload and concurrency |
 
 Do not add together memory from multiple GPUs to satisfy a per-device floor.
 If the deployment must serve Transfer, provision each GPU against the
-**Transfer minimum VRAM/device** column in the
-[Generator configurations](support-matrix.md#generator-configurations), not the
-**Generation minimum VRAM/device** value.
+**Transfer Minimum VRAM/Device** column in the
+[Generator Profiles](support-matrix.md#generator-profiles), not the
+**Generation Minimum VRAM/Device** value.
 
 Use homogeneous GPUs; Reasoner requires the same compute capability on every
 GPU. Each GPU must also have enough free memory at startup, so stop unrelated
 GPU workloads before launch.
 
 Lower-VRAM offload profiles keep model weights in system memory and carry
-their own system-memory floors; see the
-[Generator configurations](support-matrix.md#generator-configurations). A
+their own system-memory floors; refer to the
+[Generator Profiles](support-matrix.md#generator-profiles). A
 container memory limit counts before host physical memory.
 
-### Inspect unified-memory capacity and current state
+### Inspect Unified-Memory Capacity and Current State
 
 DGX Spark/GB10 and Jetson AGX Thor share one physical memory pool between CPU
 and GPU. Summarize the host memory state with this read-only command:
@@ -76,12 +76,12 @@ A memory-related preflight failure has two materially different causes:
 On these systems the Reasoner defaults to a 0.70
 [`NIM_GPU_MEMORY_UTILIZATION`](deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems)
 share; if you lower it, keep the same value from preflight through launch. Clearing page cache or deleting the model cache is
-not part of normal deployment; see
-[Unified-memory diagnostics](operations.md#unified-memory-diagnostics).
+not part of normal deployment; refer to
+[Unified-Memory Diagnostics](operations.md#unified-memory-diagnostics).
 
-## Software requirements
+## Software Requirements
 
-| Software | Required version |
+| Software | Required Version |
 | --- | --- |
 | Linux and `glibc` | Use a Linux host supported by the selected NVIDIA driver and container stack |
 | NVIDIA driver | Recommended: NVIDIA driver 595.58.03 or newer. The image is built on CUDA 13.0 user-space libraries; confirm the host with the [verification steps](#verify-the-host) and a container start |
@@ -91,7 +91,7 @@ not part of normal deployment; see
 This release was validated with the following host configuration (tested
 versions, not minimums):
 
-| Component | Validated version |
+| Component | Validated Version |
 | --- | --- |
 | OS, architecture, and GPU | Ubuntu 24.04.5 LTS on `aarch64` with NVIDIA GH200 480GB (96 GB GPU memory) |
 | NVIDIA driver | 595.58.03 |
@@ -103,12 +103,12 @@ toolkit solely for the NIM. Do not narrow the image's
 `NVIDIA_DRIVER_CAPABILITIES=compute,utility,video`; Reasoner needs the `video`
 capability for NVDEC decoding.
 
-## Client tooling
+## Client Tooling
 
 Run the API and Python examples from the NIM host or another Linux system that
 can reach the service:
 
-| Tool | Minimum version | Used for |
+| Tool | Minimum Version | Used For |
 | --- | --- | --- |
 | `curl` | 7.61 | Health checks and direct HTTP API requests |
 | `uv` | 0.11.0 | Creating the pinned Python environment and running examples |
@@ -138,7 +138,7 @@ ffplay -version | head -n 1
 For another supported client distribution, use its package manager for
 `curl`, Python 3, and FFmpeg; use the same official installer for `uv`.
 
-### Initialize the example environment
+### Initialize the Example Environment
 
 After checking out the repository, create the pinned client environment once:
 
@@ -150,7 +150,7 @@ uv sync --locked
 This creates the project `.venv` from `pyproject.toml` and `uv.lock`; rerun it
 after either file changes. `uv run python examples/...` reuses it.
 
-## Network and NGC access
+## Network and NGC Access
 
 For a normal cold start, the host must reach:
 
@@ -172,10 +172,10 @@ echo
 The variable is `NGC_API_KEY`, not `NGC_TOKEN`. Do not save the key in source
 control; continue with [Authenticate to NGC](deployment.md#authenticate-to-ngc).
 
-An air-gapped host needs a pre-populated cache; see
-[Offline and air-gapped deployment](deployment.md#offline-and-air-gapped-deployment).
+An air-gapped host needs a pre-populated cache; refer to
+[Offline and Air-Gapped Deployment](deployment.md#offline-and-air-gapped-deployment).
 
-## Verify the host
+## Verify the Host
 
 Check the operating system, CPU architecture, `glibc`, driver, Docker, and
 Container Toolkit before pulling the NIM:
@@ -197,8 +197,8 @@ docker run --rm --runtime=nvidia --gpus all ubuntu nvidia-smi
 ```
 
 The GPU query reports memory in MiB; divide by 1024 to compare with the
-binary-GiB floors in the [support matrix](support-matrix.md). The Docker check
+binary-GiB floors in the [Support Matrix](support-matrix.md). The Docker check
 verifies GPU container access, not Cosmos3 profile compatibility.
 
-For installation and verification failures, see
+For installation and verification failures, refer to
 [Troubleshooting](operations.md#troubleshooting).

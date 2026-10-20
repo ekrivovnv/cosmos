@@ -1,20 +1,20 @@
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 SPDX-License-Identifier: OpenMDW-1.1 -->
 
-# Use Cosmos3 action capabilities through the Cosmos3 NIM
+# Use Cosmos3 Action Capabilities Through the Cosmos3 NIM
 
 Send forward dynamics, policy, and inverse dynamics requests to a compatible
 **Generator** with synchronous JSON `POST /v1/infer`; `model_mode` selects the
 task.
 
 > Confirm model and domain availability for the selected image in the
-> [Support matrix](support-matrix.md).
+> [Support Matrix](support-matrix.md).
 
 Start the NIM with [Deployment](deployment.md). General Action models return
 visual rollouts for all three modes; the Edge-DROID and Nano-DROID specialists
 serve policy only and return actions without media.
 
-## Understand an action sequence
+## Understand an Action Sequence
 
 Cosmos3 models an action as a transition between consecutive visual
 observations:
@@ -29,7 +29,7 @@ A trajectory `[T,D]` covers `T` transitions across `T+1` observations, where
 
 Omit `num_frames`; the service sets it to `action_chunk_size + 1`.
 
-## Choose an Action mode
+## Choose an Action Mode
 
 | `model_mode` | Input | Output |
 | --- | --- | --- |
@@ -39,9 +39,9 @@ Omit `num_frames`; the service sets it to `action_chunk_size + 1`.
 
 Action requests must not set top-level `resolution`.
 
-## Domains and representations
+## Domains and Representations
 
-| `domain_name` | Domain ID | General `raw_action_dim` | Example chunk |
+| `domain_name` | Domain ID | General `raw_action_dim` | Example Chunk |
 | --- | ---: | ---: | ---: |
 | `av` | 1 | 9 | 60 actions at 10 action FPS |
 | `umi` | 6 | 10 | 16 actions at 20 action FPS |
@@ -55,14 +55,14 @@ the checkpoint, so apply its published transforms before driving hardware.
 The DROID specialists' 8-wide output is their own contract, not a truncated
 DROID 10D action.
 
-## Cadence and visual geometry
+## Cadence and Visual Geometry
 
 Top-level `fps` is the rollout video cadence and `action_params.action_fps`
 the action-row cadence (separate fields, aligned in the examples);
 `action_params.image_size` is a model setting, not a replacement for the
 forbidden `resolution`.
 
-## Run the examples
+## Run the Examples
 
 Install the [client tooling](prerequisites.md#client-tooling), then enter the
 cookbook directory:
@@ -74,7 +74,7 @@ export NIM_URL=${NIM_URL:-http://localhost:8000}
 
 The executable cases include AV, UMI, and robot examples:
 
-| Case | Conditioning and expected result | Run |
+| Case | Conditioning and Expected Result | Run |
 | --- | --- | --- |
 | `av_forward` | Supplied AV straight trajectory; rollout visualizes that trajectory | `uv run python examples/action.py --case av_forward` |
 | `av_left` | Supplied AV left trajectory; ego rollout turns left | `uv run python examples/action.py --case av_left` |
@@ -93,7 +93,7 @@ plus `action_<case>.json` with the predicted trajectory for policy and inverse
 dynamics. Review the video to check direction; inspect action data in the
 [Cosmos3 Action Viewer](https://huggingface.co/spaces/nvidia/Cosmos3-Action-Viewer).
 
-## Forward dynamics
+## Forward Dynamics
 
 Forward dynamics renders the observations that follow an initial image and an
 action chunk. The AV cases share `images/av_0.jpg` and differ only in the
@@ -157,10 +157,10 @@ Policy predicts an action chunk instead of receiving one:
 `av_policy_left` and `av_policy_right` differ only in the language goal and
 return a `[60,9]` action and a 61-frame rollout. Judge direction from the
 video, not raw values; a plausible rollout does not establish traffic safety or
-physical suitability. Policy omits `action` and may add the policy-only state
+physical suitability. Policy omits `action` and can add the policy-only state
 fields in the [reference](#action-parameter-reference).
 
-### Integrate a policy loop
+### Integrate a Policy Loop
 
 `POST /v1/infer` is stateless and is not the streaming policy server used by
 the RoboLab workflow: call it once per control step with the current
@@ -170,7 +170,7 @@ Before physical execution, enforce your own joint and workspace bounds,
 collision checks, timing limits, and emergency stops; a valid response is not
 authorization to execute.
 
-## Edge-DROID and Nano-DROID policy
+## Edge-DROID and Nano-DROID Policy
 
 Edge-DROID and Nano-DROID are BF16-only specialist policy checkpoints with the
 same action-only request contract. Edge-DROID is
@@ -218,7 +218,7 @@ top-level `fps`, `num_frames`, and `negative_prompt`. The model returns 32
 actions of width 8 and defaults to 4 steps, guidance `3.0`, and flow shift
 `5.0`; those and `seed` are overridable.
 
-The response is action-only, with no `b64_image` or `b64_video` (see the
+The response is action-only, with no `b64_image` or `b64_video` (refer to the
 [response example](api-reference.md#generator-response)).
 
 After readiness, run the [policy client](examples/policy_droid.py):
@@ -236,7 +236,7 @@ action under `examples/outputs/`. It does not execute robot actions. The
 uses the same sample with a different direct-vLLM `/v1/videos` API; do not copy
 its payload.
 
-## Inverse dynamics
+## Inverse Dynamics
 
 Inverse dynamics estimates the actions in an observed video. The local cases
 use `videos/av_0.mp4` and `videos/av_1.mp4`:
@@ -265,7 +265,7 @@ The `bridge_inverse` case fetches a public URL, so it needs URL input and
 container network access; use a data URL offline. Policy-only state fields are
 rejected.
 
-## Response action object
+## Response Action Object
 
 General visual policy and inverse-dynamics profiles return a video and an action
 object:
@@ -287,12 +287,12 @@ object:
 `data` is shortened here; real responses have every row in `shape`. Before
 use, check that `shape` matches `data`, that rows, width, `raw_action_dim`,
 `action_mode`, and `domain_id` match the request, and that values are finite.
-[Edge-/Nano-DROID policy](#edge-droid-and-nano-droid-policy) returns the same
+[Edge-/Nano-DROID Policy](#edge-droid-and-nano-droid-policy) returns the same
 object without media.
 
-## Action parameter reference
+## Action Parameter Reference
 
-| Field | Type/default | Contract |
+| Field | Type/Default | Contract |
 | --- | --- | --- |
 | `domain_name` | required enum | `av`, `bridge_orig_lerobot`, `droid_lerobot`, or `umi` |
 | `action_chunk_size` | required integer | Positive multiple of 4; output frames equal this value plus 1 |
@@ -305,12 +305,12 @@ object without media.
 | `use_state` | boolean or null | Policy-only |
 | `observation` | object or null | Policy-only free-form state without a public nested schema |
 
-## Defaults and request validation
+## Defaults and Request Validation
 
 General Action profiles default to `num_inference_steps=30`,
 `guidance_scale=1.0`, and `fps=10.0`; specialists can override these.
 
-## Common failures
+## Common Failures
 
 | Failure | Fix |
 | --- | --- |
@@ -320,5 +320,5 @@ General Action profiles default to `num_inference_steps=30`,
 | Configuration cannot run the action case | Confirm the selected image's action-capable model variant and supported domain |
 | Client fails on missing `b64_video` | Handle action-only specialist responses separately from general visual Action responses |
 
-For startup, OOM, and service diagnostics, see
-[operations.md](operations.md#troubleshooting).
+For startup, out-of-memory errors, and service diagnostics, refer to
+[Troubleshooting](operations.md#troubleshooting).
