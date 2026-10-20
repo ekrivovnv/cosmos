@@ -244,8 +244,9 @@ fields remain available.
 ### Frame Counts and Limits
 
 T2I uses exactly one frame. Video accepts any integer from 25 through the tier
-maximum; the service generates the next native `1 + 4k` count (VAE temporal
-compression 4) and trims to exactly `num_frames`.
+maximum. The service generates the next native `1 + 4k` count, because the
+variational autoencoder (VAE) compresses time by 4, and trims to exactly
+`num_frames`.
 
 | Resolution Tier | Maximum Frames |
 | --- | ---: |
@@ -286,8 +287,8 @@ model artifacts, precisions, or hardware layouts.
 ## Optional Prompt Upsampling
 
 Operators can enable prompt upsampling for T2I, T2V, and I2V (not V2V, Action,
-or Transfer); it keeps the request's resolution, aspect, duration, and FPS,
-and falls back to the original prompt on failure. Refer to
+or Transfer); it keeps the request's resolution, aspect, duration, and frames
+per second (FPS), and falls back to the original prompt on failure. Refer to
 [Prompt Upsampling](configuration.md#prompt-upsampling).
 
 ## Output and Playback

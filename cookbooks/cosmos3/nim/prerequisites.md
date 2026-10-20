@@ -4,7 +4,7 @@ SPDX-License-Identifier: OpenMDW-1.1 -->
 # Prerequisites for the Cosmos3 NIM
 
 Prepare and verify a host before pulling or launching the Cosmos3 NIM;
-per-configuration GPU, VRAM, and host RAM requirements are in the
+per-configuration GPU, video memory (VRAM), and host RAM requirements are in the
 [Support Matrix](support-matrix.md).
 
 ## Hardware Requirements
@@ -112,7 +112,7 @@ can reach the service:
 | --- | --- | --- |
 | `curl` | 7.61 | Health checks and direct HTTP API requests |
 | `uv` | 0.11.0 | Creating the pinned Python environment and running examples |
-| `python3` | 3.10 | Standard-library JSON formatting and inline decoding snippets |
+| `python3` | 3.10 | Standard-library JSON formatting and inline decoding examples |
 | `ffmpeg` and `ffplay` | 6.1 | Optional playback and conversion of generated VP9-in-MP4 video |
 
 On Ubuntu 24.04, install the distribution-provided client tools, then install
@@ -196,7 +196,7 @@ Then verify that Docker can expose the intended GPUs:
 docker run --rm --runtime=nvidia --gpus all ubuntu nvidia-smi
 ```
 
-The GPU query reports memory in MiB; divide by 1024 to compare with the
+The GPU query reports memory in MiB; divide by 1,024 to compare with the
 binary-GiB floors in the [Support Matrix](support-matrix.md). The Docker check
 verifies GPU container access, not Cosmos3 profile compatibility.
 

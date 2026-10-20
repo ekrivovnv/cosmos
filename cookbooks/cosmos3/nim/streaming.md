@@ -146,7 +146,7 @@ The retention object supports these fields:
 | --- | --- | --- |
 | `max_video_segments` | Server default when `retention` is omitted | Maximum retained video frames; at least 1 |
 | `max_text_tokens` | `null` | Optional soft cap on non-pinned text; when set, must be positive and no greater than `max_session_tokens` |
-| `max_session_tokens` | `7000` | Total retained prompt-token budget; required to be non-null and at least 1024 |
+| `max_session_tokens` | `7000` | Total retained prompt-token budget; required to be non-null and at least 1,024 |
 | `eviction_policy` | `sliding_window` | Supported policy for removing older context |
 | `reprefill_threshold` | `0.7` | Fraction of the trained position range that triggers rebuilding retained context at fresh positions; must be greater than 0 and less than 1 |
 
@@ -320,8 +320,8 @@ With `fatal: true`, stop sending and open a new connection before creating a
 new session. Invalid initial messages and admission failures are fatal, as
 are missing/dead sessions during frame processing. These close with WebSocket
 code `1008`; unexpected internal failures send a fatal `500` error and close
-with `1011`. Normal explicit deletion closes with `1000`. Do not assume a
-`closed` message will arrive after a fatal error or network disconnect.
+with `1011`. Normal explicit deletion closes with `1000`. Do not assume that a
+`closed` message arrives after a fatal error or network disconnect.
 
 ## Frame Replies
 

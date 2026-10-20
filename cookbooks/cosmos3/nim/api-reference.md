@@ -30,10 +30,11 @@ active `model_type` and `inference_endpoint` in `/v1/metadata`; other framework
 endpoints are in
 [Inspect the Running Service](operations.md#inspect-the-running-service).
 
-## Generator: `POST /v1/infer`
+## Generator Endpoint
 
-The Generator accepts one synchronous JSON object and rejects unknown fields.
-Every request must set `model_mode` to identify the task.
+The Generator serves `POST /v1/infer`. It accepts one synchronous JSON object
+and rejects unknown fields. Every request must set `model_mode` to identify the
+task.
 
 `NIM_MODEL_VARIANT` chooses the checkpoint at container start; `model_mode`
 chooses the task per request.
@@ -53,7 +54,8 @@ The task guides define the remaining required inputs and invalid combinations.
 
 ### Common Generator Request Fields
 
-Defaults are for video / T2I; Transfer and Action defaults are on their pages.
+Defaults are for video / text-to-image (T2I); Transfer and Action defaults are
+on their pages.
 
 | Field | Type | Video / T2I Default | Applies To |
 | --- | --- | --- | --- |
@@ -103,8 +105,9 @@ H.264, H.265/HEVC, MPEG-4 Part 2, VP8, VP9, or AV1; other codecs return HTTP
 422. Decode paths and image formats are in the
 [Support Matrix](support-matrix.md#media-and-codecs).
 
-Size caps: I2V images 20,000,000 encoded characters; V2V decoded video 75 MB;
-Transfer limits are in [Transfer](transfer.md#media-and-output).
+Size caps: image-to-video (I2V) images 20,000,000 encoded characters;
+video-to-video (V2V) decoded video 75 MB; Transfer limits are in
+[Transfer](transfer.md#media-and-output).
 
 ## Generator Response
 

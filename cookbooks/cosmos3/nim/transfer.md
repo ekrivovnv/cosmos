@@ -200,9 +200,9 @@ are spatially and temporally aligned.
 ## Transfer VRAM Admission
 
 A ready deployment can serve generation but reject Transfer when GPU headroom
-is too small; use a larger GPU or lower-VRAM configuration (refer to
-[Transfer Headroom](support-matrix.md#transfer-headroom), including the
-`NIM_ALLOW_UNSAFE_TRANSFER` diagnostic override).
+is too small. Use a larger GPU or a configuration that needs less video memory
+(VRAM). For the thresholds and the `NIM_ALLOW_UNSAFE_TRANSFER` diagnostic
+override, refer to [Transfer Headroom](support-matrix.md#transfer-headroom).
 
 ## Media and Output
 
