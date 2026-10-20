@@ -73,7 +73,7 @@ request prompts are redacted. At `DEBUG`, full prompts are logged, so use
 `DEBUG` only during diagnosis and treat its logs as sensitive. Never log
 secrets or raw media data URLs.
 
-To read recent logs from a Docker container, run:
+To read recent logs, run the command for your container:
 
 ```bash
 docker logs --since 10m cosmos3-generator

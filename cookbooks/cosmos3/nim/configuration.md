@@ -81,8 +81,7 @@ Use these only when automatic model selection is not sufficient:
 | --- | --- | --- |
 | `NIM_TAGS_SELECTOR` | Empty | Filter by comma-separated exact manifest tags as `key=value` pairs; refer to the valid keys below |
 
-Values in `NIM_TAGS_SELECTOR` are lowercased, and any key not listed here is
-an error. The selector accepts only these keys:
+`NIM_TAGS_SELECTOR` lowercases its values and accepts only the following keys:
 
 | Key | Meaning | Runtime |
 | --- | --- | --- |

@@ -79,8 +79,8 @@ Kubernetes deployment, follow [Deploy with Helm](helm.md).
 Export `NGC_API_KEY` (not `NGC_TOKEN`) as described under
 [Network and NGC Access](prerequisites.md#network-and-ngc-access). Never put
 the key in source control. Docker saves the registry login after
-`docker login`. Docker Desktop uses a native credential store. Standalone
-Docker Engine without a helper stores it base64-encoded in
+`docker login`. Docker Desktop uses a native credential store, while standalone
+Docker Engine without a helper stores the login base64-encoded in
 `$HOME/.docker/config.json` and prints a warning.
 
 For stronger at-rest protection, configure a
@@ -322,8 +322,8 @@ command in [Launch Generator](#launch-generator):
 -e NIM_CACHE_BACKEND=none
 ```
 
-Edge-DROID disables SeaCache by default (`NIM_CACHE_BACKEND=none`), so leave
-`NIM_CACHE_CONFIG` unset. Guardrails stay enabled. After readiness, follow
+Edge-DROID disables SeaCache by default. The explicit `NIM_CACHE_BACKEND=none`
+keeps that visible, so leave `NIM_CACHE_CONFIG` unset. Guardrails stay enabled. After readiness, follow
 [Verify the Selection](#verify-the-selection)
 and run the [Reasoner catalog](reasoning.md#run-the-task-catalog) or the
 [DROID policy client](action.md#edge-droid-and-nano-droid-policy). Edge-DROID

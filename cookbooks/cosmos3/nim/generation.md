@@ -224,8 +224,8 @@ size. Refer to [Media Inputs](api-reference.md#media-inputs) for codecs.
 
 ## Specialist T2I and I2V Variants
 
-Super also ships task-specific variants. Each accepts only its task. Select it
-before launch. The general-purpose contract is `NIM_MODEL_VARIANT=super`.
+Super also ships task-specific variants. Each accepts only its task. Select the
+variant before launch. The general-purpose contract is `NIM_MODEL_VARIANT=super`.
 Edge has no general-purpose, T2I, or I2V Generator. Its only Generator variant
 is [Edge-DROID Policy](action.md#edge-droid-and-nano-droid-policy).
 

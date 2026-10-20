@@ -181,8 +181,9 @@ and [streaming settings](../configuration.md#streaming-video-sessions) for
 limits. The REST idle timeout defaults to 120 seconds.
 
 A session-route 404 can indicate an old frontend/worker image or streaming
-disabled on the worker. An existing session can also expire. A 503 can mean
-workers are loading, capacity is full, or the owning worker is unavailable.
+disabled on the worker. A 404 can also mean that an existing session expired.
+A 503 can mean workers are loading, capacity is full, or the owning worker is
+unavailable.
 Sessions do not migrate after worker loss, so create a new one. Do not
 automatically retry a frame after a timeout.
 
@@ -205,7 +206,6 @@ replacing workers loses their active sessions because session state does not
 migrate. Set the count to `0` to release the GPUs while retaining the frontend
 and cache. Restore a positive count and wait for readiness before sending more
 requests.
-
 
 To stop serving while keeping the cache PVC and secrets:
 

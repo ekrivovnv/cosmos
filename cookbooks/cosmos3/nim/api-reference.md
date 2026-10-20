@@ -86,7 +86,7 @@ Integer and finite-number fields use strict JSON types. For example, `"35"`,
 ## Media Inputs
 
 Generator image and video inputs (`input_reference` and Transfer control
-videos) accept the following formats:
+videos) can be supplied in the following ways:
 
 - Raw base64
 - A MIME-aware data URL such as `data:image/jpeg;base64,...` or

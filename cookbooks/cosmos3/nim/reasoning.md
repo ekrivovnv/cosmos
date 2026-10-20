@@ -359,7 +359,7 @@ run and are not golden NIM output.
 
 ## Errors
 
-The following errors are specific to Reasoner requests:
+Reasoner requests commonly fail as follows:
 
 | Status/Symptom | Meaning | Action |
 | --- | --- | --- |

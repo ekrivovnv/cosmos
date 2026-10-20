@@ -152,10 +152,9 @@ measurements. Refer to
 
 ### OpenTelemetry
 
-The following endpoint assumes an OpenTelemetry Collector DaemonSet that
-listens on host port 4318. Change `OTEL_EXPORTER_OTLP_ENDPOINT` for other
-collector layouts. To export traces and metrics over OTLP, add these entries
-to `env`:
+To export traces and metrics over OTLP, add these entries to `env`. The
+endpoint assumes an OpenTelemetry Collector DaemonSet that listens on host port
+4318. Change `OTEL_EXPORTER_OTLP_ENDPOINT` for other collector layouts:
 
 ```yaml
   - name: NIM_ENABLE_OTEL
@@ -278,7 +277,6 @@ longer needed.
 These are the `nim-wfm` chart values used with the chart version pinned on this
 page (1.3.0). For the authoritative list, run
 `helm show values "nim-wfm-${NIM_WFM_VERSION}.tgz"`.
-
 
 ### Deployment Parameters
 

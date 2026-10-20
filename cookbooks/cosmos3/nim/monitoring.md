@@ -120,7 +120,6 @@ dashboard panels from them. Each runtime exposes different metric families:
 Metric names can change between releases. Check your service's output before
 building dashboards or alerts.
 
-
 ## Kubernetes
 
 For [Helm](helm.md) deployments, set `metrics.serviceMonitor.enabled: true`
