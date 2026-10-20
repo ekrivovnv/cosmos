@@ -21,17 +21,16 @@ before starting workers. If reusing a cache, set `spec.pvcs[0].name` and
 Job's PVC `claimName`, to `<existing-cache-pvc>`. Keep `create: false`.
 Replace all `<angle-bracket>` values before applying.
 
-This manifest adapts the tested regular deployment's `v1alpha1` services schema,
-resources, shared cache, and operator-managed worker health probes. Streaming
-sessions were not exercised by the supplied working-deployment files. Validate
-the adapter and session requests below against your chosen image.
+This manifest adapts the regular deployment's `v1alpha1` services schema,
+resources, shared cache, and operator-managed worker health probes. Validate
+the adapter and session requests below on your deployment.
 
 ## Set the NIM Image
 
-In [`reasoner_with_streaming.yaml`](reasoner_with_streaming.yaml), replace
-both occurrences of `<nim-image-build>` with the same available Cosmos3 NIM
-image address, including its tag or digest. The image must include
-`/opt/nim/streaming/dynamo/`. Use the same image in the download Job.
+[`reasoner_with_streaming.yaml`](reasoner_with_streaming.yaml) uses
+`nvcr.io/nim/nvidia/cosmos3:2.1.0` for both the frontend and the workers. If you change it,
+change both occurrences and the download Job together. The image must include
+`/opt/nim/streaming/dynamo/`.
 
 The frontend runs `/opt/nim/.venv/bin/python -m streaming.dynamo.frontend`
 from `/opt/nim`. It serves streaming configuration and REST sessions. It
@@ -87,7 +86,7 @@ Edge supports the same REST session API in BF16 and FP8. In both
 Replace the existing variant and precision entries rather than adding
 duplicates. Keep the image, cache, and GPU selectors aligned between the Job and
 workers. Edge does not support DFlash in this version. Set the streaming method
-explicitly to `none` so images that default streaming to DFlash do not request a
+explicitly to `none`, because streaming defaults to DFlash and Edge has no
 draft. The shared frontend needs no model-specific change. The client discovers
 the Edge model from `/v1/streaming/config`. Use a separate streaming endpoint if
 running Edge alongside a Nano or Super pool.

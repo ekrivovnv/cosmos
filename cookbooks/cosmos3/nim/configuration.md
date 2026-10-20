@@ -57,7 +57,7 @@ processes, so a passed value can place work outside the intended GPUs.
 | Name | Default | Use |
 | --- | --- | --- |
 | `NIM_MODEL_PATH` | Empty | Absolute local directory or `hf://owner/repository[:revision]` for either runtime |
-| `NIM_DISABLE_MODEL_DOWNLOAD` | `false` | Disable profile download for a completely local Reasoner override; incompatible with Reasoner `hf://` and rejected for Generator |
+| `NIM_DISABLE_MODEL_DOWNLOAD` | `false` | Disable profile download; set automatically for a Reasoner checkpoint override, incompatible with Reasoner `hf://`, and rejected for Generator |
 | `HF_TOKEN` | Empty | Authenticate to a private Hugging Face repository named by `NIM_MODEL_PATH` |
 
 To override the DFlash draft, refer to `NIM_DFLASH_MODEL_PATH` under
@@ -94,9 +94,6 @@ Use these only when automatic model selection is not sufficient:
 | `nim_up` | Ulysses sequence-parallel factor; latency profiles use `n_gpus / 2` | Generator |
 | `nim_tp` | Tensor-parallel factor; Super BF16 also has a 2-GPU `nim_tp=2` layout | Reasoner |
 
-`gp`, `cp`, and `dp` are accepted as aliases for `nim_gp`, `nim_up`, and
-`nim_dp`.
-
 Selectors filter the image's existing profiles and cannot create a layout the
 manifest lacks. A selection that matches no profile fails at startup. Without
 them, the Generator uses as many visible GPUs as a compatible profile supports
@@ -108,8 +105,8 @@ On an integrated GPU with unified host/device memory (NVIDIA DGX Spark/GB10, Jet
 AGX Thor), the NIM treats 70% of the shared pool as GPU memory for profile
 floors and as the default Reasoner `NIM_GPU_MEMORY_UTILIZATION`.
 
-A shorthand variable that conflicts with `NIM_TAGS_SELECTOR` is a startup
-error. Use the `model_variant` tag to filter by model. Exact tags and profile
+A selector variable, such as `NIM_MODEL_VARIANT` or `NIM_PRECISION`, that
+conflicts with `NIM_TAGS_SELECTOR` is a startup error. Use the `model_variant` tag to filter by model. Exact tags and profile
 IDs are tied to an image release. For the offload, memory-headroom, and
 profile-pin variables, refer to [Advanced Settings](#advanced-settings).
 
@@ -129,7 +126,7 @@ Client HTTP timeouts do not change this backend ceiling. Refer to
 
 | Name | Default | Use |
 | --- | --- | --- |
-| `NIM_ENABLE_WARMUP` | `false` | Run synthetic inference before readiness at the `256_1_1`, `480_16_9`, and `720_16_9` resolutions; Nano-DROID uses only `480_16_9`, and 4-step variants use their fixed step count |
+| `NIM_ENABLE_WARMUP` | `false` | Run synthetic inference before readiness at the `256_1_1`, `480_16_9`, and `720_16_9` resolutions; Edge-DROID and Nano-DROID use only `480_16_9`, and 4-step variants use their fixed step count |
 
 ### Guardrails
 
@@ -288,15 +285,14 @@ Leave these at their defaults unless diagnosing or tuning a measured workload:
 
 | Name | Default | Use |
 | --- | --- | --- |
-| `NIM_STREAMING_SPEC_METHOD` | `dflash` when DFlash is enabled; otherwise `none` | Select `dflash`, GPU n-gram speculation (`ngram`), or `none`; takes precedence over `NIM_USE_DFLASH` |
-| `NIM_STREAMING_SPEC_NUM_TOKENS` | `3` | Number of proposed n-gram tokens; values below 1 become 1, and non-integer values fall back to 3 |
+| `NIM_STREAMING_SPEC_METHOD` | `dflash` | Select `dflash`, GPU n-gram speculation (`ngram`), or `none`; while streaming is enabled, it replaces `NIM_USE_DFLASH` |
+| `NIM_STREAMING_SPEC_NUM_TOKENS` | `3` | Number of proposed n-gram tokens; an integer of at least 1, and invalid values fail startup when streaming is enabled |
 | `NIM_STREAMING_FORCE_V1_RUNNER` | Unset | Set `1` to force the vLLM V1 model runner; otherwise leave runner selection to vLLM |
 
 The speculation controls apply only when streaming is enabled. For Edge, which
 has no [DFlash](#speculative-decoding), set `NIM_STREAMING_SPEC_METHOD=none`
-explicitly. With the method unset,
-`NIM_USE_DFLASH=0` disables streaming speculation in updated images, but older
-images default streaming to DFlash. Both V1 and V2 model runners support the
+explicitly. While streaming is enabled, `NIM_USE_DFLASH` is ignored, so set
+`NIM_STREAMING_SPEC_METHOD=none` to turn speculation off. Both V1 and V2 model runners support the
 streaming path, so pinning V1 is not required for normal operation.
 
 Inspect `GET /v1/streaming/config` for the served model and default retention
@@ -316,7 +312,7 @@ for the client's shared-frontend checks, which require no worker URLs or metadat
 
 ### Run NIM as a Dynamo Worker
 
-Use the available NIM image `<nim-image-build>` and start
+Use the Cosmos3 NIM image (`nvcr.io/nim/nvidia/cosmos3:2.1.0`) and start
 `/opt/nim/start_server.sh` with `NIM_MODEL_TYPE=reasoner` and
 `NIM_DYNAMO_WORKER=true`. Generator profiles do not support Dynamo worker mode.
 The NIM selects and loads the model, launches a Dynamo vLLM worker and a private
@@ -352,7 +348,7 @@ NIM_DISCOVERY_BACKEND={"async_scheduling":false,"discovery_backend":"kubernetes"
 ### Dynamo Streaming
 
 Set `NIM_ENABLE_STREAMING=1` alongside `NIM_DYNAMO_WORKER=true` on workers.
-Use the same `<nim-image-build>` image for the shared frontend, running
+Use the same NIM image for the shared frontend, running
 `/opt/nim/.venv/bin/python -m streaming.dynamo.frontend` from `/opt/nim`.
 The stock `python3 -m dynamo.frontend` command does not serve video-session routes.
 The NIM worker selects its private streaming frontend automatically.
@@ -397,14 +393,14 @@ Leave these at their defaults unless you have measured a need.
 | `NIM_VAE_FAST_PATH` | Generator | `channels_last` | VAE decode path: `channels_last`, `lossless`, or `off` |
 | `NIM_ENABLE_VAE_PARALLELISM` | Generator | `true` when one replica spans more than one GPU | Shard VAE decode spatially across the replica's GPUs |
 | `NIM_VAE_SPATIAL_TEMPORAL_CHUNK_SIZE` | Generator | Automatic | Positive number of latent frames per sharded VAE decode chunk |
-| `NIM_LINEAR_BACKEND` | Generator | Quantized: `cutlass`; BF16: unset | `auto`, `cutlass`, `flashinfer_cutlass`, `flashinfer_cutedsl`, or `torch` for quantized DiT linear layers; an incompatible backend fails at model load |
+| `NIM_LINEAR_BACKEND` | Both | FP8 on DGX Spark or Jetson AGX Thor: `torch`; other quantized Generator profiles: `cutlass`; otherwise unset | `auto`, `cutlass`, `flashinfer_cutlass`, `flashinfer_cutedsl`, or `torch` for quantized linear layers; an incompatible backend fails at model load |
 | `NIM_TRITON_LOG_VERBOSE` | Generator | `0` | Backend log verbosity for diagnosis |
 | `NIM_MAX_SEQUENCE_LENGTH` | Generator | `5120` | Startup prompt-token sequence length |
 | `NIM_ALLOW_UNSAFE_TRANSFER` | Generator | `false` | Bypass Transfer's VRAM admission check for an approved diagnostic; can fail with OOM |
 | `NIM_DFLASH_BF16_KV_CACHE` | Reasoner | `false` on NVIDIA Hopper; `true` otherwise | BF16 DFlash KV cache; can improve acceptance but uses more memory |
 | `NIM_DFLASH_CONFIG` | Reasoner | Empty object | Extra vLLM DFlash speculative-config fields as JSON |
-| `NIM_MAX_NUM_BATCHED_TOKENS` | Reasoner | `16384` with unchunked multimodal input; otherwise `8192` | Scheduler token budget; unchunked multimodal input enforces at least `16384` |
-| `NIM_MAX_NUM_SEQS` | Reasoner | `256` | Maximum scheduled sequences |
+| `NIM_MAX_NUM_BATCHED_TOKENS` | Reasoner | `16384` with unchunked multimodal input (`24300` on Edge); otherwise `8192` | Scheduler token budget; unchunked multimodal input enforces at least `16384` (`24300` on Edge) |
+| `NIM_MAX_NUM_SEQS` | Reasoner | `256`; `8` on RTX PRO 4500 Blackwell | Maximum scheduled sequences |
 | `NIM_ENABLE_KV_CACHE_REUSE` | Reasoner | `true` | Prefix/KV-cache reuse |
 | `NIM_ENABLE_CHUNKED_PREFILL` | Reasoner | `true` | Chunked prefill |
 | `NIM_DISABLE_CHUNKED_MM_INPUT` | Reasoner | `true` | Require one whole multimodal item per scheduler iteration |

@@ -129,7 +129,9 @@ export NIM_GPU_MEMORY_UTILIZATION=0.60
 ```
 
 If you set a value, pass `-e NIM_GPU_MEMORY_UTILIZATION` in every Reasoner
-preflight and launch command on that system. Do not set it for Generator. Refer to
+launch command on that system. Profile selection and preflight always use the
+70% share, so the value does not change the preflight result. Do not set it
+for Generator. Refer to
 [Reasoner Context and Scheduling](configuration.md#context-and-scheduling).
 
 ## Run the Pre-Download Profile Preflight
@@ -156,8 +158,8 @@ docker run --rm \
 
 Use the selectors, GPU exposure, and container memory limit of the real
 deployment. For Reasoner, set `NIM_MODEL_TYPE=reasoner`, select `edge`, `nano`,
-or `super`, and omit `NIM_PERF_PROFILE`. On DGX Spark or Jetson AGX Thor, add
-`-e NIM_GPU_MEMORY_UTILIZATION` only if you
+or `super`, and omit `NIM_PERF_PROFILE`. Preflight ignores
+`NIM_GPU_MEMORY_UTILIZATION`, so leave it out here even if you
 [lowered the memory share](#set-the-reasoner-memory-share-on-unified-memory-systems).
 This example checks Nano Reasoner:
 
@@ -295,9 +297,8 @@ that client's `NIM_URL` accordingly.
 
 ## Deploy Edge Models
 
-Use an image whose manifest includes the Edge profiles. For Edge Reasoner, add
-these selectors to the command in [Launch Reasoner](#launch-reasoner), with `fp8` or
-`bf16`:
+For Edge Reasoner, replace the model selector lines in the command in
+[Launch Reasoner](#launch-reasoner) with these, using `fp8` or `bf16`:
 
 ```text
 -e NIM_MODEL_TYPE=reasoner \
@@ -311,8 +312,8 @@ For streaming, also set `NIM_ENABLE_STREAMING=true` and
 [Advanced Streaming Controls](configuration.md#advanced-streaming-controls)).
 
 For Edge-DROID, which is
-[experimental](support-matrix.md#choose-a-model), add these selectors to the
-command in [Launch Generator](#launch-generator):
+[experimental](support-matrix.md#choose-a-model), replace the model selector
+lines in the command in [Launch Generator](#launch-generator) with these:
 
 ```text
 -e NIM_MODEL_TYPE=generator \

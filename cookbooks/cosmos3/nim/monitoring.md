@@ -117,7 +117,7 @@ dashboard panels from them. Each runtime exposes different metric families:
 | Runtime | Endpoint | Metric Families |
 |---------|----------|-----------------|
 | Generator | `:8000/v1/metrics` | GPU, process, and Python gauges only, no request metrics: `gpu_utilization`, `gpu_memory_used_bytes`, `gpu_power_usage_watts`, `process_resident_memory_bytes` |
-| Generator | `:8002/metrics` (Triton) | Per-model request metrics, labelled by `model` such as `Cosmos3Omni` and `Qwen3GuardFilter`: `nv_inference_count`, `nv_inference_request_success`, `nv_inference_request_failure`, `nv_inference_request_duration_us`, `nv_inference_queue_duration_us`; plus `nv_gpu_*` and `nv_cpu_*` gauges |
+| Generator | `:8002/metrics` (Triton) | Per-model request metrics, labelled by `model` such as `Cosmos3OmniDiffusion` and `Qwen3GuardFilter`: `nv_inference_count`, `nv_inference_request_success`, `nv_inference_request_failure`, `nv_inference_request_duration_us`, `nv_inference_queue_duration_us`; plus `nv_gpu_*` and `nv_cpu_*` gauges |
 | Reasoner | `:8000/v1/metrics` | vLLM request and cache metrics: `vllm:time_to_first_token_seconds`, `vllm:e2e_request_latency_seconds`, `vllm:num_requests_running`, `vllm:num_requests_waiting`, `vllm:kv_cache_usage_perc`; plus `gpu_*` gauges |
 
 Metric names can change between releases. Check your service's output before
