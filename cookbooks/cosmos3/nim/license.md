@@ -6,7 +6,7 @@ SPDX-License-Identifier: OpenMDW-1.1 -->
 The governing download terms for the Cosmos3 NIM are:
 
 - Use of the container is governed by the
-  [NVIDIA Software License](https://github.com/NVIDIA/cuda-python/blob/main/cuda_bindings/LICENSE)
+  [NVIDIA Software License Agreement](https://www.nvidia.com/en-us/agreements/enterprise-software/nvidia-software-license-agreement/)
   and the
   [Product-Specific Terms for NVIDIA AI Products](https://www.nvidia.com/en-us/agreements/enterprise-software/product-specific-terms-for-ai-products/).
 - Use of the models is governed by
