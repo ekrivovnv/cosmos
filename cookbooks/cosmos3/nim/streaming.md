@@ -1,7 +1,7 @@
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 SPDX-License-Identifier: OpenMDW-1.1 -->
 
-# Stream video frames with the Cosmos3 NIM Reasoner
+# Stream Video Frames With the Cosmos3 NIM Reasoner
 
 The streaming API maintains a reasoning session across a sequence of image
 frames. Your client decodes or captures the video, sends one JPEG or PNG at a
@@ -33,7 +33,7 @@ standalone ([Edge experiments](deployment.md#edge-experiments)) or
 [Dynamo](dynamo/dynamo_with_streaming.md#use-edge-reasoner) mode. Refer to
 [Advanced streaming controls](configuration.md#advanced-streaming-controls).
 
-## Example client
+## Example Client
 
 Initialize the [pinned client environment](prerequisites.md#initialize-the-example-environment)
 and run commands from `cookbooks/cosmos3/nim`. The
@@ -111,7 +111,7 @@ All paths use the same host and port as the Reasoner API.
 WebSocket routes are not described by OpenAPI. The REST endpoints and
 WebSocket endpoint share session capacity and admission checks.
 
-### Session configuration
+### Session Configuration
 
 REST creation accepts the following JSON fields. WebSocket creation adds
 `"op":"create"` and optionally `"frame_format":"binary"` or `"base64"`.
@@ -157,7 +157,7 @@ the server's policy. Admission also requires `max_session_tokens + max_tokens`
 to remain below the engine context limit, and `max_session_tokens` to remain
 below the re-prefill position threshold.
 
-## REST example: create, send frames, close
+## REST Example: Create, Send Frames, Close
 
 Prepare two local image files, `frame1.jpg` and `frame2.jpg`, from your feed.
 Run this Bash example with `NIM_URL` set as above. It uses cURL and Python's
@@ -189,7 +189,7 @@ Send frames with `Content-Type: application/json` and
 Use raw base64 without a data-URL prefix. Wait for each frame response before
 sending the next. Deletion returns `session_id`, `frames`, and `closed: true`.
 
-## WebSocket message formats and flow
+## WebSocket Message Formats and Flow
 
 Connect to `ws://localhost:8000/v1/streaming/ws`, or `wss://` behind TLS.
 One connection owns one session. All control messages and every server reply
@@ -219,9 +219,9 @@ The server processes messages sequentially; submitting ahead can queue stale
 video frames. Closing the socket instead of sending `delete` also releases
 session resources, but the client cannot rely on receiving a final reply.
 
-### Client messages
+### Client Messages
 
-| Message | Wire format | When to send |
+| Message | Wire Format | When to Send |
 | --- | --- | --- |
 | `create` | JSON text with session configuration | First message, exactly once per connection |
 | Binary frame | Raw JPEG/PNG bytes, without a JSON envelope | After `created`, when `frame_format` is `binary` |
@@ -273,7 +273,7 @@ the session.
 {"op": "delete"}
 ```
 
-### Server messages
+### Server Messages
 
 | `op` | Fields | Meaning |
 | --- | --- | --- |
@@ -322,7 +322,7 @@ code `1008`; unexpected internal failures send a fatal `500` error and close
 with `1011`. Normal explicit deletion closes with `1000`. Do not assume a
 `closed` message will arrive after a fatal error or network disconnect.
 
-## Frame replies
+## Frame Replies
 
 REST returns a JSON object; WebSocket adds `"op":"frame"`. A representative
 reply has this shape (text and counts depend on the input):
@@ -350,7 +350,7 @@ timings report image decoding, prompt construction/preprocessing, engine work,
 and queue waiting in milliseconds. Timing fields can be null; they are server
 measurements, not client round-trip latency or promised performance.
 
-## Errors and session cleanup
+## Errors and Session Cleanup
 
 Each frame is limited to **8 MiB** of encoded image bytes (the JPEG/PNG file
 bytes, before base64 expansion). Invalid image data is rejected. Both
@@ -360,7 +360,7 @@ REST session errors use
 `{"error":{"message":"...","code":400}}` with the corresponding HTTP
 status. WebSocket error messages are described [above](#server-messages).
 
-| Code | Meaning and action |
+| Code | Meaning and Action |
 | --- | --- |
 | `400` | Invalid configuration, image, or protocol message; correct the request |
 | `404` | Unknown model or missing/expired session; verify the model or create a new session |

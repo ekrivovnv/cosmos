@@ -8,16 +8,16 @@ model-selection variables and keep automatic defaults unless the workload
 requires an override. Refer to [Deployment](deployment.md) for complete Docker
 commands.
 
-## Essential configuration
+## Essential Configuration
 
-### Authentication and cache
+### Authentication and Cache
 
 | Name | Default | Use |
 | --- | --- | --- |
 | `NGC_API_KEY` | Empty | Download required model and runtime artifacts when they are not already cached |
 | `NIM_CACHE_PATH` | `/opt/nim/.cache` | Set the writable in-container artifact cache |
 
-### Choose the runtime and model
+### Choose the Runtime and Model
 
 | Name | Default | Use |
 | --- | --- | --- |
@@ -33,7 +33,7 @@ general-purpose Edge Generator.
 The NIM chooses the best compatible profile for these settings and the visible
 GPUs; a normal deployment does not need a profile ID.
 
-### GPU selection
+### GPU Selection
 
 The GPUs exposed by Docker `--gpus` are the visible GPUs that automatic
 selection considers. List host GPUs with their indexes and UUIDs:
@@ -53,7 +53,7 @@ idle.
 Do not pass `-e CUDA_VISIBLE_DEVICES`: the NIM sets it for its worker
 processes, so a passed value can place work outside the intended GPUs.
 
-### Bring your own checkpoint
+### Bring Your Own Checkpoint
 
 | Name | Default | Use |
 | --- | --- | --- |
@@ -66,7 +66,7 @@ decoding](#speculative-decoding). Refer to [Bring your own
 checkpoint](bring-your-own-checkpoint.md) for layouts, mounts, and
 compatibility checks.
 
-### Server and logging
+### Server and Logging
 
 | Name | Default | Use |
 | --- | --- | --- |
@@ -74,7 +74,7 @@ compatibility checks.
 | `NIM_LOG_LEVEL` | `INFO` | Set the service logging threshold |
 | `NIM_LOGGING_JSONL` | `false` | Emit JSON-line logs |
 
-## Advanced profile controls
+## Advanced Profile Controls
 
 Use these only when automatic model selection is not sufficient:
 
@@ -115,9 +115,9 @@ error; use the `model_variant` tag to filter by model. Exact tags and profile
 IDs are tied to an image release. For the offload, memory-headroom, and
 profile-pin variables, refer to [Advanced settings](#advanced-settings).
 
-## Generator configuration
+## Generator Configuration
 
-### Input and output
+### Input and Output
 
 | Name | Default | Use |
 | --- | --- | --- |
@@ -127,7 +127,7 @@ profile-pin variables, refer to [Advanced settings](#advanced-settings).
 Client HTTP timeouts do not change this backend ceiling; refer to [Long-running
 requests](operations.md#long-running-requests).
 
-### Startup and execution
+### Startup and Execution
 
 | Name | Default | Use |
 | --- | --- | --- |
@@ -147,7 +147,7 @@ The selected profile owns guardrail residency; choose it with the
 [Advanced profile controls](#advanced-profile-controls). Refer to
 [Guardrails](operations.md#guardrails) for what each layer does.
 
-### Diffusion cache, attention, and VAE decode
+### Diffusion Cache, Attention, and VAE Decode
 
 These performance defaults are validated startup settings, not request fields.
 If you notice a quality issue in a specific workload, try
@@ -173,7 +173,7 @@ If you notice a quality issue in a specific workload, try
   raise per-GPU memory, and a larger `NIM_VAE_SPATIAL_TEMPORAL_CHUNK_SIZE`
   raises peak memory and can change rounding.
 
-### Prompt upsampling
+### Prompt Upsampling
 
 Prompt upsampling is optional and applies only to Generator T2I, T2V, and I2V.
 It sends the request to an operator-provided OpenAI-compatible endpoint.
@@ -190,11 +190,11 @@ It sends the request to an operator-provided OpenAI-compatible endpoint.
 Endpoint, model, and key are required when the feature is enabled. A request-time
 external failure logs a warning and continues with the original prompt.
 
-## Reasoner configuration
+## Reasoner Configuration
 
 Change controls one at a time and measure the effect.
 
-### Optimization presets
+### Optimization Presets
 
 | Name | Default | Use |
 | --- | --- | --- |
@@ -210,7 +210,7 @@ On profiles with tensor parallelism above 1, both presets also set
 media across TP ranks. An explicitly set variable wins over the preset; on
 Edge, set `NIM_USE_DFLASH=0` with `TPOT`.
 
-### Speculative decoding
+### Speculative Decoding
 
 | Name | Default | Use |
 | --- | --- | --- |
@@ -227,14 +227,14 @@ is enabled.
 `NIM_DFLASH_CONFIG` requires DFlash enabled and cannot set the `method` or
 `model` keys.
 
-### Context and scheduling
+### Context and Scheduling
 
 | Name | Default | Use |
 | --- | --- | --- |
 | `NIM_MAX_MODEL_LEN` | `-1` (auto) | Let the runtime choose a context length, bounded by the checkpoint limit of 262,144 tokens |
 | `NIM_GPU_MEMORY_UTILIZATION` | Discrete GPU: `0.93`, capped to leave `NIM_GPU_MEMORY_HEADROOM_GIB` free; unified memory: `0.70` | Set the Reasoner GPU-memory target in `(0,1]`; startup warns when it exceeds current free memory but does not reduce it. On DGX Spark/GB10 and Jetson AGX Thor, lower it only from host measurements; refer to [Set the Reasoner memory share](deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems) |
 
-### Caching and multimodal processing
+### Caching and Multimodal Processing
 
 | Name | Default | Use |
 | --- | --- | --- |
@@ -246,7 +246,7 @@ Prefer request-level `media_io_kwargs` over the operator-wide
 GPU memory; set `NIM_DISABLE_CHUNKED_MM_INPUT=0` only after measuring memory,
 latency, and throughput.
 
-### Streaming video sessions
+### Streaming Video Sessions
 
 Set `NIM_MODEL_TYPE=reasoner` and `NIM_ENABLE_STREAMING=true` to enable the
 WebSocket and REST session APIs in standalone NIM. In [Dynamo mode](#dynamo-streaming),
@@ -278,7 +278,7 @@ timeout for feeds with long pauses. Per-session `retention` and `sampling`
 belong in the creation request; retention overrides remain subject to shared
 capacity and model-context admission checks.
 
-#### Advanced streaming controls
+#### Advanced Streaming Controls
 
 Leave these at their defaults unless diagnosing or tuning a measured workload:
 
@@ -301,16 +301,16 @@ this route. Refer to [Streaming](streaming.md) for session requests and error ha
 and [Dynamo REST streaming](dynamo/dynamo_with_streaming.md#stream-video-frames-over-rest)
 for the client's shared-frontend checks, which require no worker URLs or metadata.
 
-### API behavior
+### API Behavior
 
 | Name | Default | Use |
 | --- | --- | --- |
 | `NIM_DISABLE_LOG_REQUESTS` | `true` | Keep Reasoner request bodies out of logs |
 | `NIM_DISABLE_RESPONSES_ROUTE` | `false` | Remove Responses routes when set to `true` |
 
-## Dynamo configuration
+## Dynamo Configuration
 
-### Run NIM as a Dynamo worker
+### Run NIM as a Dynamo Worker
 
 Use the available NIM image `<nim-image-build>` and start
 `/opt/nim/start_server.sh` with `NIM_MODEL_TYPE=reasoner` and
@@ -345,7 +345,7 @@ NIM_DISCOVERY_BACKEND={"async_scheduling":true,"discovery_backend":"kubernetes",
 NIM_DISCOVERY_BACKEND={"async_scheduling":false,"discovery_backend":"kubernetes","enable_multimodal":true}
 ```
 
-### Dynamo streaming
+### Dynamo Streaming
 
 Set `NIM_ENABLE_STREAMING=1` alongside `NIM_DYNAMO_WORKER=true` on workers.
 Use the same `<nim-image-build>` image for the shared frontend, running
@@ -376,7 +376,7 @@ proxy expose `GET /v1/streaming/config` and the REST session routes. The stock
 Refer to [Dynamo with streaming](dynamo/dynamo_with_streaming.md) for the manifest
 and REST request examples.
 
-## Advanced settings
+## Advanced Settings
 
 Leave these at their defaults unless you have measured a need.
 
@@ -411,7 +411,7 @@ Leave these at their defaults unless you have measured a need.
 | `NIM_VIDEO_PRUNING_METHOD` | Reasoner | `vidcom2` | `vidcom2` or `evs` when pruning is enabled |
 | `NIM_GUIDED_DECODING_BACKEND` | Reasoner | `xgrammar` | Structured-output backend |
 
-## Secret handling
+## Secret Handling
 
 Inject `NGC_API_KEY`, `HF_TOKEN`, and `NIM_PROMPT_UPSAMPLING_API_KEY` as
 separate secrets through the deployment environment, never through source

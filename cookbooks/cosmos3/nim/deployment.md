@@ -8,7 +8,7 @@ Reasoner, and verify the selected service. The commands pin the current 2.1.0
 release image. Use the [Support matrix](support-matrix.md) to choose a
 compatible configuration.
 
-## How selection works
+## How Selection Works
 
 Users normally select a runtime and model, not a profile ID:
 
@@ -28,9 +28,9 @@ If no profile fits, startup fails; free GPU memory and restart. Refer to
 [GPU architecture and topology](support-matrix.md#gpu-architecture-and-topology)
 for the memory rules.
 
-### Select a Generator model
+### Select a Generator Model
 
-| `NIM_MODEL_VARIANT` | Supported use |
+| `NIM_MODEL_VARIANT` | Supported Use |
 | --- | --- |
 | `nano` | General-purpose Nano Generator |
 | `edge-droid` | Edge-DROID policy with an action-only response; BF16 only; [experimental](support-matrix.md#choose-a-model) |
@@ -44,14 +44,14 @@ for the memory rules.
 Specialist variants accept only their task. There is no general-purpose Edge
 Generator. Set the workload objective explicitly:
 
-| `NIM_PERF_PROFILE` | Optimize for |
+| `NIM_PERF_PROFILE` | Optimize For |
 | --- | --- |
 | `latency` | Lower latency for an individual request |
 | `throughput` | Higher aggregate request rate |
 
 The default is `latency`.
 
-### Select a Reasoner model
+### Select a Reasoner Model
 
 Set `NIM_MODEL_TYPE=reasoner` and choose `NIM_MODEL_VARIANT=edge`, `nano`, or
 `super`. Reasoner rejects `NIM_PERF_PROFILE` at startup. DFlash speculative
@@ -59,7 +59,7 @@ decoding is on by default for Nano and Super; set `NIM_USE_DFLASH=0` to disable
 it. Edge has no DFlash draft: its profiles disable DFlash and reject
 `NIM_USE_DFLASH=1` (refer to [Configuration](configuration.md#speculative-decoding)).
 
-### Precision selection
+### Precision Selection
 
 Omit `NIM_PRECISION` normally: Generator prefers FP8 when compatible, and
 Reasoner prefers BF16 on compute capability 8.0 through 8.8, FP8 on 8.9 through
@@ -68,7 +68,7 @@ Set `NIM_PRECISION=bf16`, `fp8`, or another available value only when the
 workload requires it; Edge Reasoner is BF16 or FP8 (no NVFP4), and Edge-DROID
 and Nano-DROID are BF16 only.
 
-## Before you deploy
+## Before You Deploy
 
 Verify the host against [Prerequisites](prerequisites.md) and choose a
 compatible configuration from the [Support matrix](support-matrix.md). For a
@@ -116,7 +116,7 @@ docker pull "$NIM_IMAGE"
 
 Do not replace the versioned tag with `latest` or another unvalidated image.
 
-### Set the Reasoner memory share on unified-memory systems
+### Set the Reasoner Memory Share on Unified-Memory Systems
 
 On DGX Spark/GB10 and Jetson AGX Thor, the NIM gives the model 70% of the
 unified host/device memory pool: it applies that share to profile floors and
@@ -132,7 +132,7 @@ If you set a value, pass `-e NIM_GPU_MEMORY_UTILIZATION` in every Reasoner
 preflight and launch command on that system. Do not set it for Generator. Refer to
 [Reasoner context and scheduling](configuration.md#context-and-scheduling).
 
-## Run the pre-download profile preflight
+## Run the Pre-Download Profile Preflight
 
 After the image is present locally, run profile selection without starting the
 server or downloading model artifacts. This example checks the same Nano
@@ -188,7 +188,7 @@ RAM, disk, shared memory, the driver stack, media, and inference. Preflight
 writes nothing outside its removed container. Resolve any reported failure
 before a cold download.
 
-## Prepare the model cache
+## Prepare the Model Cache
 
 ```bash
 export LOCAL_NIM_CACHE="${LOCAL_NIM_CACHE:-$HOME/.cache/nim/cosmos3}"
@@ -262,7 +262,7 @@ docker run -d --name cosmos3-reasoner \
   "$NIM_IMAGE"
 ```
 
-### Discrete GPU example
+### Discrete GPU Example
 
 This example launches Super FP8 Reasoner, which needs compute capability 8.9+,
 67 GiB of VRAM usable after the 4-GiB Reasoner reserve, and 43 GiB of system
@@ -292,7 +292,7 @@ the GPUs it needs.
 To run both runtimes concurrently, publish one on another host port and set
 that client's `NIM_URL` accordingly.
 
-## Edge experiments
+## Edge Experiments
 
 Use an image whose manifest includes the Edge profiles. For Edge Reasoner, add
 these selectors to the [Reasoner launch](#launch-reasoner), with `fp8` or
@@ -328,7 +328,7 @@ and run the [Reasoner catalog](reasoning.md#run-the-task-catalog) or the
 [DROID policy client](action.md#edge-droid-and-nano-droid-policy). Edge-DROID
 serves policy only, not image/video generation or forward/inverse dynamics.
 
-## Wait for readiness
+## Wait for Readiness
 
 Liveness means the HTTP process exists. Readiness means the selected model can
 serve requests:
@@ -345,7 +345,7 @@ done
 A cold start (download, materialization, model load, warmup) takes much longer
 than HTTP startup. Send inference only after readiness succeeds.
 
-## Verify the selection
+## Verify the Selection
 
 ```bash
 curl -fsS "$NIM_URL/v1/metadata" | python3 -m json.tool
@@ -356,7 +356,7 @@ Metadata reports the selected model and profile. Confirm that `model_type` and
 `inference_endpoint` are `generator` and `/v1/infer`, or `reasoner` and
 `/v1/chat/completions`, before sending requests.
 
-## Offline and air-gapped deployment
+## Offline and Air-Gapped Deployment
 
 The NIM can start offline from a cache filled by an earlier online start. The
 cache holds only the selected profile's artifacts, so fill it for every
@@ -393,13 +393,13 @@ docker exec cosmos3-generator python3 -c \
   'import urllib.request as u; print(u.urlopen("http://localhost:8000/v1/health/ready").status)'
 ```
 
-## Advanced profile controls
+## Advanced Profile Controls
 
 Offload modes, guardrail-offload selectors, GPU-count and parallelism
 selectors, tag selectors, and profile-ID pins are for validated needs only;
 refer to [Configuration](configuration.md#advanced-profile-controls).
 
-## Docker flag summary
+## Docker Flag Summary
 
 | Flag | Purpose |
 | --- | --- |
@@ -414,7 +414,7 @@ refer to [Configuration](configuration.md#advanced-profile-controls).
 GPU counts, VRAM floors, and host RAM are in the
 [support matrix](support-matrix.md).
 
-## Next steps
+## Next Steps
 
 - [Configuration](configuration.md) lists user-facing and advanced variables.
 - [Bring your own checkpoint](bring-your-own-checkpoint.md) covers local and

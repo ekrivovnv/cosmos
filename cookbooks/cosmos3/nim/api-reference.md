@@ -1,7 +1,7 @@
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 SPDX-License-Identifier: OpenMDW-1.1 -->
 
-# Cosmos3 NIM API reference
+# Cosmos3 NIM API Reference
 
 Use this compact reference for runtime routing, the shared Generator request
 envelope, media inputs, and the common Generator response. Task-specific rules
@@ -10,7 +10,7 @@ and examples live with each task workflow.
 > Check `/openapi.json` on the running Generator or Reasoner for routes supplied
 > by the active runtime and selected image.
 
-## Runtime and primary endpoints
+## Runtime and Primary Endpoints
 
 One selected profile starts one backend. A Generator profile does not serve
 Reasoner completion APIs, and a Reasoner profile does not serve `/v1/infer`.
@@ -51,11 +51,11 @@ chooses the task per request.
 
 The task guides define the remaining required inputs and invalid combinations.
 
-### Common Generator request fields
+### Common Generator Request Fields
 
 Defaults are for video / T2I; Transfer and Action defaults are on their pages.
 
-| Field | Type | Default (video / T2I) | Applies to |
+| Field | Type | Default (Video / T2I) | Applies To |
 | --- | --- | --- | --- |
 | `model_mode` | required enum | None | Selects one of the seven modes above |
 | `prompt` | string or null; maximum 20,000 characters | None | Required and non-empty for T2I/T2V; task-dependent otherwise |
@@ -75,13 +75,13 @@ Defaults are for video / T2I; Transfer and Action defaults are on their pages.
 
 Empty or whitespace-only media strings are treated as absent.
 
-### Strict JSON types
+### Strict JSON Types
 
 Integer and finite-number fields use strict JSON types. For example, `"35"`,
 `35.0`, and `true` are not accepted spellings of integer
 `num_inference_steps=35`. Unknown nested fields are rejected too.
 
-## Media inputs
+## Media Inputs
 
 Generator image and video inputs (`input_reference` and Transfer control
 videos) accept:
@@ -106,7 +106,7 @@ H.264, H.265/HEVC, MPEG-4 Part 2, VP8, VP9, or AV1; other codecs return HTTP
 Size caps: I2V images 20,000,000 encoded characters; V2V decoded video 75 MB;
 Transfer limits are in [Transfer](transfer.md#media-and-output).
 
-## Generator response
+## Generator Response
 
 A successful Generator response contains an image, a video, or—on a compatible
 specialist policy profile—an action without visual media. T2I returns:
@@ -150,7 +150,7 @@ In that case both `b64_image` and `b64_video` are absent or null. Clients must
 branch on the fields actually present rather than assuming every non-T2I
 request has `b64_video`. Refer to [Edge-/Nano-DROID policy](action.md#edge-droid-and-nano-droid-policy).
 
-## Errors and live schema
+## Errors and Live Schema
 
 A request for the other runtime's primary route returns HTTP 404 with the
 common NIM error envelope naming the active runtime and its endpoint. Refer to

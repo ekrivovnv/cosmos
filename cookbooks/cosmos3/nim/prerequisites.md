@@ -7,9 +7,9 @@ Prepare and verify a host before pulling or launching the Cosmos3 NIM;
 per-configuration GPU, VRAM, and host RAM requirements are in the
 [support matrix](support-matrix.md).
 
-## Hardware requirements
+## Hardware Requirements
 
-| Requirement | Current requirement |
+| Requirement | Current Requirement |
 | --- | --- |
 | CPU architecture | The release image provides `amd64` and `arm64` variants; use the variant selected by the container runtime |
 | GPU compute capability | Generator: BF16 `>=8.0`, FP8 `>=8.9`; Reasoner: BF16 `>=8.0`, FP8 `>=8.9`, NVFP4 `>=10.0` |
@@ -33,7 +33,7 @@ their own system-memory floors; refer to the
 [Generator configurations](support-matrix.md#generator-configurations). A
 container memory limit counts before host physical memory.
 
-### Inspect unified-memory capacity and current state
+### Inspect Unified-Memory Capacity and Current State
 
 DGX Spark/GB10 and Jetson AGX Thor share one physical memory pool between CPU
 and GPU. Summarize the host memory state with this read-only command:
@@ -79,9 +79,9 @@ share; if you lower it, keep the same value from preflight through launch. Clear
 not part of normal deployment; refer to
 [Unified-memory diagnostics](operations.md#unified-memory-diagnostics).
 
-## Software requirements
+## Software Requirements
 
-| Software | Required version |
+| Software | Required Version |
 | --- | --- |
 | Linux and `glibc` | Use a Linux host supported by the selected NVIDIA driver and container stack |
 | NVIDIA driver | Recommended: NVIDIA driver 595.58.03 or newer. The image is built on CUDA 13.0 user-space libraries; confirm the host with the [verification steps](#verify-the-host) and a container start |
@@ -91,7 +91,7 @@ not part of normal deployment; refer to
 This release was validated with the following host configuration (tested
 versions, not minimums):
 
-| Component | Validated version |
+| Component | Validated Version |
 | --- | --- |
 | OS, architecture, and GPU | Ubuntu 24.04.5 LTS on `aarch64` with NVIDIA GH200 480GB (96 GB GPU memory) |
 | NVIDIA driver | 595.58.03 |
@@ -103,12 +103,12 @@ toolkit solely for the NIM. Do not narrow the image's
 `NVIDIA_DRIVER_CAPABILITIES=compute,utility,video`; Reasoner needs the `video`
 capability for NVDEC decoding.
 
-## Client tooling
+## Client Tooling
 
 Run the API and Python examples from the NIM host or another Linux system that
 can reach the service:
 
-| Tool | Minimum version | Used for |
+| Tool | Minimum Version | Used For |
 | --- | --- | --- |
 | `curl` | 7.61 | Health checks and direct HTTP API requests |
 | `uv` | 0.11.0 | Creating the pinned Python environment and running examples |
@@ -138,7 +138,7 @@ ffplay -version | head -n 1
 For another supported client distribution, use its package manager for
 `curl`, Python 3, and FFmpeg; use the same official installer for `uv`.
 
-### Initialize the example environment
+### Initialize the Example Environment
 
 After checking out the repository, create the pinned client environment once:
 
@@ -150,7 +150,7 @@ uv sync --locked
 This creates the project `.venv` from `pyproject.toml` and `uv.lock`; rerun it
 after either file changes. `uv run python examples/...` reuses it.
 
-## Network and NGC access
+## Network and NGC Access
 
 For a normal cold start, the host must reach:
 
@@ -175,7 +175,7 @@ control; continue with [Authenticate to NGC](deployment.md#authenticate-to-ngc).
 An air-gapped host needs a pre-populated cache; refer to
 [Offline and air-gapped deployment](deployment.md#offline-and-air-gapped-deployment).
 
-## Verify the host
+## Verify the Host
 
 Check the operating system, CPU architecture, `glibc`, driver, Docker, and
 Container Toolkit before pulling the NIM:

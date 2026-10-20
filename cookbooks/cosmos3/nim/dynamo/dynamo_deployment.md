@@ -1,7 +1,7 @@
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 SPDX-License-Identifier: OpenMDW-1.1 -->
 
-# Deploy Cosmos3 Reasoner with Dynamo
+# Deploy Cosmos3 Reasoner With Dynamo
 
 Run a Dynamo frontend with Cosmos3 Reasoner workers on Kubernetes. This
 example uses a pinned Dynamo frontend image and a Cosmos3 NIM worker image,
@@ -80,7 +80,7 @@ before use; remove those guardrail overrides or set them to `1` to enable the
 checks. Disabled warmup means Ready does not establish representative inference
 has completed. Do not copy a cold-start duration as an expected startup time.
 
-## Prepare the namespace and cache
+## Prepare the Namespace and Cache
 
 Run commands from `cookbooks/cosmos3/nim/dynamo`, with the intended Kubernetes
 context selected. Set your namespace (also export it in terminals used below).
@@ -112,7 +112,7 @@ Set the download Job's `volumes[].persistentVolumeClaim.claimName` to the same
 claim. The cache mounts at `/opt/nim/.cache` without a subdirectory. A storage class
 using `WaitForFirstConsumer` can leave the PVC Pending until the download Job or workers are scheduled.
 
-## Download model artifacts
+## Download Model Artifacts
 
 Set `<nim-image-build>` and the profile selectors in
 [`model-download.yaml`](model-download.yaml) to match the workers, then run:
@@ -141,7 +141,7 @@ kubectl -n "$NAMESPACE" get pods \
   -l nvidia.com/dynamo-graph-deployment-name=cosmos3-reasoner -w
 ```
 
-## Check the deployment
+## Check the Deployment
 
 Wait for the frontend and worker pods to become Ready, then stop the watch
 with Ctrl+C. Cold startup still includes model loading and may download any
@@ -173,7 +173,7 @@ port-forward a worker pod to a different local port to inspect those endpoints.
 Check each worker's readiness and match `selectedModelProfileId` from metadata
 to `/v1/manifest`, using [inspect_profile.py](../examples/inspect_profile.py).
 
-## Send a request
+## Send a Request
 
 The frontend serves `/v1/chat/completions`. Discover the model ID rather than
 assuming it matches the Kubernetes resource name:
@@ -215,7 +215,7 @@ The worker NIM proxy also forwards Responses creation unless
 frontend's own route. Check the selected frontend build and operator settings
 when a route is absent.
 
-## Run the cookbook clients
+## Run the Cookbook Clients
 
 `inspect_profile.py`, `reasoner.py`, and `reasoner_responses.py` use the worker's
 NIM metadata and model endpoints. Use these commands with either deployment
@@ -253,7 +253,7 @@ namespace prefix in the worker container. A Responses
 `Model not found` error does not mean the Responses route is absent. Successful
 requests through the shared frontend do not validate the worker proxy's routes.
 
-## Scale or stop
+## Scale or Stop
 
 To add workers, set `spec.services.ReasonerWorker.replicas` to `<worker-count>` in
 [`reasoner.yaml`](reasoner.yaml) and apply it again. Each

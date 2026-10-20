@@ -1,15 +1,15 @@
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 SPDX-License-Identifier: OpenMDW-1.1 -->
 
-# Operate and troubleshoot the Cosmos3 NIM
+# Operate and Troubleshoot the Cosmos3 NIM
 
 Interpret health, inspect the selected profile, configure logging and
 guardrails, and diagnose failures. Refer to [Deployment](deployment.md) for launch
 and [Configuration](configuration.md) for environment variables.
 
-## Health and startup
+## Health and Startup
 
-| Probe | Healthy meaning | It does not prove |
+| Probe | Healthy Meaning | It Does Not Prove |
 | --- | --- | --- |
 | `/v1/health/live` | HTTP process is alive | Model artifacts are loaded or inference can run |
 | `/v1/health/ready` | Selected backend reports ready after startup work | Every capability/media case has passed a smoke test |
@@ -34,7 +34,7 @@ free memory once, before materialization: a competing allocation can cause a
 lower-memory fallback or startup failure, and later changes do not trigger
 reselection.
 
-## Inspect the running service
+## Inspect the Running Service
 
 Use the active runtime rather than launch-time assumptions:
 
@@ -42,7 +42,7 @@ Use the active runtime rather than launch-time assumptions:
 curl -fsS "$NIM_URL/v1/metadata" | python3 -m json.tool
 ```
 
-| Endpoint | Operational question |
+| Endpoint | Operational Question |
 | --- | --- |
 | `/v1/metadata` | Which `model_type`, primary `inference_endpoint`, profile/checkpoint, and Generator `model_variant` did the NIM report? |
 | `/v1/models` | Which model ID should the Reasoner client send? This endpoint alone does not identify the active runtime. |
@@ -83,7 +83,7 @@ docker logs --since 10m cosmos3-reasoner
 Scrape `$NIM_URL/v1/metrics`; refer to [Monitoring](monitoring.md) for Prometheus
 and Grafana setup and the metric families of each runtime.
 
-## Long-running requests
+## Long-Running Requests
 
 Generator `/v1/infer` requests are synchronous: the connection stays quiet
 until inference and serialization finish, which alone does not mean a hang.
@@ -95,7 +95,7 @@ default 30 minutes, and a longer client timeout does not extend it; for the
 check the container logs and GPU activity rather than readiness, and avoid
 blind retries that duplicate expensive work.
 
-## Unified-memory diagnostics
+## Unified-Memory Diagnostics
 
 On DGX Spark, Jetson AGX Thor, and other unified-memory systems, [inspect
 current memory](prerequisites.md#inspect-unified-memory-capacity-and-current-state)
@@ -109,7 +109,7 @@ Generator guardrails are an input-prompt blocklist and a Qwen3Guard text guard
 (text switch), plus output face detection with blur and a SigLIP content check
 (video switches). The Reasoner has no NIM-provided guardrails.
 
-| Variable | Current default | Effect |
+| Variable | Current Default | Effect |
 | --- | --- | --- |
 | `NIM_ENABLE_TEXT_GUARDRAILS` | true | Input-prompt blocklist and text classifier path |
 | `NIM_ENABLE_VIDEO_GUARDRAILS` | true | Output image/video face-privacy guardrail path |
@@ -131,7 +131,7 @@ deployment policy. Do so only for an approved, isolated diagnostic:
 Disabling video guardrails also disables SigLIP; disabling SigLIP alone keeps
 the face path. Generator BYOC does not replace the NIM-owned guardrails.
 
-## Prompt-upsampling diagnostics
+## Prompt-Upsampling Diagnostics
 
 Startup fails if the feature is enabled without endpoint, model, key, or
 required templates. At request time, external failures log a warning and
@@ -145,7 +145,7 @@ generation continues with the original prompt. When debugging, confirm:
 - provider-specific fields are placed in
   `NIM_PROMPT_UPSAMPLING_EXTRA_BODY` only when that endpoint accepts them.
 
-## Production checks
+## Production Checks
 
 Before accepting traffic:
 
@@ -199,12 +199,12 @@ Task-specific validation belongs to [Generation](generation.md),
 
 ## Troubleshooting
 
-### Startup and deployment
+### Startup and Deployment
 
 For Kubernetes Pod, volume, and probe failures, refer to [Helm
 troubleshooting](helm.md#troubleshooting).
 
-| Symptom | Likely cause | Action |
+| Symptom | Likely Cause | Action |
 | --- | --- | --- |
 | Image pull unauthorized | Docker is not logged in or key lacks repository access | Review the complete [NGC authentication and credential-storage workflow](deployment.md#authenticate-to-ngc), then log in with `NGC_API_KEY` and literal `$oauthtoken` |
 | Artifact download fails | Container lacks `NGC_API_KEY`, entitlement, DNS/network, or storage | Verify key injection and NGC connectivity; inspect cache capacity/ownership |
@@ -219,13 +219,13 @@ troubleshooting](helm.md#troubleshooting).
 | Wrong-runtime 404 | `NIM_URL` reaches Generator for a Reasoner request, or Reasoner for `/v1/infer` | Inspect `/v1/metadata`, then start the intended runtime or correct the URL |
 | `/dev/shm` or resource error | Shared memory/ulimits are too small | Apply the documented `--shm-size` and ulimits |
 
-### Generator and media
+### Generator and Media
 
 For Action and Transfer request failures, refer to [Action common
 failures](action.md#common-failures) and [Transfer validation and common
 failures](transfer.md#validation-and-common-failures).
 
-| Symptom | Likely cause | Action |
+| Symptom | Likely Cause | Action |
 | --- | --- | --- |
 | HTTP 422, missing or invalid `model_mode` | The request does not identify a valid Generator task | Set one of the documented top-level modes |
 | Selected variant rejects request mode or sampling fields | A specialist received another mode, or a four-step request supplied model-owned controls | Select a compatible `NIM_MODEL_VARIANT`; omit `num_inference_steps`, `guidance_scale`, and `flow_shift` for four-step variants |
@@ -238,7 +238,7 @@ failures](transfer.md#validation-and-common-failures).
 
 ### Reasoner
 
-| Symptom | Likely cause | Action |
+| Symptom | Likely Cause | Action |
 | --- | --- | --- |
 | Model not found | Client hard-coded the wrong served ID | Discover it through `/v1/models` |
 | HTTP 400 request error | Sampling, thinking controls, `top_logprobs`, or extension placement is invalid | Check current ranges, use strict JSON types, and place NIM extensions in `extra_body` |

@@ -1,7 +1,7 @@
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 SPDX-License-Identifier: OpenMDW-1.1 -->
 
-# Monitor the Cosmos3 NIM with Prometheus and Grafana
+# Monitor the Cosmos3 NIM With Prometheus and Grafana
 
 Scrape the NIM's Prometheus metrics and chart them in Grafana. The steps apply
 to both the Generator and the Reasoner.
@@ -105,7 +105,7 @@ datasources:
 Use **Explore** to browse the metrics Prometheus has collected, then build
 dashboard panels from them. Each runtime exposes different metric families:
 
-| Runtime | Endpoint | Metric families |
+| Runtime | Endpoint | Metric Families |
 |---------|----------|-----------------|
 | Generator | `:8000/v1/metrics` | GPU, process, and Python gauges only, no request metrics: `gpu_utilization`, `gpu_memory_used_bytes`, `gpu_power_usage_watts`, `process_resident_memory_bytes` |
 | Generator | `:8002/metrics` (Triton) | Per-model request metrics, labelled by `model` such as `Cosmos3Omni` and `Qwen3GuardFilter`: `nv_inference_count`, `nv_inference_request_success`, `nv_inference_request_failure`, `nv_inference_request_duration_us`, `nv_inference_queue_duration_us`; plus `nv_gpu_*` and `nv_cpu_*` gauges |

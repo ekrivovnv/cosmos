@@ -1,7 +1,7 @@
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 SPDX-License-Identifier: OpenMDW-1.1 -->
 
-# Control video generation with Cosmos3 Transfer
+# Control Video Generation With Cosmos3 Transfer
 
 Guide Generator output with edge, blur, depth, segmentation, or
 world-space-map (WSM) video controls: send `POST /v1/infer` with
@@ -15,9 +15,9 @@ one precomputed control. To choose between V2V, Transfer, and inverse
 dynamics, refer to
 [Choose a video-conditioned workflow](generation.md#choose-a-video-conditioned-workflow).
 
-## Control types
+## Control Types
 
-| Control | Precomputed video | Server-derived from `input_reference` | Preset |
+| Control | Precomputed Video | Server-Derived From `input_reference` | Preset |
 | --- | --- | --- | --- |
 | `edge` | Yes | Yes | `very_low`, `low`, `medium`, `high`, `very_high` |
 | `blur` | Yes | Yes | `none`, `very_low`, `low`, `medium`, `high`, `very_high` |
@@ -28,7 +28,7 @@ dynamics, refer to
 At least one control must be enabled. Control media uses the same
 [media input rules](api-reference.md#media-inputs) as `input_reference`.
 
-## Run the examples
+## Run the Examples
 
 The script has five precomputed cases with matching prompts, control media,
 geometry, and seeds; run one at a time, as each is an expensive generation.
@@ -67,7 +67,7 @@ Replace `derived_edge` with `derived_blur` to use a derived blur control. The
 script needs a general-purpose `nano` or `super` variant and writes
 `examples/outputs/transfer_<case>.mp4`.
 
-## Precomputed control
+## Precomputed Control
 
 Put the control media inside the matching nested object. A server-local file
 path is not accepted as control media:
@@ -99,7 +99,7 @@ path is not accepted as control media:
 Replace `edge` with `blur`, `depth`, `seg`, or `wsm` and provide the matching
 control.
 
-## Advanced: derive edge or blur
+## Advanced: Derive Edge or Blur
 
 For server-derived controls, send the source video in `input_reference` and
 omit the nested control video:
@@ -135,9 +135,9 @@ only to a derived control and cannot accompany nested `video`.
 Depth, segmentation, and WSM cannot be derived by the server; supply a
 precomputed control video.
 
-## Advanced tuning
+## Advanced Tuning
 
-| Field | Constraint | Current effective default |
+| Field | Constraint | Current Effective Default |
 | --- | --- | --- |
 | `control_guidance` | Number `[0.0,10.0]` | 1.5 generally, 2.0 segmentation-only, 3.0 WSM-only |
 | `num_video_frames_per_chunk` | Integer `>= 1` | 93 generally, 101 WSM-only |
@@ -149,7 +149,7 @@ precomputed control video.
 `control_weight` belongs inside a control object; refer to
 [Advanced multiple controls](#advanced-multiple-controls).
 
-### Control guidance behavior
+### Control Guidance Behavior
 
 When control and text guidance are both active, the control term is scaled by
 `control_guidance` alone; with the edge-family defaults the effective control
@@ -159,7 +159,7 @@ branch.
 Current defaults by family (explicit valid values override them; recheck on
 another image):
 
-| Request family | Frames | FPS | Steps | Guidance | Flow shift | Control guidance |
+| Request Family | Frames | FPS | Steps | Guidance | Flow Shift | Control Guidance |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | Edge, blur, depth, or mixed | 121 | 30 | 50 | 3.0 | 10.0 | 1.5 |
 | Segmentation-only | 121 | 30 | 50 | 3.0 | 10.0 | 2.0 |
@@ -167,7 +167,7 @@ another image):
 
 The example script uses a 121-frame chunk, or 101 for WSM.
 
-## Advanced multiple controls
+## Advanced Multiple Controls
 
 A `transfer` object can enable several controls; mixed requests use the edge
 family defaults. Each control object (`edge`, `blur`, `depth`, `seg`, `wsm`)
@@ -197,14 +197,14 @@ accepted only when another enabled control has a positive weight. This guide doe
 control per request unless yours is validated, and only combine controls that
 are spatially and temporally aligned.
 
-## Transfer VRAM admission
+## Transfer VRAM Admission
 
 A ready deployment can serve generation but reject Transfer when GPU headroom
 is too small; use a larger GPU or lower-VRAM configuration (refer to
 [Transfer headroom](support-matrix.md#transfer-headroom), including the
 `NIM_ALLOW_UNSAFE_TRANSFER` diagnostic override).
 
-## Media and output
+## Media and Output
 
 Control videos and video `input_reference` values accept up to 100,000,000
 encoded characters; refer to [media inputs](api-reference.md#media-inputs) for
@@ -218,7 +218,7 @@ formats, codecs, and URL rules.
 
 The response is `b64_video` plus `action: null`.
 
-## Validation and common failures
+## Validation and Common Failures
 
 Besides the failures below, Transfer rejects V2V fields
 (`condition_frame_indexes_vision`, `condition_video_keep`) and `action_params`,

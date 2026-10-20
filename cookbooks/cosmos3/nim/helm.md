@@ -1,7 +1,7 @@
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 SPDX-License-Identifier: OpenMDW-1.1 -->
 
-# Deploy the Cosmos3 NIM with Helm
+# Deploy the Cosmos3 NIM With Helm
 
 Use this page to deploy the Cosmos3 NIM on Kubernetes with the shared
 `nim-wfm` Helm chart. Model selection, hardware floors, and verification are
@@ -23,7 +23,7 @@ for regular Dynamo and Dynamo with streaming, and require the Dynamo operator.
 - `NGC_API_KEY` exported as described in
   [Network and NGC access](prerequisites.md#network-and-ngc-access).
 
-## Create secrets
+## Create Secrets
 
 The chart needs an image pull secret and a generic secret with a key named
 `NGC_API_KEY`:
@@ -37,7 +37,7 @@ kubectl create secret generic ngc-api \
   --from-literal=NGC_API_KEY="$NGC_API_KEY"
 ```
 
-## Fetch the chart
+## Fetch the Chart
 
 This page uses `nim-wfm` chart version 1.3.0:
 
@@ -55,7 +55,7 @@ helm show readme "nim-wfm-${NIM_WFM_VERSION}.tgz"
 helm show values "nim-wfm-${NIM_WFM_VERSION}.tgz"
 ```
 
-## Configure values
+## Configure Values
 
 Save the following as `cosmos3-values.yaml`. It deploys the Nano Generator,
 optimized for latency, on one GPU:
@@ -114,7 +114,7 @@ Adjust it for the chosen configuration:
 
 Set these through chart values rather than `env`:
 
-| Chart value | Replaces |
+| Chart Value | Replaces |
 | --- | --- |
 | `model.nimCache` | `NIM_CACHE_PATH` |
 | `model.ngcAPISecret` | `NGC_API_KEY` |
@@ -173,7 +173,7 @@ port 4318; change `OTEL_EXPORTER_OTLP_ENDPOINT` for other collector layouts:
 `HOST_IP` must come before `OTEL_EXPORTER_OTLP_ENDPOINT` so that Kubernetes
 can expand it.
 
-### Other chart features
+### Other Chart Features
 
 The chart README documents these optional features; all are off by default:
 
@@ -226,7 +226,7 @@ Confirm that metadata reports `generator` and `/v1/infer`, or `reasoner` and
 `/v1/chat/completions`. Then run a first request from
 [Use an existing NIM endpoint](README.md#use-an-existing-nim-endpoint).
 
-## Storage and scaling
+## Storage and Scaling
 
 The chart supports these cache options; use only one:
 
@@ -258,7 +258,7 @@ start downloads the model again.
 | Scaling or upgrade fails with `statefulSet.enabled: false` | The cache volume is `ReadWriteOnce`; refer to [Storage and scaling](#storage-and-scaling) |
 | Profile selection fails | Compare GPU type, count, free memory, and pod memory limit with the [Support matrix](support-matrix.md); refer to [Troubleshooting](operations.md#troubleshooting) |
 
-## Remove the deployment
+## Remove the Deployment
 
 ```bash
 helm uninstall cosmos3
@@ -269,13 +269,13 @@ StatefulSet volume claims are retained by default and keep the model cache.
 Delete them and the `ngc-secret` and `ngc-api` secrets only when they are no
 longer needed.
 
-## Chart parameters
+## Chart Parameters
 
 These are the `nim-wfm` chart values used with the chart version pinned on this
 page (1.3.0); run `helm show values "nim-wfm-${NIM_WFM_VERSION}.tgz"` for the
 authoritative list.
 
-### Deployment parameters
+### Deployment Parameters
 
 | Name | Description | Value |
 | --- | --- | --- |
@@ -319,7 +319,7 @@ authoritative list.
 | `statefulSet.enabled` | Enables `statefulset` deployment. Enabling `statefulSet` allows PVC templates for scaling. If using central PVC with RWX `accessMode`, this is not needed. | `true` |
 | `tolerations` | Specify tolerations for pod assignment. Allows the scheduler to schedule pods with matching taints. | |
 
-### Autoscaling parameters
+### Autoscaling Parameters
 
 Values used for creating a `Horizontal Pod Autoscaler`. If autoscaling is not
 enabled, the rest are ignored. NVIDIA recommends usage of the custom metrics
@@ -333,7 +333,7 @@ and memory are of limited use in scaling NIM.
 | `autoscaling.maxReplicas` | Specify maximum replicas for autoscaling. | `10` |
 | `autoscaling.metrics` | Array of metrics for autoscaling. | `[]` |
 
-### Ingress parameters
+### Ingress Parameters
 
 | Name | Description | Value |
 | --- | --- | --- |
@@ -346,7 +346,7 @@ and memory are of limited use in scaling NIM.
 | `ingress.hosts[0].paths[0].pathType` | Specify path type. | `ImplementationSpecific` |
 | `ingress.tls` | Specify list of pairs of TLS `secretName` and hosts. | `[]` |
 
-### Probe parameters
+### Probe Parameters
 
 | Name | Description | Value |
 | --- | --- | --- |
@@ -374,7 +374,7 @@ and memory are of limited use in scaling NIM.
 | `startupProbe.successThreshold` | Success threshold for `startupProbe`. | `1` |
 | `startupProbe.failureThreshold` | Failure threshold for `startupProbe`. | `180` |
 
-### Helm test parameters
+### Helm Test Parameters
 
 The readiness test always uses the HTTP management endpoint, including when
 gRPC inference is selected. The inference test is opt-in because request
@@ -401,7 +401,7 @@ payloads are model-specific, and it is only rendered for
 | `tests.inference.payload` | Request body sent by the inference Helm test. Required when the inference test is enabled. | `""` |
 | `tests.inference.expectedResponseField` | Optional response field required in the inference response. | `""` |
 
-### Metrics parameters
+### Metrics Parameters
 
 | Name | Description | Value |
 | --- | --- | --- |
@@ -414,7 +414,7 @@ payloads are model-specific, and it is only rendered for
 | `metrics.serviceMonitor.interval` | Optional Prometheus scrape interval. | `""` |
 | `metrics.serviceMonitor.scrapeTimeout` | Optional Prometheus scrape timeout. | `""` |
 
-### Models parameters
+### Models Parameters
 
 | Name | Description | Value |
 | --- | --- | --- |
@@ -434,7 +434,7 @@ payloads are model-specific, and it is only rendered for
 | `model.jsonLogging` | Turns JSON lines logging on or off. | `true` |
 | `model.logLevel` | Log level of the NIM service. Possible values are TRACE, DEBUG, INFO, WARNING, ERROR, and CRITICAL. | `INFO` |
 
-### Storage parameters
+### Storage Parameters
 
 | Name | Description | Value |
 | --- | --- | --- |
@@ -456,7 +456,7 @@ payloads are model-specific, and it is only rendered for
 | `nfs.server` | Specify NFS server address. | `nfs-server.example.com` |
 | `nfs.readOnly` | Set to true to mount as read-only. | `false` |
 
-### Service parameters
+### Service Parameters
 
 | Name | Description | Value |
 | --- | --- | --- |

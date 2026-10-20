@@ -1,7 +1,7 @@
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 SPDX-License-Identifier: OpenMDW-1.1 -->
 
-# Deploy Cosmos3 Reasoner with Dynamo streaming
+# Deploy Cosmos3 Reasoner With Dynamo Streaming
 
 Use [`reasoner_with_streaming.yaml`](reasoner_with_streaming.yaml) for Chat
 Completions plus persistent video sessions over REST. The frontend and workers
@@ -26,7 +26,7 @@ resources, shared cache, and operator-managed worker health probes. Streaming
 sessions were not exercised by the supplied working-deployment files; validate
 the adapter and session requests below against your chosen image.
 
-## Set the NIM image
+## Set the NIM Image
 
 In [`reasoner_with_streaming.yaml`](reasoner_with_streaming.yaml), replace
 both occurrences of `<nim-image-build>` with the same available Cosmos3 NIM
@@ -85,7 +85,7 @@ The shared frontend needs no model-specific change; the client discovers the
 Edge model from `/v1/streaming/config`. Use a separate streaming endpoint if
 running Edge alongside a Nano or Super pool.
 
-## Deploy and check
+## Deploy and Check
 
 Run from `cookbooks/cosmos3/nim/dynamo`. If your image uses another registry,
 configure its credentials and replace the `imagePullSecrets` entries in both
@@ -109,7 +109,7 @@ handlers attached. Chat Completions use the same
 Responses, and profile-inspection scripts, use the
 [worker NIM URL commands](dynamo_deployment.md#run-the-cookbook-clients).
 
-## Stream video frames over REST
+## Stream Video Frames Over REST
 
 Use the forwarded frontend at `NIM_URL`. Create a session, send one JPEG or
 PNG frame at a time, then delete the session. This Dynamo path supports raw
@@ -177,7 +177,7 @@ workers are loading, capacity is full, or the owning worker is unavailable.
 Sessions do not migrate after worker loss; create a new one. Do not
 automatically retry a frame after a timeout.
 
-## Other routes
+## Other Routes
 
 The adapter forwards ordinary HTTP requests to the bundled Dynamo frontend,
 including `POST /v1/responses`. Use `store=false` for Responses creation, as in
@@ -187,7 +187,7 @@ responses, or `previous_response_id`; those require separate backend storage
 support. NIM's `NIM_DISABLE_RESPONSES_ROUTE` controls the worker proxy's route,
 not the shared frontend's routes.
 
-## Scale or stop
+## Scale or Stop
 
 Set `spec.services.ReasonerWorker.replicas` to `<worker-count>` in the streaming
 YAML and apply that file again. Each replica needs the shared

@@ -1,7 +1,7 @@
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 SPDX-License-Identifier: OpenMDW-1.1 -->
 
-# Cosmos3 Reasoner with Dynamo
+# Cosmos3 Reasoner With Dynamo
 
 Refer to [Dynamo configuration](../configuration.md#dynamo-configuration) for worker
 enablement, discovery, proxy settings, and
@@ -9,7 +9,7 @@ enablement, discovery, proxy settings, and
 
 Choose a deployment:
 
-| Guide | Manifest | Frontend and behavior |
+| Guide | Manifest | Frontend and Behavior |
 | --- | --- | --- |
 | [Regular Dynamo](dynamo_deployment.md) | [reasoner.yaml](reasoner.yaml) | Pinned Dynamo frontend running `dynamo.frontend`; Chat Completions, no persistent video sessions. |
 | [Dynamo with streaming](dynamo_with_streaming.md) | [reasoner_with_streaming.yaml](reasoner_with_streaming.yaml) | Same NIM image for frontend and workers; frontend runs `streaming.dynamo.frontend` for Chat Completions plus REST video sessions. |

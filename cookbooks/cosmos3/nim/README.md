@@ -27,14 +27,14 @@ the
 
 ![Cosmos3 Mixture-of-Transformers architecture with Reasoner and Generator towers](../cosmos3-model-architecture.png)
 
-## Choose what to run
+## Choose What to Run
 
 Choose a runtime, a model variant (`NIM_MODEL_VARIANT`), optionally a
 precision, and for Generator a latency or throughput objective; the NIM selects
 a compatible profile, as described in
 [How selection works](deployment.md#how-selection-works).
 
-## Choose a task
+## Choose a Task
 
 | Task | Runtime | Input | Output | Guide |
 | --- | --- | --- | --- | --- |
@@ -55,9 +55,9 @@ a compatible profile, as described in
 Local examples publish either runtime at `http://localhost:8000`; remove the
 active example container before launching the other runtime on the same port.
 
-## Get started
+## Get Started
 
-### Use an existing NIM endpoint
+### Use an Existing NIM Endpoint
 
 If an administrator already deployed the NIM, install and initialize the
 [client tooling](prerequisites.md#client-tooling), then set the service URL:
@@ -85,7 +85,7 @@ For a Reasoner:
 uv run python examples/reasoner.py --case image_caption
 ```
 
-### Deploy the NIM yourself
+### Deploy the NIM Yourself
 
 1. Verify the GPU host against [Prerequisites](prerequisites.md).
 2. Choose a compatible model and hardware configuration from the
@@ -107,7 +107,7 @@ matching variant. Examples save outputs under the ignored `examples/outputs/` di
 Validate the selected configuration with representative requests before
 production use.
 
-## AI-assisted usage
+## AI-Assisted Usage
 
 Open this directory in a compatible coding assistant to get guided help with
 host preparation, deployment, endpoint verification, request selection, and
@@ -116,7 +116,7 @@ pages and examples as their source of truth and default to read-only assistance.
 
 ## Documentation
 
-### Deploy and configure
+### Deploy and Configure
 
 - [Prerequisites](prerequisites.md)
 - [Deployment](deployment.md)
@@ -146,7 +146,7 @@ pages and examples as their source of truth and default to read-only assistance.
 - [License and notices](license.md)
 - [Acknowledgements](acknowledgements/README.md)
 
-## Safety, license, and notices
+## Safety, License, and Notices
 
 Generator guardrails are enabled by default. Disabling them can remove
 content-policy and face-privacy protections; refer to

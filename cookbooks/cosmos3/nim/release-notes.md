@@ -1,13 +1,13 @@
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 SPDX-License-Identifier: OpenMDW-1.1 -->
 
-# Cosmos3 NIM release notes
+# Cosmos3 NIM Release Notes
 
 ## 2.1.0
 
 Image: `nvcr.io/nim/nvidia/cosmos3:2.1.0`.
 
-### New models and features
+### New Models and Features
 
 - **Edge Reasoner** (`NIM_MODEL_VARIANT=edge`): BF16 and FP8 profiles with a
   12-GiB per-device floor and no DFlash draft.
@@ -26,7 +26,7 @@ Image: `nvcr.io/nim/nvidia/cosmos3:2.1.0`.
   `control_weight`; refer to [Transfer](transfer.md#advanced-multiple-controls).
 - **AVI video input** for both runtimes.
 
-### Behavior changes
+### Behavior Changes
 
 - **Transfer guidance**: with control and text guidance both active, the
   control term is no longer also multiplied by `guidance_scale` (effective
@@ -51,7 +51,7 @@ Image: `nvcr.io/nim/nvidia/cosmos3:2.1.0`.
   discrete GPUs.
 - **Validation**: `flow_shift` must be greater than 0.
 
-### Renamed or removed variables
+### Renamed or Removed Variables
 
 | 2.0.0 | 2.1.0 |
 | --- | --- |
@@ -60,7 +60,7 @@ Image: `nvcr.io/nim/nvidia/cosmos3:2.1.0`.
 | `NIM_UNIFIED_MEMORY_HOST_RESERVE_GIB` | Removed; unified-memory systems use a fixed 70% share |
 | `NIM_QWEN3GUARD_MAX_GPU_MEMORY_GB` | Removed |
 
-## 2.0.0: Initial unified Cosmos3 NIM release
+## 2.0.0: Initial Unified Cosmos3 NIM Release
 
 This is the first release of the unified Cosmos3 NIM, published as
 `nvcr.io/nim/nvidia/cosmos3:2.0.0`. One container image includes both runtime
