@@ -4,14 +4,14 @@ SPDX-License-Identifier: OpenMDW-1.1 -->
 # Use Cosmos3 Action Capabilities Through the Cosmos3 NIM
 
 Send forward dynamics, policy, and inverse dynamics requests to a compatible
-**Generator** with synchronous JSON `POST /v1/infer`; `model_mode` selects the
-task.
+**Generator** with synchronous JSON `POST /v1/infer`. The `model_mode` field
+selects the task.
 
 > Confirm model and domain availability for the selected image in the
 > [Support Matrix](support-matrix.md).
 
 Start the NIM with [Deployment](deployment.md). General Action models return
-visual rollouts for all three modes; the Edge-DROID and Nano-DROID specialists
+visual rollouts for all three modes. The Edge-DROID and Nano-DROID specialists
 serve policy only and return actions without media.
 
 ## Understand an Action Sequence
@@ -24,10 +24,10 @@ o0 --a0--> o1 --a1--> o2 ... --a(T-1)--> oT
 ```
 
 A trajectory `[T,D]` covers `T` transitions across `T+1` observations, where
-`T` is `action_chunk_size` and `D` the domain's action width; the AV cases send
+`T` is `action_chunk_size` and `D` the domain's action width. The AV cases send
 60 rows of 9 values and get a 61-frame rollout.
 
-Omit `num_frames`; the service sets it to `action_chunk_size + 1`.
+Omit `num_frames`. The service sets it to `action_chunk_size + 1`.
 
 ## Choose an Action Mode
 
@@ -48,18 +48,19 @@ Action requests must not set top-level `resolution`.
 | `bridge_orig_lerobot` | 7 | 10 | 16 actions at 5 action FPS |
 | `droid_lerobot` | 8 | 10 | 16 actions in the general contract |
 
-AV actions are 9D (translation plus 6D rotation); UMI and DROID are a 9D
-end-effector pose plus a gripper value. The API checks only domain and width;
-units, normalization, frames, gripper conventions, and denormalization belong to
-the checkpoint, so apply its published transforms before driving hardware.
+AV actions are 9D (translation plus 6D rotation). UMI and DROID actions are a
+9D end-effector pose plus a gripper value. The API checks only domain and
+width. Units, normalization, frames, gripper conventions, and denormalization
+belong to the checkpoint, so apply its published transforms before driving
+hardware.
 The DROID specialists' 8-wide output is their own contract, not a truncated
 DROID 10D action.
 
 ## Cadence and Visual Geometry
 
-Top-level `fps` is the rollout video cadence and `action_params.action_fps`
-the action-row cadence (separate fields, aligned in the examples);
-`action_params.image_size` is a model setting, not a replacement for the
+Top-level `fps` is the rollout video cadence, and `action_params.action_fps` is
+the action-row cadence. They are separate fields, aligned in the examples. The
+`action_params.image_size` field is a model setting, not a replacement for the
 forbidden `resolution`.
 
 ## Run the Examples
@@ -86,11 +87,11 @@ The executable cases include AV, UMI, and robot examples:
 | `av_policy_left` | `av_0.jpg` plus a left-turn goal; predicts a left-turn trajectory and rollout | `uv run python examples/action.py --case av_policy_left` |
 | `av_policy_right` | `av_0.jpg` plus a right-turn goal; predicts a right-turn trajectory and rollout | `uv run python examples/action.py --case av_policy_right` |
 
-AV policy cases need a general-purpose `nano` variant; the others accept
+AV policy cases need a general-purpose `nano` variant. The others accept
 `nano` or `super`. The `av_policy` and `policy` aliases select
 `av_policy_right`. Output lands in `examples/outputs/`: `action_<case>.mp4`,
 plus `action_<case>.json` with the predicted trajectory for policy and inverse
-dynamics. Review the video to check direction; inspect action data in the
+dynamics. Review the video to check direction. Inspect action data in the
 [Cosmos3 Action Viewer](https://huggingface.co/spaces/nvidia/Cosmos3-Action-Viewer).
 
 ## Forward Dynamics
@@ -121,10 +122,10 @@ request = {
 }
 ```
 
-`action` needs `action_chunk_size` rows of `raw_action_dim` finite numbers;
-the trajectory, not the prompt, selects the maneuver. Forward dynamics rejects
-`history_length`, `use_state`, and `observation` and returns video with no
-action.
+The `action` field needs `action_chunk_size` rows of `raw_action_dim` finite
+numbers. The trajectory, not the prompt, selects the maneuver. Forward dynamics
+rejects `history_length`, `use_state`, and `observation` and returns video with
+no action.
 
 `umi_forward` uses `images/umi.png` and the first 16 rows of
 `actions/umi.json`. For longer rollouts, condition each next chunk on the last
@@ -156,19 +157,19 @@ Policy predicts an action chunk instead of receiving one:
 
 `av_policy_left` and `av_policy_right` differ only in the language goal and
 return a `[60,9]` action and a 61-frame rollout. Judge direction from the
-video, not raw values; a plausible rollout does not establish traffic safety or
+video, not raw values. A plausible rollout does not establish traffic safety or
 physical suitability. Policy omits `action` and can add the policy-only state
 fields in the [reference](#action-parameter-reference).
 
 ### Integrate a Policy Loop
 
 `POST /v1/infer` is stateless and is not the streaming policy server used by
-the RoboLab workflow: call it once per control step with the current
-observation and state, apply the checkpoint's transforms to the returned
-actions, execute only part of the horizon, then replan from a new observation.
-Before physical execution, enforce your own joint and workspace bounds,
-collision checks, timing limits, and emergency stops; a valid response is not
-authorization to execute.
+the RoboLab workflow. Call it once per control step with the current
+observation and state. Apply the checkpoint's transforms to the returned
+actions, execute only part of the horizon, and then replan from a new
+observation. Before physical execution, enforce your own joint and workspace
+bounds, collision checks, timing limits, and emergency stops. A valid response
+is not authorization to execute.
 
 ## Edge-DROID and Nano-DROID Policy
 
@@ -186,7 +187,7 @@ manifest includes the matching Generator profile:
 ```
 
 Use `NIM_MODEL_VARIANT=nano-droid` for Nano-DROID. `NIM_CACHE_BACKEND=none`
-disables SeaCache; guardrails stay enabled. Neither variant serves DROID
+disables SeaCache. Guardrails stay enabled. Neither variant serves DROID
 forward or inverse dynamics.
 
 Its request uses the same `POST /v1/infer` API as other Generator tasks:
@@ -209,17 +210,17 @@ Its request uses the same `POST /v1/infer` API as other Generator tasks:
 ```
 
 The observation needs exactly seven finite joint positions and one finite
-gripper position; the image is a 640×540 composition with the wrist view above
+gripper position. The image is a 640×540 composition with the wrist view above
 two exterior views.
 
 Omit the model-owned fields `raw_action_dim`, `action_space`, `image_size`,
 `action_fps`, `history_length`, and `use_state` in `action_params`, and
 top-level `fps`, `num_frames`, and `negative_prompt`. The model returns 32
 actions of width 8 and defaults to 4 steps, guidance `3.0`, and flow shift
-`5.0`; those and `seed` are overridable.
+`5.0`. Those defaults and `seed` are overridable.
 
-The response is action-only, with no `b64_image` or `b64_video` (refer to the
-[response example](api-reference.md#generator-response)).
+The response is action-only, with no `b64_image` or `b64_video`. Refer to the
+[response example](api-reference.md#generator-response).
 
 After readiness, run the [policy client](examples/policy_droid.py):
 
@@ -228,13 +229,14 @@ uv run python examples/policy_droid.py
 ```
 
 It composes the first frame of each camera in the public
-[`droid_lerobot_example`](../generator/action/assets/droid_lerobot_example)
-(wrist view above the two exterior views), sends the matching first-frame
-joint/gripper state, and saves the composed image and the validated `[32, 8]`
-action under `examples/outputs/`. It does not execute robot actions. The
-[vLLM-Omni policy notebook](../generator/action/run_policy_with_vllm_omni.ipynb)
-uses the same sample with a different direct-vLLM `/v1/videos` API; do not copy
-its payload.
+[`droid_lerobot_example`](../generator/action/assets/droid_lerobot_example),
+with the wrist view above the two exterior views. It then sends the matching
+first-frame joint/gripper state and saves the composed image and the validated
+`[32, 8]` action under `examples/outputs/`. It does not execute robot actions.
+
+The [vLLM-Omni policy
+notebook](../generator/action/run_policy_with_vllm_omni.ipynb) uses the same
+sample with a different direct-vLLM `/v1/videos` API. Do not copy its payload.
 
 ## Inverse Dynamics
 
@@ -262,7 +264,7 @@ use `videos/av_0.mp4` and `videos/av_1.mp4`:
 ```
 
 The `bridge_inverse` case fetches a public URL, so it needs URL input and
-container network access; use a data URL offline. Policy-only state fields are
+container network access. Use a data URL offline. Policy-only state fields are
 rejected.
 
 ## Response Action Object
@@ -284,9 +286,10 @@ object:
 }
 ```
 
-`data` is shortened here; real responses have every row in `shape`. Before
-use, check that `shape` matches `data`, that rows, width, `raw_action_dim`,
-`action_mode`, and `domain_id` match the request, and that values are finite.
+The `data` array is shortened here. Real responses have every row in `shape`.
+Before use, check that `shape` matches `data`, that rows, width,
+`raw_action_dim`, `action_mode`, and `domain_id` match the request, and that
+values are finite.
 [Edge-/Nano-DROID Policy](#edge-droid-and-nano-droid-policy) returns the same
 object without media.
 
@@ -308,7 +311,7 @@ object without media.
 ## Defaults and Request Validation
 
 General Action profiles default to `num_inference_steps=30`,
-`guidance_scale=1.0`, and `fps=10.0`; specialists can override these.
+`guidance_scale=1.0`, and `fps=10.0`. Specialists can override these.
 
 ## Common Failures
 
