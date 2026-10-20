@@ -58,7 +58,10 @@ docker run -d --name prometheus \
 ```
 
 To scrape a NIM published on the host instead, use `--network host`, drop
-`-p 9090:9090`, and set the target to `localhost:8000`.
+`-p 9090:9090`, and set the target to `localhost:8000`. In that case, also run
+Grafana with `--network host` instead of `--network cosmos3-monitoring` and
+`-p 3000:3000`, and use `http://localhost:9090` wherever this guide uses
+`http://prometheus:9090`.
 
 Open `http://localhost:9090/targets` (**Status > Targets**). The
 `cosmos3-nim` job, and for a Generator the `cosmos3-generator-triton`
