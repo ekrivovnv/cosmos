@@ -216,9 +216,9 @@ uv run python examples/reasoner_responses.py
 ```
 
 Requests need a non-empty model and use the Chat Completions sampling defaults.
-Read the answer from `response.output_text`. `store=false` is the default.
+Read the answer from `response.output_text`. Send `store=false`, as the example does, because response storage is disabled by default.
 Retrieval, cancellation, background responses, and `previous_response_id` need
-response storage, which is disabled by default. Use Chat Completions for video.
+response storage. Use Chat Completions for video.
 
 ## Final Answers, Instructions, and Tool Calls
 

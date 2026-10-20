@@ -39,7 +39,8 @@ scrape_configs:
 
 The NIM serves metrics at `/v1/metrics` on the HTTP API port `8000`, not at
 the Prometheus default `/metrics`. The `cosmos3-generator-triton` job scrapes
-Generator request metrics from the internal Triton port `8002`, reachable on
+Generator request metrics from the internal NVIDIA Triton Inference Server
+port `8002`, reachable on
 the shared Docker network without publishing it. Omit this job for a Reasoner.
 
 Run Prometheus with the config mounted read-only. This example uses a shared
@@ -62,11 +63,13 @@ To scrape a NIM published on the host instead, use `--network host`, drop
 `-p 9090:9090`, and set the target to `localhost:8000`. In that case, also run
 Grafana with `--network host` instead of `--network cosmos3-monitoring` and
 `-p 3000:3000`, and use `http://localhost:9090` wherever this guide uses
-`http://prometheus:9090`.
+`http://prometheus:9090`. Omit the `cosmos3-generator-triton` job: its
+container name does not resolve on the host network, and port `8002` is not
+published.
 
 Open `http://localhost:9090/targets` (**Status > Targets**). The
-`cosmos3-nim` job, and for a Generator the `cosmos3-generator-triton`
-job, must show `UP`. If a target is down, check the following causes:
+`cosmos3-nim` job, and for a Generator on the shared network the
+`cosmos3-generator-triton` job, must show `UP`. If a target is down, check the following causes:
 
 | Symptom | Cause |
 |---------|-------|

@@ -90,7 +90,7 @@ uv run python examples/reasoner.py --case image_caption
 2. Choose a compatible model and hardware configuration from the
    [Support Matrix](support-matrix.md).
 3. Follow [Deployment](deployment.md) to authenticate, pull the image, run the
-   preflight, and launch Generator or Reasoner. On DGX Spark or Jetson AGX
+   preflight, and launch Generator or Reasoner. On NVIDIA DGX Spark or Jetson AGX
    Thor, the NIM applies a 70%
    [unified-memory share](deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems)
    automatically.

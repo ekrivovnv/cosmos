@@ -27,7 +27,7 @@ ready", "status": "ready"}` for readiness, and `"Service is live"` / `"live"`
 for liveness. Treat the HTTP status as the primary result. Failed probes are
 non-2xx.
 
-Cold startup can include NGC download, cache materialization, engine build,
+Cold startup can include NVIDIA NGC download, cache materialization, engine build,
 model load, and warmup, so a live-but-not-ready interval is expected. Size
 orchestrator startup budgets for it. Profile selection reads each visible GPU's
 free memory once, before materialization. A competing allocation can cause a
@@ -99,7 +99,7 @@ blind retries that duplicate expensive work.
 
 ## Unified-Memory Diagnostics
 
-On DGX Spark, Jetson AGX Thor, and other unified-memory systems, [inspect
+On NVIDIA DGX Spark, Jetson AGX Thor, and other unified-memory systems, [inspect
 current memory](prerequisites.md#inspect-unified-memory-capacity-and-current-state)
 to tell a capacity failure from a temporary one. For a current-memory failure,
 stop the competing workload and rerun preflight. Do not clear the page cache,
@@ -107,8 +107,8 @@ delete the NIM model cache, or reboot as routine recovery.
 
 ## Guardrails
 
-Generator guardrails are an input-prompt blocklist and a Qwen3Guard text guard
-(text switch), plus output face detection with blur and a SigLIP content check
+Generator guardrails are an input-prompt blocklist and an Alibaba Qwen3Guard text guard
+(text switch), plus output face detection with blur and a Google SigLIP content check
 (video switches). The Reasoner has no NIM-provided guardrails.
 
 | Variable | Current Default | Effect |
@@ -250,6 +250,7 @@ Failures](transfer.md#validation-and-common-failures).
 | Chat Completions route 404 | Client reached Generator or the selected image lacks the route | Confirm Reasoner through `/v1/metadata` and inspect live OpenAPI |
 | Responses route 404 | Route disabled, absent, or requested from Generator | Confirm Reasoner metadata, then use Chat Completions and inspect live OpenAPI/operator setting |
 | Host OOM or near-zero `MemAvailable` on unified memory | The Reasoner memory share is too large for the shared host/device pool and the host workload | Remove any explicit `NIM_GPU_MEMORY_UTILIZATION` above the `0.70` default, or lower it from host measurements, then restart |
+| Structured output is prose or invalid JSON | The request did not enforce a JSON schema | Send a JSON schema in `response_format` (Chat Completions) or `text.format` (Responses). With the catalog, add `--guided-output`. Refer to [Structured Output](reasoning.md#structured-output) |
 | KV-cache/context OOM | Context, media tokens, batching, or concurrency is too large | Reduce media FPS and concurrency; the default unchunked multimodal path enforces a 16,384 batched-token minimum, so enable multimodal chunking with `NIM_DISABLE_CHUNKED_MM_INPUT=0` only after validation before lowering that budget |
 
 For DFlash and checkpoint-source failures, refer to [BYOC](#byoc).

@@ -133,7 +133,7 @@ The `"edge": true` and `"blur": true` settings select the corresponding derived
 control with preset `medium`. They require `input_reference`. A preset applies
 only to a derived control and cannot accompany nested `video`.
 
-Depth, segmentation, and WSM cannot be derived by the server. Supply a
+The server cannot derive depth, segmentation, or WSM controls. Supply a
 precomputed control video.
 
 ## Tune Transfer Parameters

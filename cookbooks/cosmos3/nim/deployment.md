@@ -3,7 +3,7 @@ SPDX-License-Identifier: OpenMDW-1.1 -->
 
 # Deploy the Cosmos3 NIM
 
-Use this page to authenticate to NGC, choose a model, launch Generator or
+Use this page to authenticate to NVIDIA NGC, choose a model, launch Generator or
 Reasoner, and verify the selected service. The commands pin the current 2.1.0
 release image. Use the [Support Matrix](support-matrix.md) to choose a
 compatible configuration.
@@ -118,7 +118,7 @@ Do not replace the versioned tag with `latest` or another unvalidated image.
 
 ### Set the Reasoner Memory Share on Unified-Memory Systems
 
-On DGX Spark/GB10 and Jetson AGX Thor, the NIM gives the model 70% of the
+On NVIDIA DGX Spark/GB10 and Jetson AGX Thor, the NIM gives the model 70% of the
 unified host/device memory pool. It applies that share to profile floors and
 uses it as the Reasoner `NIM_GPU_MEMORY_UTILIZATION` default. No variable is
 required. Lower the share only when host measurements show that media
@@ -231,8 +231,8 @@ system memory for BF16 or 35 GiB for FP8. Selection enforces these
 
 Change the model and objective as needed, expose every GPU a multi-GPU
 configuration requires, and add `-e NIM_PRECISION=fp8` only to pin precision.
-The Generator uses as many exposed GPUs as a compatible profile supports.
-Refer to [Advanced Profile Controls](configuration.md#advanced-profile-controls).
+The Generator uses as many exposed GPUs as a compatible profile supports. To
+limit them, refer to [GPU Selection](configuration.md#gpu-selection).
 
 ## Launch Reasoner
 
@@ -363,11 +363,21 @@ The NIM can start offline from a cache filled by an earlier online start. The
 cache holds only the selected profile's artifacts, so fill it for every
 configuration you run offline.
 
-1. On a host with NGC access, launch each configuration as shown in
+1. Make the container image available on the offline host. Push it to a
+   registry that the host can reach, or move it as an archive:
+
+   ```bash
+   docker save "$NIM_IMAGE" -o cosmos3-nim.tar
+   # On the offline host:
+   docker load -i cosmos3-nim.tar
+   ```
+
+   Set `NIM_IMAGE` on the offline host to the loaded or mirrored image.
+2. On a host with NGC access, launch each configuration as shown in
    [Launch Generator](#launch-generator) or [Launch Reasoner](#launch-reasoner),
    with the offline host's selectors and GPU exposure, and wait for readiness.
    Several configurations can share one cache.
-2. Copy the cache with a tool that preserves symbolic links:
+3. Copy the cache with a tool that preserves symbolic links:
 
    ```bash
    rsync -a "$LOCAL_NIM_CACHE/" /path/to/offline-cache/
@@ -377,14 +387,15 @@ configuration you run offline.
    dereference links break the cache. On the offline host,
    `find /path/to/offline-cache -xtype l` must print nothing. Apply the
    ownership from [Prepare the Model Cache](#prepare-the-model-cache).
-3. On the offline host, set `LOCAL_NIM_CACHE` to the copy and run the same
+4. On the offline host, set `LOCAL_NIM_CACHE` to the copy and run the same
    launch command. Generator can omit `-e NGC_API_KEY`. Keep it for Reasoner,
    whose keyless offline start has not been validated.
-4. For Generator, do not set `NIM_DISABLE_MODEL_DOWNLOAD=1`. Startup rejects it
+5. For Generator, do not set `NIM_DISABLE_MODEL_DOWNLOAD=1`. Startup rejects it
    because guardrail artifacts must be materialized from the cached files.
-5. [Wait for Readiness](#wait-for-readiness). With a complete cache, every
-   artifact logs `Skipping download, using cached copy of file`. The
-   `Downloading manifest profile` line does not indicate network access.
+6. [Wait for Readiness](#wait-for-readiness). With a complete cache, every
+   artifact logs "Skipping download, using cached copy of file" instead of
+   downloading it. The "Downloading manifest profile" line does not indicate
+   network access.
 
 To test a cache on a connected host before moving it, replace `-p 8000:8000`
 with `--network none` and check readiness inside the container:
@@ -396,9 +407,10 @@ docker exec cosmos3-generator python3 -c \
 
 ## Advanced Profile Controls
 
-Offload modes, guardrail-offload selectors, GPU-count and parallelism
-selectors, tag selectors, and profile-ID pins are for validated needs only.
-Refer to [Configuration](configuration.md#advanced-profile-controls).
+Tag selectors, offload modes, and profile-ID pins are for validated needs
+only. Refer to [Advanced Profile Controls](configuration.md#advanced-profile-controls)
+for `NIM_TAGS_SELECTOR`, and to [Advanced Settings](configuration.md#advanced-settings)
+for `NIM_OFFLOAD_MODE` and `NIM_MODEL_PROFILE`.
 
 ## Docker Flag Summary
 

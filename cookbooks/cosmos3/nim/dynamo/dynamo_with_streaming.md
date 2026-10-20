@@ -4,7 +4,7 @@ SPDX-License-Identifier: OpenMDW-1.1 -->
 # Deploy Cosmos3 Reasoner With Dynamo Streaming
 
 Use [`reasoner_with_streaming.yaml`](reasoner_with_streaming.yaml) for Chat
-Completions plus persistent video sessions over REST. The frontend and workers
+Completions plus persistent video sessions over REST on NVIDIA Dynamo. The frontend and workers
 use the same Cosmos3 NIM image, with different launch commands. The frontend
 runs the bundled streaming adapter. Workers run the NIM server with streaming
 enabled.
