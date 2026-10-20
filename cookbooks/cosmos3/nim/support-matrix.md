@@ -10,8 +10,8 @@ tables list nominal capacities in GB.
 
 ## Choose a Model
 
-Choose the model; the NIM selects a compatible profile and precision (refer to
-[Precision Selection](deployment.md#precision-selection)).
+Choose the model. The NIM selects a compatible profile and precision. Refer to
+[Precision Selection](deployment.md#precision-selection).
 
 | Runtime | Model | Supported Use |
 | --- | --- | --- |
@@ -39,14 +39,16 @@ After startup, follow
 
 ### Practical Model Recommendation
 
-- H200- and B200-class discrete GPUs: use Super when the workload needs it,
-  with `NIM_PERF_PROFILE=latency` for Generator; leave precision, offload,
+Start from the recommendation for your GPU class:
+
+- H200- and B200-class discrete GPUs: Use Super when the workload needs it,
+  with `NIM_PERF_PROFILE=latency` for Generator. Leave precision, offload,
   tags, and profile ID unset.
-- H100, RTX PRO 6000 Blackwell, and lower-throughput discrete GPUs: default to
+- H100, RTX PRO 6000 Blackwell, and lower-throughput discrete GPUs: Default to
   Nano, especially for video. Use Super only for an explicit model requirement.
-- Unified-memory systems (DGX Spark, Jetson AGX Thor): default to Nano for both
+- Unified-memory systems (DGX Spark, Jetson AGX Thor): Default to Nano for both
   runtimes. Some Super Reasoner rows fit, but turnaround is impractical.
-- Smallest GPUs: Edge Reasoner and Edge-DROID have the lowest floors; refer to
+- Smallest GPUs: Edge Reasoner and Edge-DROID have the lowest floors. Refer to
   [Edge Reasoner Verified GPUs](#edge-reasoner-verified-gpus).
 
 ## GPU Architecture and Topology
@@ -62,10 +64,10 @@ GPU SKU allowlist:
 | Reasoner | FP8 | 8.9 |
 | Reasoner | NVFP4 | 10.0 |
 
-Use homogeneous GPUs; mixed-GPU configurations are not supported, and
+Use homogeneous GPUs. Mixed-GPU configurations are not supported, and
 Reasoner requires the same compute capability on every GPU. Do not add VRAM
 across devices. Each GPU in the selected layout must meet the floor in total
-and in free memory at startup; on a discrete GPU, Reasoner measures free
+and in free memory at startup. On a discrete GPU, Reasoner measures free
 memory after a 4-GiB runtime reserve (`NIM_GPU_MEMORY_HEADROOM_GIB`).
 On unified-memory systems, Generator uses only rows with
 **Model offload = None** and **Guardrails = Resident**.
@@ -73,7 +75,7 @@ On unified-memory systems, Generator uses only rows with
 ### Unified-Memory Thresholds
 
 On unified-memory systems, **effective shared memory** is 70% of the
-device-reported total; the rest stays with the host. The same share is the
+device-reported total. The rest stays with the host. The same share is the
 default Reasoner `NIM_GPU_MEMORY_UTILIZATION`.
 
 | Runtime/Profile | Effective Shared-Memory Floor | Unified-Memory Policy |
@@ -90,15 +92,15 @@ default Reasoner `NIM_GPU_MEMORY_UTILIZATION`.
 | Reasoner `super` FP8, TP1 | 67 GiB/device | No CPU/model offload |
 | Reasoner `super` NVFP4, TP1 | 73 GiB/device | No CPU/model offload |
 
-Floors are compared with 70% of the binary-GiB total reported by the running system;
-current free shared memory is checked separately at startup.
+Floors are compared with 70% of the binary-GiB total reported by the running
+system. Current free shared memory is checked separately at startup.
 
 ## Tested GPU Inventory
 
-Devices in the release hardware inventory, grouped by architecture and sorted
-by nominal memory. Inventory membership does not mean every configuration is
-tested on that device, and devices outside it can be compatible when they meet
-the floors.
+This section lists devices in the release hardware inventory, grouped by
+architecture and sorted by nominal memory. Inventory membership does not mean
+every configuration is tested on that device, and devices outside it can be
+compatible when they meet the floors.
 
 ### Unified-Memory Systems
 
@@ -162,7 +164,7 @@ both systems' total capacity, so freeing cache cannot make it fit.
 | A100 SXM4 80 GB | 80 GB HBM2e |
 
 Nominal memory only orders this inventory. For GH200 480 GB, 480 GB is CPU
-memory; the table shows HBM GPU memory.
+memory. The table shows HBM GPU memory.
 
 ## Generator Profiles
 
@@ -187,10 +189,11 @@ only to the general-purpose `nano` and `super` variants.
 | `super` | FP8 | Layer | Resident | 1 | 38 GiB | 80 GiB | 50 GiB |
 
 Specialist variants (`nano-droid`, `edge-droid`, and `super-*`) use only the
-resident-guardrail rows of their base model. Multi-GPU rows use every GPU: a
+resident-guardrail rows of their base model. Multi-GPU rows use every GPU. A
 `latency` profile splits each request with guidance parallelism 2 and sequence
-parallelism `n_gpus / 2`; a `throughput` profile runs one engine replica per
-GPU, and there is no one-GPU `throughput` profile. To limit the GPU count, refer to
+parallelism `n_gpus / 2`. A `throughput` profile runs one engine replica per
+GPU, and there is no one-GPU `throughput` profile. To limit the GPU count, refer
+to
 [Advanced Profile Controls](configuration.md#advanced-profile-controls).
 
 The 31-GiB Nano layer-offload rows target 32-GB client GPUs such as the
@@ -198,9 +201,9 @@ GeForce RTX 5090, which does not meet their 35-GiB Transfer minimum.
 
 > **System memory:** Profile selection enforces each row's system-memory floor
 > (Generator and Reasoner) against host memory or a smaller container memory
-> limit. Treat the floors as minimums; media processing, concurrency, and other
+> limit. Treat the floors as minimums. Media processing, concurrency, and other
 > host workloads can need more. Unified-memory systems have no separate host RAM
-> requirement; size them with
+> requirement. Size them with
 > [Unified-Memory Thresholds](#unified-memory-thresholds).
 
 Leave offload and guardrail residency on automatic selection unless a
@@ -224,13 +227,13 @@ Reasoner does not use Generator latency/throughput or model-offload selectors:
 
 System memory follows the note under
 [Generator Profiles](#generator-profiles). Selection prefers Super
-BF16 TP1 and can fall back to TP2 when TP1 lacks free memory; to require TP2,
+BF16 TP1 and can fall back to TP2 when TP1 lacks free memory. To require TP2,
 set `NIM_TAGS_SELECTOR='n_gpus=2,nim_tp=2'`.
 
 ## Edge Reasoner Verified GPUs
 
-Edge Reasoner was verified on these GPUs. Edge-DROID policy was not validated;
-it is [experimental](#choose-a-model). Each deployment must still meet the
+Edge Reasoner was verified on these GPUs. Edge-DROID policy was not validated
+and is [experimental](#choose-a-model). Each deployment must still meet the
 floors above and the exact image manifest.
 
 | Architecture | GPUs |
@@ -246,7 +249,7 @@ NVIDIA Ampere GPUs (compute capability 8.0) support only the BF16 Edge profiles.
 ## Transfer Headroom
 
 Transfer needs more peak memory than ordinary generation, so startup checks it
-separately; a deployment can serve generation while rejecting Transfer. Use a
+separately. A deployment can serve generation while rejecting Transfer. Use a
 larger GPU or a lower-memory configuration. `NIM_ALLOW_UNSAFE_TRANSFER=1`
 bypasses the check for diagnosis only and can cause out-of-memory failures.
 
@@ -259,6 +262,6 @@ bypasses the check for diagnosis only and can cause out-of-memory failures.
 | Output | Generator image | JPEG |
 | Output | Generator video | VP9 in MP4 |
 
-Inputs are base64 or data URLs; HTTP(S) input works only when enabled and
+Inputs are base64 or data URLs. HTTP(S) input works only when enabled and
 reachable from the container. Refer to [API Reference](api-reference.md) for the
 media rules.
