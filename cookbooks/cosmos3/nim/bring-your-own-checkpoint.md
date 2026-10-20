@@ -93,8 +93,8 @@ checkpoint. Mount it read-only and select the Reasoner:
 -v "$BYOC_CHECKPOINT:/byoc/cosmos3-reasoner:ro"
 ```
 
-With a local checkpoint, `NIM_DISABLE_MODEL_DOWNLOAD=1` prevents profile
-artifact downloads. With `NIM_MODEL_PATH`, the NIM does not download the
+With a local checkpoint, the NIM sets `NIM_DISABLE_MODEL_DOWNLOAD=1`
+automatically, so it does not download profile artifacts. With `NIM_MODEL_PATH`, the NIM does not download the
 profile's DFlash draft, which Nano and Super Reasoner enable by default. Mount a
 matching Nano or Super draft through
 `NIM_DFLASH_MODEL_PATH` (absolute local path, no `hf://`), or set

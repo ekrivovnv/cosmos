@@ -75,7 +75,8 @@ A memory-related preflight failure has two materially different causes:
 
 On these systems the Reasoner defaults to a 0.70
 [`NIM_GPU_MEMORY_UTILIZATION`](deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems)
-share. If you lower it, keep the same value from preflight through launch.
+share. If you lower it, pass the same value to every Reasoner launch. Preflight
+always uses the 70% share.
 Clearing page cache or deleting the model cache is not part of normal
 deployment. Refer to
 [Unified-Memory Diagnostics](operations.md#unified-memory-diagnostics).

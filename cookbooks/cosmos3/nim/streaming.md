@@ -26,10 +26,10 @@ checks only the shared frontend's `/health`, `/v1/models`, and
 Standalone NIM mode retains its readiness, runtime metadata, and selected-profile
 checks.
 
-Nano and Super streaming default to DFlash speculation when DFlash is enabled.
-Set `NIM_STREAMING_SPEC_METHOD=ngram` for GPU n-gram speculation or `none` to
-disable it. Edge works with the same clients, which discover its model ID.
-Launch Edge with `NIM_USE_DFLASH=0` and `NIM_STREAMING_SPEC_METHOD=none`, in
+Streaming defaults to DFlash speculation (`NIM_STREAMING_SPEC_METHOD=dflash`)
+and ignores `NIM_USE_DFLASH`. Set `NIM_STREAMING_SPEC_METHOD=ngram` for GPU
+n-gram speculation or `none` to disable it. Edge works with the same clients,
+which discover its model ID. Launch Edge with `NIM_STREAMING_SPEC_METHOD=none`, in
 standalone ([Deploy Edge Models](deployment.md#deploy-edge-models)) or
 [Dynamo](dynamo/dynamo_with_streaming.md#use-edge-reasoner) mode. Refer to
 [Advanced Streaming Controls](configuration.md#advanced-streaming-controls).
@@ -254,7 +254,7 @@ handled by the WebSocket stack, not by a JSON `op`.
 
 **Binary frame.** Send the JPEG/PNG file bytes as one binary WebSocket message.
 There is no `op`, filename, timestamp, session ID, or base64 prefix. Each image
-is limited to 8 MiB. The server decodes the image, processes it in the session,
+is limited to 8 MiB and 4,194,304 pixels (4 MP). The server decodes the image, processes it in the session,
 and returns a JSON `frame` reply.
 
 **Base64 frame.** When creation selected `"frame_format":"base64"`, send:
@@ -354,8 +354,10 @@ measurements, not client round-trip latency or promised performance.
 ## Errors and Session Cleanup
 
 Each frame is limited to **8 MiB** of encoded image bytes (the JPEG/PNG file
-bytes, before base64 expansion). Invalid image data is rejected. Both
-transports apply the frame-size limit.
+bytes, before base64 expansion) and to 4,194,304 pixels (4 MP) after decoding.
+A 4K camera frame exceeds the pixel limit even when it is under 8 MiB, so
+downscale it first. Invalid image data is rejected. Both transports apply these
+limits.
 
 REST session errors use
 `{"error":{"message":"...","code":400}}` with the corresponding HTTP

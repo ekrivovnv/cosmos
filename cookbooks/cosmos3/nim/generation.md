@@ -113,8 +113,8 @@ When `negative_prompt` is omitted, the default depends on the request:
 | T2I | Empty string |
 | T2V, I2V, V2V, Transfer, and Action | Built-in structured negative prompt |
 
-Send `"negative_prompt": ""` to disable the built-in prompt. The `nano-droid`
-variant rejects `negative_prompt`.
+Send `"negative_prompt": ""` to disable the built-in prompt. The `edge-droid`
+and `nano-droid` variants reject `negative_prompt`.
 
 ## Text-to-Video
 

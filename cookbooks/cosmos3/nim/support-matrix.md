@@ -88,7 +88,6 @@ default Reasoner `NIM_GPU_MEMORY_UTILIZATION`.
 | Reasoner `edge` BF16 or FP8 | 12 GiB/device | No CPU/model offload |
 | Reasoner `nano` BF16, FP8, or NVFP4 | 23.1 GiB/device | No CPU/model offload |
 | Reasoner `super` BF16, TP1 | 135 GiB/device | No CPU/model offload |
-| Reasoner `super` BF16, TP2 | 73 GiB/device | No CPU/model offload |
 | Reasoner `super` FP8, TP1 | 67 GiB/device | No CPU/model offload |
 | Reasoner `super` NVFP4, TP1 | 73 GiB/device | No CPU/model offload |
 
@@ -226,8 +225,8 @@ Reasoner does not use Generator latency/throughput or model-offload selectors:
 | `super` | NVFP4 | 1 | 1 | 73 GiB | 33 GiB | 10.0 |
 
 System memory follows the note under
-[Generator Profiles](#generator-profiles). Selection prefers Super
-BF16 TP1 and can fall back to TP2 when TP1 lacks free memory. To require TP2,
+[Generator Profiles](#generator-profiles). When BF16 is selected, Super prefers
+TP1 and can fall back to TP2 when TP1 lacks free memory. To require TP2,
 set `NIM_TAGS_SELECTOR='n_gpus=2,nim_tp=2'`.
 
 ## Edge Reasoner Verified GPUs
@@ -239,7 +238,7 @@ floors above and the exact image manifest.
 | Architecture | GPUs |
 | --- | --- |
 | NVIDIA Blackwell Ultra | B300 SXM6, GB300 |
-| NVIDIA Blackwell | B200, GB200, DGX Spark (GB10), RTX PRO 6000 Blackwell Server Edition, RTX PRO 6000 Blackwell Workstation Edition, GeForce RTX 5090, GeForce RTX 5080 |
+| NVIDIA Blackwell | B200, GB200, DGX Spark (GB10), RTX PRO 6000 Blackwell Server Edition, RTX PRO 6000 Blackwell Workstation Edition, GeForce RTX 5090 |
 | NVIDIA Hopper and Grace Hopper | H100 80 GB HBM3, H100 PCIe, H100 NVL, H200, H200 NVL, H20, GH200 480 GB, GH200 144 GB HBM3e |
 | NVIDIA Ada Lovelace | L40S, RTX 6000 Ada Generation |
 | NVIDIA Ampere | A100 SXM4 40 GB, A100 SXM4 80 GB, A100 PCIe 40 GB, A100 80 GB PCIe |

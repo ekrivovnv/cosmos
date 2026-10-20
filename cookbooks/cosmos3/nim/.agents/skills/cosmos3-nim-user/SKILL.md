@@ -57,8 +57,8 @@ rules while doing so:
   ([memory share](../../../deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems)):
   the NIM counts 70% of the shared pool toward profile floors and defaults
   `NIM_GPU_MEMORY_UTILIZATION` to `0.70`. Suggest a lower value only from host
-  measurements, then include it from the first preflight command you show
-  through every launch command.
+  measurements, then include it in every Reasoner launch command. Preflight
+  ignores it and always uses the 70% share.
 - **NGC login** ([authenticate](../../../deployment.md#authenticate-to-ngc)):
   mention that Docker stores the login unless a credential helper is configured
   (the helper is optional) and that `--password-stdin` protects only shell
@@ -142,8 +142,9 @@ Generator requests are synchronous
 examples use 30-minute (Generator) and 60-minute (Transfer) client timeouts as
 ceilings, not expected latency, and the backend still stops at 30 minutes unless
 the container sets `NIM_TRITON_REQUEST_TIMEOUT`. Check whether a request is
-still running before retrying. If a diagnostic needs an unsafe override, state
-the risk, limit it to that diagnostic, and restore the default.
+still running before retrying. Do not recommend an unsafe override as a fix. If
+the customer chooses one for a diagnostic, state the risk, limit it to that
+diagnostic, and restore the default.
 
 ## 6. State the result
 

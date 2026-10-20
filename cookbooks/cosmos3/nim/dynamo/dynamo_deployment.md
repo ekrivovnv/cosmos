@@ -21,16 +21,15 @@ that serves only the `v1beta1` `spec.components` schema. Helm is not needed,
 but the Dynamo operator is still required.
 
 Replace values in `<angle-brackets>` with your own values before applying.
-Use the same `<nim-image-build>` tag or digest in the workers and
-[`model-download.yaml`](model-download.yaml). The regular frontend stays pinned
+The workers and [`model-download.yaml`](model-download.yaml) use the same NIM
+image, `nvcr.io/nim/nvidia/cosmos3:2.1.0`. The regular frontend stays pinned
 to `nvcr.io/nvidia/ai-dynamo/dynamo-frontend-nightly:20260906-c70f1c7`.
 The tested NIM image bundled `ai-dynamo==1.5.0.dev20260902`, with the operator's
 canonical `runtimeVersionOverride: "1.5.0"`. Verify compatibility among the
 frontend, worker image, and operator when changing versions.
 
-The supplied working-deployment files establish the regular Chat Completions
-setup. They do not independently validate streaming sessions, Responses, or
-every cookbook client against that deployment. Validate those paths separately.
+This setup is validated for Chat Completions. Validate streaming sessions,
+Responses, and the other cookbook clients separately on your deployment.
 
 ## Prerequisites
 
@@ -70,9 +69,7 @@ constrain placement on mixed-GPU clusters.
 
 The example pins Nano FP8 to match the tested deployment. Keep the image,
 `NIM_MODEL_VARIANT`, `NIM_PRECISION`, and `NIM_TAGS_SELECTOR` aligned in the Job
-and workers when choosing another profile. The working files used the legacy
-`NIM_MODEL_SIZE=nano`. These manifests use the documented
-`NIM_MODEL_VARIANT=nano` selector. Confirm image support during profile
+and workers when choosing another profile. Confirm image support during profile
 selection. For unified-memory hosts, follow the
 [Reasoner memory-share guidance](../deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems)
 in the Job and workers before starting either. Do not assume these
@@ -120,8 +117,8 @@ workers are scheduled.
 
 ## Download Model Artifacts
 
-Set `<nim-image-build>` and the profile selectors in
-[`model-download.yaml`](model-download.yaml) to match the workers, then run:
+Keep the image and profile selectors in
+[`model-download.yaml`](model-download.yaml) matched to the workers, then run:
 
 ```bash
 kubectl -n "$NAMESPACE" apply -f model-download.yaml
@@ -199,12 +196,7 @@ Refer to [Reasoning](../reasoning.md) for image/video request formats. The
 frontend uses Dynamo's API, including OpenAI `response_format`. The worker's
 NIM proxy handles NIM-specific aliases. The frontend does not expose NIM
 metadata. The Python Reasoner and Responses examples require a worker NIM URL.
-Refer to [Run the Cookbook Clients](#run-the-cookbook-clients). Older
-experimental worker images can also omit `model_type` and
-`inference_endpoint` from `/v1/metadata`, so cookbook clients requiring those
-fields reject those workers before inference. Use a worker image that exposes
-the same runtime identifiers and checkpoint label as standalone Reasoner.
-Verify the selected profile through the worker's `/v1/manifest`. For
+Refer to [Run the Cookbook Clients](#run-the-cookbook-clients). Verify the selected profile through the worker's `/v1/manifest`. For
 persistent video sessions, use the client's explicit
 [Dynamo mode](dynamo_with_streaming.md#stream-video-frames-over-rest), which
 uses only shared frontend endpoints and does not require worker metadata.

@@ -91,7 +91,8 @@ env:
 The chart also accepts these selectors as `model.selection.type`,
 `model.selection.variant`, `model.selection.precision`, and
 `model.selection.performanceProfile` values. Setting a selector both there and
-in `env` fails the render.
+in `env` fails the render. Chart 1.3.0's `model.selection` does not accept the
+`edge` or `edge-droid` variants, so set those through `env`.
 
 Adjust it for the chosen configuration:
 

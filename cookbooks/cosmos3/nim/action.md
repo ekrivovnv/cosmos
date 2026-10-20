@@ -159,7 +159,8 @@ Policy predicts an action chunk instead of receiving one:
 return a `[60,9]` action and a 61-frame rollout. Judge direction from the
 video, not raw values. A plausible rollout does not establish traffic safety or
 physical suitability. Policy omits `action` and can add the policy-only state
-fields in the [reference](#action-parameter-reference).
+fields in the [reference](#action-parameter-reference), except `observation`,
+which only the DROID specialists accept.
 
 ### Integrate a Policy Loop
 
@@ -176,8 +177,8 @@ is not authorization to execute.
 Edge-DROID and Nano-DROID are BF16-only specialist policy checkpoints with the
 same action-only request contract. Edge-DROID is
 [experimental](support-matrix.md#choose-a-model) in this release because it
-has not been validated. Choose one at startup from an image whose
-manifest includes the matching Generator profile:
+has not been validated. Choose one at startup by replacing the model selector
+lines of the [Generator launch](deployment.md#launch-generator) with these:
 
 ```bash
 -e NIM_MODEL_TYPE=generator \
@@ -187,7 +188,8 @@ manifest includes the matching Generator profile:
 ```
 
 Use `NIM_MODEL_VARIANT=nano-droid` for Nano-DROID. `NIM_CACHE_BACKEND=none`
-disables SeaCache. Guardrails stay enabled. Neither variant serves DROID
+disables SeaCache. It is already the Edge-DROID default, but Nano-DROID enables
+SeaCache unless you keep this line. Guardrails stay enabled. Neither variant serves DROID
 forward or inverse dynamics.
 
 Its request uses the same `POST /v1/infer` API as other Generator tasks:
@@ -306,7 +308,7 @@ object without media.
 | `action_fps` | number or null | Optional range `[1.0,60.0]` |
 | `history_length` | integer or null | Policy-only and `>= 1` |
 | `use_state` | boolean or null | Policy-only |
-| `observation` | object or null | Policy-only free-form state without a public nested schema |
+| `observation` | object or null | DROID specialist policy only; the general policy rejects it. Free-form state without a public nested schema |
 
 ## Defaults and Request Validation
 
