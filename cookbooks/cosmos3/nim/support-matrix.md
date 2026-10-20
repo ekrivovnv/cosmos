@@ -28,8 +28,8 @@ Choose the model; the NIM selects a compatible profile and precision (see
 A Generator specialist rejects requests for other tasks. Edge has no
 general-purpose Generator.
 
-> **Experimental:** Edge-DROID policy is experimental in this release while
-> NVIDIA verifies it with benchmarks. Validate its accuracy, latency, and safety
+> **Experimental:** Edge-DROID policy is experimental in this release because
+> NVIDIA has not validated it. Validate its accuracy, latency, and safety
 > behavior for your workload before relying on it.
 
 After startup,
@@ -227,9 +227,9 @@ set `NIM_TAGS_SELECTOR='n_gpus=2,nim_tp=2'`.
 
 ## Edge verified GPUs
 
-Edge Reasoner and Edge-DROID were verified on these GPUs. Verification does not
-establish Edge-DROID policy accuracy for a workload; each deployment must still
-meet the floors above and the exact image manifest.
+Edge Reasoner was verified on these GPUs. Edge-DROID policy was not validated;
+it is [experimental](#choose-a-model). Each deployment must still meet the
+floors above and the exact image manifest.
 
 | Architecture | GPUs |
 | --- | --- |

@@ -12,8 +12,8 @@ Image: `nvcr.io/nim/nvidia/cosmos3:2.1.0`.
 - **Edge Reasoner** (`NIM_MODEL_VARIANT=edge`): BF16 and FP8 profiles with a
   12-GiB per-device floor and no DFlash draft.
 - **Edge-DROID policy** (`NIM_MODEL_VARIANT=edge-droid`): a BF16 Generator
-  policy with action-only output; [experimental](support-matrix.md#choose-a-model).
-  Edge was verified on the [Edge verified GPUs](support-matrix.md#edge-verified-gpus).
+  policy with action-only output; [experimental](support-matrix.md#choose-a-model)
+  because it has not been validated.
 - **Streaming video sessions** for the Reasoner over WebSocket and REST
   (`NIM_ENABLE_STREAMING=true`); see [Streaming](streaming.md).
 - **Dynamo deployment** for the Reasoner, including REST streaming; see

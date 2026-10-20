@@ -174,8 +174,8 @@ authorization to execute.
 
 Edge-DROID and Nano-DROID are BF16-only specialist policy checkpoints with the
 same action-only request contract. Edge-DROID is
-[experimental](support-matrix.md#choose-a-model) in this release; see
-[Edge verified GPUs](support-matrix.md#edge-verified-gpus). Choose one at startup from an image whose
+[experimental](support-matrix.md#choose-a-model) in this release because it
+has not been validated. Choose one at startup from an image whose
 manifest includes the matching Generator profile:
 
 ```bash

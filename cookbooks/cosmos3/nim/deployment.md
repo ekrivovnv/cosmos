@@ -322,8 +322,8 @@ For Edge-DROID, which is
 ```
 
 Edge-DROID disables SeaCache by default; `NIM_CACHE_BACKEND=none` keeps that
-visible, so leave `NIM_CACHE_CONFIG` unset. Guardrails stay enabled. Edge was
-verified on the [Edge verified GPUs](support-matrix.md#edge-verified-gpus). After readiness, [verify the selection](#verify-the-selection)
+visible, so leave `NIM_CACHE_CONFIG` unset. Guardrails stay enabled. After
+readiness, [verify the selection](#verify-the-selection)
 and run the [Reasoner catalog](reasoning.md#run-the-task-catalog) or the
 [DROID policy client](action.md#edge-droid-and-nano-droid-policy). Edge-DROID
 serves policy only, not image/video generation or forward/inverse dynamics.
