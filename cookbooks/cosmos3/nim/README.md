@@ -12,17 +12,16 @@ contains two runtimes, but each container runs only one:
   Completions and, when enabled, the Responses API.
 
 > Deployment commands pin the current release image,
-> `nvcr.io/nim/nvidia/cosmos3:2.1.0`; compatible configurations are in the
+> `nvcr.io/nim/nvidia/cosmos3:2.1.0`. Compatible configurations are in the
 > [Support Matrix](support-matrix.md).
 
 ## Architecture
 
 Cosmos3 is a Mixture-of-Transformers (MoT) world foundation model with two
-jointly trained towers that share latent representations: a **Reasoner**
-(vision-language) tower that grounds the prompt, and a **Generator** (world
-simulator) tower that produces the output, such as video. The Generator runtime
-uses both towers; the Reasoner runtime serves understanding. For details, refer to
-the
+jointly trained towers that share latent representations. The **Reasoner**
+(vision-language) tower grounds the prompt. The **Generator** (world simulator)
+tower produces the output, such as video. The Generator runtime uses both
+towers, and the Reasoner runtime serves understanding. For details, refer to the
 [Cosmos3 technical report](https://research.nvidia.com/labs/cosmos-lab/cosmos3/technical-report.pdf).
 
 ![Cosmos3 Mixture-of-Transformers architecture with Reasoner and Generator towers](../cosmos3-model-architecture.png)
@@ -30,8 +29,8 @@ the
 ## Choose What to Run
 
 Choose a runtime, a model variant (`NIM_MODEL_VARIANT`), optionally a
-precision, and for Generator a latency or throughput objective; the NIM selects
-a compatible profile, as described in
+precision, and for Generator a latency or throughput objective. The NIM
+selects a compatible profile, as described in
 [How Selection Works](deployment.md#how-selection-works).
 
 ## Choose a Task
@@ -52,7 +51,7 @@ a compatible profile, as described in
 | Streaming video reasoning | Reasoner | Sequential image frames | Per-frame text with retained context | [Streaming](streaming.md) |
 | Responses API | Reasoner | Responses input | Response object/text | [Reasoning](reasoning.md#use-the-responses-api) |
 
-Local examples publish either runtime at `http://localhost:8000`; remove the
+Local examples publish either runtime at `http://localhost:8000`. Remove the
 active example container before launching the other runtime on the same port.
 
 ## Get Started
@@ -69,8 +68,8 @@ curl -fsS "$NIM_URL/v1/health/ready"
 curl -fsS "$NIM_URL/v1/metadata" | python3 -m json.tool
 ```
 
-Confirm that metadata identifies the intended runtime and primary endpoint:
-Generator uses `/v1/infer`; Reasoner uses `/v1/chat/completions`.
+Confirm that metadata identifies the intended runtime and primary endpoint.
+Generator uses `/v1/infer`, and Reasoner uses `/v1/chat/completions`.
 
 Run an example that matches the active runtime and model. For a general-purpose
 Generator, start with an image request:
@@ -102,7 +101,8 @@ Specialist variants accept only their task: run
 [`t2i_4step.py`](examples/t2i_4step.py),
 [`i2v_4step.py`](examples/i2v_4step.py), or
 [`policy_droid.py`](action.md#edge-droid-and-nano-droid-policy) only against the
-matching variant. Examples save outputs under the ignored `examples/outputs/` directory.
+matching variant. Examples save outputs under the ignored `examples/outputs/`
+directory.
 
 Validate the selected configuration with representative requests before
 production use.
@@ -149,18 +149,18 @@ pages and examples as their source of truth and default to read-only assistance.
 ## Safety, License, and Notices
 
 Generator guardrails are enabled by default. Disabling them can remove
-content-policy and face-privacy protections; refer to
+content-policy and face-privacy protections. Refer to
 [Guardrails](operations.md#guardrails).
 
-Refer to [License and Notices](license.md) for the terms. This cookbook is licensed
-under the repository [LICENSE](../../../LICENSE). The running NIM serves its
-license at `/v1/license`; the image also contains product terms, notices,
-component licenses, and the package-modification source described in
+Refer to [License and Notices](license.md) for the terms. This cookbook is
+licensed under the repository [LICENSE](../../../LICENSE). The running NIM
+serves its license at `/v1/license`. The image also contains product terms,
+notices, component licenses, and the package-modification source described in
 [Acknowledgements](acknowledgements/README.md).
 
-The NIM is distributed as a container image through the NVIDIA NGC Catalog,
-which publishes a security scan report for each image: a security rating, CVE
-severity by package, and links to CVE details.
+The NIM is distributed as a container image through the NVIDIA NGC Catalog.
+The catalog publishes a security scan report for each image, with a security
+rating, CVE severity by package, and links to CVE details.
 
 ## NVIDIA Developer Program
 
