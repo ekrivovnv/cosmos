@@ -246,8 +246,7 @@ start without a new download.
 
 With `statefulSet.enabled: false` and a `ReadWriteOnce` volume, scaling or
 rolling upgrades beyond one pod are likely to fail. Use a `ReadWriteMany`
-storage class, manually cloned `ReadOnlyMany` volumes of a pre-filled cache,
-or direct NFS. Without persistence, the cache is an `emptyDir` and every pod
+storage class or writable direct NFS. Without persistence, the cache is an `emptyDir` and every pod
 start downloads the model again.
 
 ## Troubleshooting

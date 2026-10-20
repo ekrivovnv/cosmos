@@ -131,7 +131,9 @@ file URLs; inactive fields are omitted or null. Only general Policy and inverse
 dynamics return video plus an
 [action object](action.md#response-action-object).
 
-A specialist action-only policy can return:
+A specialist action-only policy can return the following response. The `data`
+array is shortened to one row here; a complete response has 32 rows of eight
+values, matching `shape: [32, 8]`:
 
 ```json
 {

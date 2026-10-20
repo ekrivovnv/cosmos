@@ -4,7 +4,9 @@ SPDX-License-Identifier: OpenMDW-1.1 -->
 # Cosmos3 NIM Support Matrix
 
 Match a model to precision, GPU compute capability, GPU count, per-device VRAM,
-and system memory. All memory values are binary GiB per device.
+and system memory. Memory requirements use binary GiB: VRAM floors are per
+device, and system-memory floors are per host. The GPU inventory tables list
+nominal capacities in GB.
 
 ## Choose a Model
 
