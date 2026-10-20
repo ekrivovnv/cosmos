@@ -6,7 +6,7 @@ SPDX-License-Identifier: OpenMDW-1.1 -->
 Use [`reasoner_with_streaming.yaml`](reasoner_with_streaming.yaml) for Chat
 Completions plus persistent video sessions over REST. The frontend and workers
 use the same Cosmos3 NIM image, with different launch commands. The frontend
-runs the bundled streaming adapter; workers run the NIM server with streaming
+runs the bundled streaming adapter. Workers run the NIM server with streaming
 enabled.
 
 > **WebSocket is not supported in Dynamo mode.** The
@@ -23,7 +23,7 @@ Replace all `<angle-bracket>` values before applying.
 
 This manifest adapts the tested regular deployment's `v1alpha1` services schema,
 resources, shared cache, and operator-managed worker health probes. Streaming
-sessions were not exercised by the supplied working-deployment files; validate
+sessions were not exercised by the supplied working-deployment files. Validate
 the adapter and session requests below against your chosen image.
 
 ## Set the NIM Image
@@ -34,32 +34,39 @@ image address, including its tag or digest. The image must include
 `/opt/nim/streaming/dynamo/`. Use the same image in the download Job.
 
 The frontend runs `/opt/nim/.venv/bin/python -m streaming.dynamo.frontend`
-from `/opt/nim`. It serves streaming configuration and REST sessions and forwards
-ordinary Chat Completions to Dynamo without loading a model or requesting a GPU. The stock
-`python3 -m dynamo.frontend` command does not expose the session routes.
+from `/opt/nim`. It serves streaming configuration and REST sessions. It
+forwards ordinary Chat Completions to Dynamo without loading a model or
+requesting a GPU. The stock `python3 -m dynamo.frontend` command does not
+expose the session routes.
 
 Workers start `/opt/nim/start_server.sh`: `NIM_DYNAMO_WORKER=true` and
 `NIM_ENABLE_STREAMING=1` select the streaming worker and its private frontend.
-The worker's `DYN_NAMESPACE_PREFIX` comes from the operator's pod label, allowing
-the private frontend to discover models in suffixed worker namespaces. The
+The worker's `DYN_NAMESPACE_PREFIX` comes from the operator's pod label,
+allowing the private frontend to discover models in suffixed worker
+namespaces. The
 streaming pool still uses the separate `NIM_DYNAMO_STREAMING_ENDPOINT` setting.
 Refer to [Dynamo Worker Configuration](../configuration.md#run-nim-as-a-dynamo-worker)
 and [Dynamo Streaming Configuration](../configuration.md#dynamo-streaming)
 for environment variables, defaults, precedence, and timeouts.
-The tested image bundled Dynamo `1.5.0.dev20260902`; the graph's operator runtime
-override remains `1.5.0`. Verify compatibility for your image/operator pairing.
+The tested image bundled Dynamo `1.5.0.dev20260902`. The graph's operator
+runtime override remains `1.5.0`. Verify compatibility for your
+image/operator pairing.
 
 Both manifests use the same Bash launch style (`set -euo pipefail` followed
 by `exec`), explicit Kubernetes discovery, scheduling tolerations, and shared
-worker environment values. Streaming uses the NIM image and its Python
-environment for the frontend in place of the regular pinned Dynamo image,
-changes the frontend module, enables
-`NIM_ENABLE_STREAMING`, disables asynchronous scheduling, and adds the shared
-streaming endpoint to the frontend and workers.
+worker environment values. The streaming manifest differs from the regular
+one in the following ways:
+
+- Uses the NIM image and its Python environment for the frontend in place of
+  the regular pinned Dynamo image
+- Changes the frontend module
+- Enables `NIM_ENABLE_STREAMING`
+- Disables asynchronous scheduling
+- Adds the shared streaming endpoint to the frontend and workers
 
 The YAML sets synchronous scheduling explicitly and uses the same
 `NIM_DYNAMO_STREAMING_ENDPOINT` on frontend and workers. Keep that value
-identical; use a distinct endpoint for each separate model pool.
+identical. Use a distinct endpoint for each separate model pool.
 
 ## Use Edge Reasoner
 
@@ -77,12 +84,12 @@ Edge supports the same REST session API in BF16 and FP8. In both
   value: none
 ```
 
-Replace the existing variant and precision entries rather than adding duplicates.
-Keep the image, cache, and GPU selectors aligned between the Job and workers.
-Edge does not support DFlash in this version. Set the streaming method explicitly
-to `none` so images that default streaming to DFlash do not request a draft.
-The shared frontend needs no model-specific change; the client discovers the
-Edge model from `/v1/streaming/config`. Use a separate streaming endpoint if
+Replace the existing variant and precision entries rather than adding
+duplicates. Keep the image, cache, and GPU selectors aligned between the Job and
+workers. Edge does not support DFlash in this version. Set the streaming method
+explicitly to `none` so images that default streaming to DFlash do not request a
+draft. The shared frontend needs no model-specific change. The client discovers
+the Edge model from `/v1/streaming/config`. Use a separate streaming endpoint if
 running Edge alongside a Nano or Super pool.
 
 ## Deploy and Check
@@ -98,10 +105,11 @@ kubectl -n "$NAMESPACE" get pods \
 ```
 
 Both YAML files define `cosmos3-reasoner`: apply only the chosen variant.
-Applying the other variant updates that deployment and replaces its pods;
-existing streaming sessions are lost.
+Applying the other variant updates that deployment and replaces its pods.
+Existing streaming sessions are lost.
 
-Follow the shared [readiness and port-forward checks](dynamo_deployment.md#check-the-deployment),
+Follow the shared
+[readiness and port-forward checks](dynamo_deployment.md#check-the-deployment),
 including setting `NIM_URL`. Check frontend and worker logs for
 `[Dynamo streaming]` messages confirming that the HTTP adapter and worker REST
 handlers attached. Chat Completions use the same
@@ -123,12 +131,13 @@ curl -fsS "$NIM_URL/v1/streaming/config" | python3 -m json.tool
 Use this config's `model` value when specifying a model for session creation.
 It can be a local model path rather than the public alias in `/v1/models`.
 
-The shared frontend exposes Dynamo's `/health` and `/v1/models`; NIM readiness,
+The shared frontend exposes Dynamo's `/health` and `/v1/models`. NIM readiness,
 metadata, and manifest routes belong to each worker's NIM endpoint. A 404 from
 `/v1/health/ready` or `/v1/metadata` on the frontend does not establish that
 streaming is unavailable.
 
-From `cookbooks/cosmos3/nim`, using the [pinned client environment](../prerequisites.md#initialize-the-example-environment):
+From `cookbooks/cosmos3/nim`, run the client in the
+[pinned client environment](../prerequisites.md#initialize-the-example-environment):
 
 ```bash
 uv run python examples/streaming.py --backend dynamo --transport rest \
@@ -137,10 +146,10 @@ uv run python examples/streaming.py --backend dynamo --transport rest \
 
 The client uses only the shared frontend. It checks for a registered `generate`
 worker at `/health`, a served model at `/v1/models`, and streaming configuration
-at `/v1/streaming/config`. It does not call worker metadata or manifest endpoints
-and needs no worker URLs or port forwards. Missing runtime metadata fields in
-older worker images do not block this mode. The client sends JSON/base64 frames
-and requires REST in Dynamo mode.
+at `/v1/streaming/config`. It does not call worker metadata or manifest
+endpoints and needs no worker URLs or port forwards. Missing runtime metadata
+fields in older worker images do not block this mode. The client sends
+JSON/base64 frames and requires REST in Dynamo mode.
 
 These checks establish frontend discovery and streaming configuration, not the
 readiness or selected profile of every worker. Operators can inspect individual
@@ -167,14 +176,14 @@ For video, decode frames on the client and wait for each reply before sending
 the next. Keep the returned `session_id` unchanged: frame uploads and deletion
 route to its owner even through a different frontend replica. This ownership
 does not depend on the Chat Completions affinity header or its 300-second TTL.
-Refer to [Streaming](../streaming.md#session-configuration) for session fields and
-[streaming settings](../configuration.md#streaming-video-sessions) for limits;
-the REST idle timeout defaults to 120 seconds.
+Refer to [Streaming](../streaming.md#session-configuration) for session fields
+and [streaming settings](../configuration.md#streaming-video-sessions) for
+limits. The REST idle timeout defaults to 120 seconds.
 
 A session-route 404 can indicate an old frontend/worker image or streaming
-disabled on the worker; an existing session can also expire. A 503 can mean
+disabled on the worker. An existing session can also expire. A 503 can mean
 workers are loading, capacity is full, or the owning worker is unavailable.
-Sessions do not migrate after worker loss; create a new one. Do not
+Sessions do not migrate after worker loss, so create a new one. Do not
 automatically retry a frame after a timeout.
 
 ## Other Routes
@@ -183,7 +192,7 @@ The adapter forwards ordinary HTTP requests to the bundled Dynamo frontend,
 including `POST /v1/responses`. Use `store=false` for Responses creation, as in
 the [Dynamo request example](dynamo_deployment.md#send-a-request). Creation does
 not establish support for stored-response retrieval, cancellation, background
-responses, or `previous_response_id`; those require separate backend storage
+responses, or `previous_response_id`. Those require separate backend storage
 support. NIM's `NIM_DISABLE_RESPONSES_ROUTE` controls the worker proxy's route,
 not the shared frontend's routes.
 
@@ -192,9 +201,11 @@ not the shared frontend's routes.
 Set `spec.services.ReasonerWorker.replicas` to `<worker-count>` in the streaming
 YAML and apply that file again. Each replica needs the shared
 [resources and cache](dynamo_deployment.md#prerequisites). Scaling down or
-replacing workers loses their active sessions; session state does not migrate.
-Set the count to `0` to release the GPUs while retaining the frontend and cache;
-restore a positive count and wait for readiness before sending more requests.
+replacing workers loses their active sessions because session state does not
+migrate. Set the count to `0` to release the GPUs while retaining the frontend
+and cache. Restore a positive count and wait for readiness before sending more
+requests.
+
 
 To stop serving while keeping the cache PVC and secrets:
 
