@@ -8,7 +8,8 @@ to both the Generator and the Reasoner.
 
 ## Prerequisites
 
-A running NIM. Confirm that the metrics endpoint returns Prometheus text:
+You need a running NIM. Confirm that the metrics endpoint returns Prometheus
+text:
 
 ```bash
 export NIM_URL=${NIM_URL:-http://localhost:8000}
@@ -39,12 +40,12 @@ scrape_configs:
 The NIM serves metrics at `/v1/metrics` on the HTTP API port `8000`, not at
 the Prometheus default `/metrics`. The `cosmos3-generator-triton` job scrapes
 Generator request metrics from the internal Triton port `8002`, reachable on
-the shared Docker network without publishing it; omit this job for a Reasoner.
+the shared Docker network without publishing it. Omit this job for a Reasoner.
 
 Run Prometheus with the config mounted read-only. This example uses a shared
-Docker network; attach the NIM container to it. The examples use the Generator
-container name from [Deployment](deployment.md#launch-generator); for a Reasoner,
-use `cosmos3-reasoner` instead.
+Docker network, so attach the NIM container to it. The examples use the
+Generator container name from [Deployment](deployment.md#launch-generator).
+For a Reasoner, use `cosmos3-reasoner` instead.
 
 ```bash
 docker network create cosmos3-monitoring   # skip if it exists
@@ -65,7 +66,7 @@ Grafana with `--network host` instead of `--network cosmos3-monitoring` and
 
 Open `http://localhost:9090/targets` (**Status > Targets**). The
 `cosmos3-nim` job, and for a Generator the `cosmos3-generator-triton`
-job, must show `UP`.
+job, must show `UP`. If a target is down, check the following causes:
 
 | Symptom | Cause |
 |---------|-------|
@@ -73,6 +74,8 @@ job, must show `UP`.
 | Target `DOWN`, connection refused or no such host | Prometheus cannot reach the NIM. Put both containers on the same Docker network and use the container name, or use host networking. |
 
 ## Grafana
+
+Run Grafana on the shared network:
 
 ```bash
 docker run -d --name grafana \
@@ -114,8 +117,9 @@ dashboard panels from them. Each runtime exposes different metric families:
 | Generator | `:8002/metrics` (Triton) | Per-model request metrics, labelled by `model` such as `Cosmos3Omni` and `Qwen3GuardFilter`: `nv_inference_count`, `nv_inference_request_success`, `nv_inference_request_failure`, `nv_inference_request_duration_us`, `nv_inference_queue_duration_us`; plus `nv_gpu_*` and `nv_cpu_*` gauges |
 | Reasoner | `:8000/v1/metrics` | vLLM request and cache metrics: `vllm:time_to_first_token_seconds`, `vllm:e2e_request_latency_seconds`, `vllm:num_requests_running`, `vllm:num_requests_waiting`, `vllm:kv_cache_usage_perc`; plus `gpu_*` gauges |
 
-Metric names can change between releases; check your service's output before
+Metric names can change between releases. Check your service's output before
 building dashboards or alerts.
+
 
 ## Kubernetes
 
