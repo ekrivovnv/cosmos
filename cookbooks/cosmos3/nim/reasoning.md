@@ -9,16 +9,16 @@ model; `/v1/infer` is a Generator endpoint and is not used here. Refer to
 [Deployment](deployment.md) to select and launch a Reasoner model.
 
 The same clients work with `edge`, `nano`, and `super`; launch Edge with the
-[Edge Experiments](deployment.md#edge-experiments) selectors.
+selectors in [Deploy Edge Models](deployment.md#deploy-edge-models).
 
 For stateful reasoning over successive video frames, refer to
-[Streaming video](streaming.md). Its [Example Client](streaming.md#example-client)
+[Streaming Video](streaming.md). Its [example client](streaming.md#example-client)
 is bundled in this cookbook and uses the same pinned environment and `NIM_URL`
 setting, with a flag to choose WebSocket or REST.
 
 ## Prepare the Client and Verify Readiness
 
-Install the [Client Tooling](prerequisites.md#client-tooling). The runnable
+Install the [client tooling](prerequisites.md#client-tooling). The runnable
 examples use the pinned OpenAI Python client from the `uv` project in the
 cookbook directory:
 
@@ -104,7 +104,7 @@ uv run python examples/reasoner.py --case all
 ### Super BF16 Example Baseline
 
 The catalog was validated on Super BF16 (hardware floor in the
-[support matrix](support-matrix.md#reasoner-configurations)) with
+[Support Matrix](support-matrix.md#reasoner-profiles)) with
 `NIM_USE_DFLASH=0` and `NIM_VIDEO_PRUNING_RATE=0`. Every case explicitly sends
 `temperature=0.7`, `top_p=0.8`, `top_k=20`, `presence_penalty=0`, and
 `repetition_penalty=1` (plus `seed=0` where the vLLM notebook sets it) unless
@@ -348,7 +348,7 @@ pixel_y = normalized_y / 1000 * image_height
 A Reasoner next-action answer or 2D trajectory is text/JSON describing a
 semantic proposal in visual coordinates. It is not a domain-specific Generator
 Action tensor and must not be sent directly to a robot. Refer to
-[Generator Action representations](action.md#domains-and-representations).
+[Action Domains and Representations](action.md#domains-and-representations).
 
 The catalog reuses the exact user prompts from the
 [vLLM Reasoner notebook](../reasoner/run_with_vllm.ipynb). Answers in the
@@ -362,8 +362,8 @@ run and are not golden NIM output.
 | Chat Completions or Responses route 404 | `NIM_URL` reaches Generator, Responses is disabled, or the route is absent | Inspect `/v1/metadata`; start Reasoner or check `NIM_DISABLE_RESPONSES_ROUTE` |
 | HTTP 422 | Media validation or preprocessing failed | Check the data URL, media ordering, and media limits |
 
-Refer to [Reasoner troubleshooting](operations.md#reasoner) for other errors, and
+Refer to [Reasoner Troubleshooting](operations.md#reasoner) for other errors, and
 check the [live schema](api-reference.md#errors-and-live-schema) before
 depending on additional fields. To serve a local or Hugging Face Reasoner
 checkpoint, refer to
-[Bring your own checkpoint](bring-your-own-checkpoint.md#reasoner-checkpoint).
+[Bring Your Own Checkpoint](bring-your-own-checkpoint.md#reasoner-checkpoint).

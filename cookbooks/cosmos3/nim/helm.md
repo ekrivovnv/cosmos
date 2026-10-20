@@ -14,7 +14,7 @@ for regular Dynamo and Dynamo with streaming, and require the Dynamo operator.
 ## Prerequisites
 
 - A Kubernetes cluster with GPU nodes that match a row in the
-  [Support matrix](support-matrix.md), with the
+  [Support Matrix](support-matrix.md), with the
   [NVIDIA GPU Operator](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/)
   installed.
 - Helm and `kubectl` access to the target namespace. The commands below use the
@@ -95,7 +95,7 @@ Adjust it for the chosen configuration:
 
 - **Model and GPUs:** Change `NIM_MODEL_VARIANT`, `NIM_PERF_PROFILE`, and
   `nvidia.com/gpu` together using the
-  [Generator Configurations](support-matrix.md#generator-configurations). The
+  [Generator Profiles](support-matrix.md#generator-profiles). The
   GPU count does not select a GPU type; use `nodeSelector` or `affinity` to
   target eligible GPU nodes, and `tolerations` if those nodes are tainted. On
   nodes with MIG enabled, request the MIG resource instead of
@@ -131,7 +131,7 @@ on a host with the same GPUs and selectors.
 ### Reasoner
 
 For Reasoner, replace `env` with the Reasoner selectors and choose the GPU
-count from the [Reasoner Configurations](support-matrix.md#reasoner-configurations).
+count from the [Reasoner Profiles](support-matrix.md#reasoner-profiles).
 Reasoner does not use `NIM_PERF_PROFILE`:
 
 ```yaml
@@ -145,7 +145,8 @@ env:
 On DGX Spark/GB10 or Jetson AGX Thor nodes, the NIM defaults
 `NIM_GPU_MEMORY_UTILIZATION` to `0.70`; set a lower value only from host
 measurements; refer to
-[Set the Reasoner memory share](deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems).
+[Set the Reasoner Memory
+Share](deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems).
 
 ### OpenTelemetry
 
@@ -256,7 +257,7 @@ start downloads the model again.
 | Pod stays `Pending` | Run `kubectl describe pod <pod>` and check `Events` for insufficient GPUs, untolerated taints, or an unbound volume claim |
 | Pod restarts while preparing the model workspace | The startup probe ran out before the download finished; increase `startupProbe.failureThreshold` |
 | Scaling or upgrade fails with `statefulSet.enabled: false` | The cache volume is `ReadWriteOnce`; refer to [Storage and Scaling](#storage-and-scaling) |
-| Profile selection fails | Compare GPU type, count, free memory, and pod memory limit with the [Support matrix](support-matrix.md); refer to [Troubleshooting](operations.md#troubleshooting) |
+| Profile selection fails | Compare GPU type, count, free memory, and pod memory limit with the [Support Matrix](support-matrix.md); refer to [Troubleshooting](operations.md#troubleshooting) |
 
 ## Remove the Deployment
 

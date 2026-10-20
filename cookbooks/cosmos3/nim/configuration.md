@@ -44,8 +44,8 @@ nvidia-smi -L
 
 Expose specific GPUs instead of `--gpus all`, for example
 `--gpus '"device=0,1"'` or `--gpus '"device=GPU-<uuid>"'`. Expose a GPU count
-listed in the [Generator](support-matrix.md#generator-configurations) or
-[Reasoner](support-matrix.md#reasoner-configurations) configurations, all of a
+listed in the [Generator](support-matrix.md#generator-profiles) or
+[Reasoner](support-matrix.md#reasoner-profiles) profiles, all of a
 single model ([mixed GPUs are not
 supported](support-matrix.md#gpu-architecture-and-topology)); extra GPUs sit
 idle.
@@ -61,8 +61,9 @@ processes, so a passed value can place work outside the intended GPUs.
 | `NIM_DISABLE_MODEL_DOWNLOAD` | `false` | Disable profile download for a completely local Reasoner override; incompatible with Reasoner `hf://` and rejected for Generator |
 | `HF_TOKEN` | Empty | Authenticate to a private Hugging Face repository named by `NIM_MODEL_PATH` |
 
-To override the DFlash draft, refer to `NIM_DFLASH_MODEL_PATH` under [Speculative Decoding](#speculative-decoding). Refer to [Bring your own
-checkpoint](bring-your-own-checkpoint.md) for layouts, mounts, and
+To override the DFlash draft, refer to `NIM_DFLASH_MODEL_PATH` under
+[Speculative Decoding](#speculative-decoding). Refer to [Bring Your Own
+Checkpoint](bring-your-own-checkpoint.md) for layouts, mounts, and
 compatibility checks.
 
 ### Server and Logging
@@ -123,7 +124,8 @@ profile-pin variables, refer to [Advanced Settings](#advanced-settings).
 | `NIM_ALLOW_URL_INPUT` | `true` | Allow HTTP(S) image, video, and Transfer inputs; set `false` to require encoded input |
 | `NIM_TRITON_REQUEST_TIMEOUT` | 30 minutes (`1800000000` microseconds) | Set the queue-plus-execution timeout in microseconds |
 
-Client HTTP timeouts do not change this backend ceiling; refer to [Long-Running Requests](operations.md#long-running-requests).
+Client HTTP timeouts do not change this backend ceiling; refer to [Long-Running
+Requests](operations.md#long-running-requests).
 
 ### Startup and Execution
 
@@ -230,7 +232,7 @@ is enabled.
 | Name | Default | Use |
 | --- | --- | --- |
 | `NIM_MAX_MODEL_LEN` | `-1` (auto) | Let the runtime choose a context length, bounded by the checkpoint limit of 262,144 tokens |
-| `NIM_GPU_MEMORY_UTILIZATION` | Discrete GPU: `0.93`, capped to leave `NIM_GPU_MEMORY_HEADROOM_GIB` free; unified memory: `0.70` | Set the Reasoner GPU-memory target in `(0,1]`; startup warns when it exceeds current free memory but does not reduce it. On DGX Spark/GB10 and Jetson AGX Thor, lower it only from host measurements; refer to [Set the Reasoner memory share](deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems) |
+| `NIM_GPU_MEMORY_UTILIZATION` | Discrete GPU: `0.93`, capped to leave `NIM_GPU_MEMORY_HEADROOM_GIB` free; unified memory: `0.70` | Set the Reasoner GPU-memory target in `(0,1]`; startup warns when it exceeds current free memory but does not reduce it. On DGX Spark/GB10 and Jetson AGX Thor, lower it only from host measurements; refer to [Set the Reasoner Memory Share](deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems) |
 
 ### Caching and Multimodal Processing
 
@@ -296,7 +298,7 @@ streaming path, so pinning V1 is not required for normal operation.
 Inspect `GET /v1/streaming/config` for the served model and default retention
 and sampling policy. Standalone NIM and the Dynamo streaming adapter expose
 this route. Refer to [Streaming](streaming.md) for session requests and error handling,
-and [Dynamo REST streaming](dynamo/dynamo_with_streaming.md#stream-video-frames-over-rest)
+and [Dynamo REST Streaming](dynamo/dynamo_with_streaming.md#stream-video-frames-over-rest)
 for the client's shared-frontend checks, which require no worker URLs or metadata.
 
 ### API Behavior
@@ -371,7 +373,7 @@ ownership does not depend on the Chat Completions affinity TTL.
 frontend and worker NIM endpoints. The streaming adapter and enabled worker NIM
 proxy expose `GET /v1/streaming/config` and the REST session routes. The stock
 `dynamo.frontend` launcher does not attach these streaming routes.
-Refer to [Dynamo with streaming](dynamo/dynamo_with_streaming.md) for the manifest
+Refer to [Dynamo With Streaming](dynamo/dynamo_with_streaming.md) for the manifest
 and REST request examples.
 
 ## Advanced Settings

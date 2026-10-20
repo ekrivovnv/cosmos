@@ -13,7 +13,7 @@ enabled.
 > `WS /v1/streaming/ws` endpoint is unavailable on both the shared frontend
 > and worker NIM endpoints. Use the REST session API below.
 
-First complete the [Prerequisites](dynamo_deployment.md#prerequisites) and
+First complete the [prerequisites](dynamo_deployment.md#prerequisites) and
 [namespace and cache setup](dynamo_deployment.md#prepare-the-namespace-and-cache).
 Complete the shared [model-download step](dynamo_deployment.md#download-model-artifacts)
 before starting workers. If reusing a cache, set `spec.pvcs[0].name` and
@@ -43,8 +43,8 @@ Workers start `/opt/nim/start_server.sh`: `NIM_DYNAMO_WORKER=true` and
 The worker's `DYN_NAMESPACE_PREFIX` comes from the operator's pod label, allowing
 the private frontend to discover models in suffixed worker namespaces. The
 streaming pool still uses the separate `NIM_DYNAMO_STREAMING_ENDPOINT` setting.
-Refer to [Dynamo worker configuration](../configuration.md#run-nim-as-a-dynamo-worker)
-and [Dynamo streaming configuration](../configuration.md#dynamo-streaming)
+Refer to [Dynamo Worker Configuration](../configuration.md#run-nim-as-a-dynamo-worker)
+and [Dynamo Streaming Configuration](../configuration.md#dynamo-streaming)
 for environment variables, defaults, precedence, and timeouts.
 The tested image bundled Dynamo `1.5.0.dev20260902`; the graph's operator runtime
 override remains `1.5.0`. Verify compatibility for your image/operator pairing.

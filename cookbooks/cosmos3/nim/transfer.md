@@ -8,7 +8,7 @@ world-space-map (WSM) video controls: send `POST /v1/infer` with
 `model_mode=video2video` and a top-level `transfer` object.
 
 > Confirm control and model availability for the selected image in the
-> [Support matrix](support-matrix.md).
+> [Support Matrix](support-matrix.md).
 
 Start a compatible Generator with [Deployment](deployment.md) and begin with
 one precomputed control. To choose between V2V, Transfer, and inverse
@@ -17,7 +17,7 @@ dynamics, refer to
 
 ## Control Types
 
-| Control | Precomputed Video | Server-Derived From `input_reference` | Preset |
+| Control | Precomputed Video | Derived by Server | Preset |
 | --- | --- | --- | --- |
 | `edge` | Yes | Yes | `very_low`, `low`, `medium`, `high`, `very_high` |
 | `blur` | Yes | Yes | `none`, `very_low`, `low`, `medium`, `high`, `very_high` |
@@ -43,7 +43,7 @@ match, add `-e NIM_TRITON_REQUEST_TIMEOUT=3600000000` (microseconds) to the
 Generator launch and restart; refer to
 [Long-Running Requests](operations.md#long-running-requests).
 
-Install the [Client Tooling](prerequisites.md#client-tooling). Then, from the
+Install the [client tooling](prerequisites.md#client-tooling). Then, from the
 repository root, enter the cookbook directory before running a case:
 
 ```bash
@@ -99,7 +99,7 @@ path is not accepted as control media:
 Replace `edge` with `blur`, `depth`, `seg`, or `wsm` and provide the matching
 control.
 
-## Advanced: Derive Edge or Blur
+## Derive Edge or Blur Controls
 
 For server-derived controls, send the source video in `input_reference` and
 omit the nested control video:
@@ -135,7 +135,7 @@ only to a derived control and cannot accompany nested `video`.
 Depth, segmentation, and WSM cannot be derived by the server; supply a
 precomputed control video.
 
-## Advanced Tuning
+## Tune Transfer Parameters
 
 | Field | Constraint | Current Effective Default |
 | --- | --- | --- |
@@ -147,7 +147,7 @@ precomputed control video.
 
 `num_first_chunk_conditional_frames > 0` requires `input_reference`.
 `control_weight` belongs inside a control object; refer to
-[Advanced Multiple Controls](#advanced-multiple-controls).
+[Combine Multiple Controls](#combine-multiple-controls).
 
 ### Control Guidance Behavior
 
@@ -167,7 +167,7 @@ another image):
 
 The example script uses a 121-frame chunk, or 101 for WSM.
 
-## Advanced Multiple Controls
+## Combine Multiple Controls
 
 A `transfer` object can enable several controls; mixed requests use the edge
 family defaults. Each control object (`edge`, `blur`, `depth`, `seg`, `wsm`)

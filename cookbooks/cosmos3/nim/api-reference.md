@@ -22,7 +22,7 @@ Reasoner completion APIs, and a Reasoner profile does not serve `/v1/infer`.
 | Generator | `POST /v1/infer` with `transfer` | [Transfer](transfer.md) |
 | Reasoner | `POST /v1/chat/completions` | [Reasoning](reasoning.md) |
 | Reasoner | `POST /v1/responses` and optional state routes | [Reasoning](reasoning.md#use-the-responses-api) |
-| Reasoner (streaming enabled) | WebSocket `/v1/streaming/ws` and REST `/v1/streaming/*` | [Streaming endpoints](streaming.md#endpoints) |
+| Reasoner (streaming enabled) | WebSocket `/v1/streaming/ws` and REST `/v1/streaming/*` | [Streaming Endpoints](streaming.md#endpoints) |
 
 Reasoner features are in
 [Reasoning](reasoning.md#final-answers-instructions-and-tool-calls). Check the
@@ -55,7 +55,7 @@ The task guides define the remaining required inputs and invalid combinations.
 
 Defaults are for video / T2I; Transfer and Action defaults are on their pages.
 
-| Field | Type | Default (Video / T2I) | Applies To |
+| Field | Type | Video / T2I Default | Applies To |
 | --- | --- | --- | --- |
 | `model_mode` | required enum | None | Selects one of the seven modes above |
 | `prompt` | string or null; maximum 20,000 characters | None | Required and non-empty for T2I/T2V; task-dependent otherwise |
@@ -101,7 +101,7 @@ need container network access and can time out or change.
 Input videos must use an MP4/MOV, Matroska/WebM, FLV, or AVI container with
 H.264, H.265/HEVC, MPEG-4 Part 2, VP8, VP9, or AV1; other codecs return HTTP
 422. Decode paths and image formats are in the
-[support matrix](support-matrix.md#media-and-codecs).
+[Support Matrix](support-matrix.md#media-and-codecs).
 
 Size caps: I2V images 20,000,000 encoded characters; V2V decoded video 75 MB;
 Transfer limits are in [Transfer](transfer.md#media-and-output).
@@ -148,7 +148,8 @@ A specialist action-only policy can return:
 
 In that case both `b64_image` and `b64_video` are absent or null. Clients must
 branch on the fields actually present rather than assuming every non-T2I
-request has `b64_video`. Refer to [Edge-/Nano-DROID policy](action.md#edge-droid-and-nano-droid-policy).
+request has `b64_video`. Refer to [Edge-/Nano-DROID
+Policy](action.md#edge-droid-and-nano-droid-policy).
 
 ## Errors and Live Schema
 

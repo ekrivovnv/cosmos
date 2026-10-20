@@ -13,7 +13,7 @@ contains two runtimes, but each container runs only one:
 
 > Deployment commands pin the current release image,
 > `nvcr.io/nim/nvidia/cosmos3:2.1.0`; compatible configurations are in the
-> [Support matrix](support-matrix.md).
+> [Support Matrix](support-matrix.md).
 
 ## Architecture
 
@@ -89,7 +89,7 @@ uv run python examples/reasoner.py --case image_caption
 
 1. Verify the GPU host against [Prerequisites](prerequisites.md).
 2. Choose a compatible model and hardware configuration from the
-   [Support matrix](support-matrix.md).
+   [Support Matrix](support-matrix.md).
 3. Follow [Deployment](deployment.md) to authenticate, pull the image, run the
    preflight, and launch Generator or Reasoner. On DGX Spark or Jetson AGX
    Thor, the NIM applies a 70%
@@ -121,29 +121,29 @@ pages and examples as their source of truth and default to read-only assistance.
 - [Prerequisites](prerequisites.md)
 - [Deployment](deployment.md)
 - [Configuration](configuration.md)
-- [Support matrix](support-matrix.md)
-- [Helm deployment](helm.md)
-- [Dynamo overview](dynamo/README.md)
-- [Dynamo deployment](dynamo/dynamo_deployment.md)
-- [Dynamo with streaming](dynamo/dynamo_with_streaming.md)
-- [Bring your own checkpoint](bring-your-own-checkpoint.md)
+- [Support Matrix](support-matrix.md)
+- [Helm Deployment](helm.md)
+- [Dynamo Overview](dynamo/README.md)
+- [Dynamo Deployment](dynamo/dynamo_deployment.md)
+- [Dynamo With Streaming](dynamo/dynamo_with_streaming.md)
+- [Bring Your Own Checkpoint](bring-your-own-checkpoint.md)
 
 ### Use the APIs
 
-- [API reference](api-reference.md)
+- [API Reference](api-reference.md)
 - [Generation](generation.md)
 - [Reasoning](reasoning.md)
-- [Streaming video](streaming.md)
+- [Streaming Video](streaming.md)
 - [Action](action.md)
 - [Transfer](transfer.md)
-- [Python examples](examples/)
+- [Python Examples](examples/)
 
 ### Operate
 
-- [Operations and troubleshooting](operations.md)
-- [Monitoring with Prometheus and Grafana](monitoring.md)
-- [Release notes](release-notes.md)
-- [License and notices](license.md)
+- [Operations and Troubleshooting](operations.md)
+- [Monitoring With Prometheus and Grafana](monitoring.md)
+- [Release Notes](release-notes.md)
+- [License and Notices](license.md)
 - [Acknowledgements](acknowledgements/README.md)
 
 ## Safety, License, and Notices
@@ -152,7 +152,7 @@ Generator guardrails are enabled by default. Disabling them can remove
 content-policy and face-privacy protections; refer to
 [Guardrails](operations.md#guardrails).
 
-Refer to [License and notices](license.md) for the terms. This cookbook is licensed
+Refer to [License and Notices](license.md) for the terms. This cookbook is licensed
 under the repository [LICENSE](../../../LICENSE). The running NIM serves its
 license at `/v1/license`; the image also contains product terms, notices,
 component licenses, and the package-modification source described in

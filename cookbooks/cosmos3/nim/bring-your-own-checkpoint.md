@@ -39,8 +39,8 @@ Generator contract is the BF16 `edge-droid` policy.
 
 ### Launch
 
-Add these options to the standard
-[Generator launch](deployment.md#launch-generator), with `BYOC_CHECKPOINT` set
+Add these options to the command in
+[Launch Generator](deployment.md#launch-generator), with `BYOC_CHECKPOINT` set
 to the host checkpoint directory:
 
 ```text
@@ -49,8 +49,8 @@ to the host checkpoint directory:
 ```
 
 Choose a variant, precision, and objective that match the checkpoint. The NIM
-still downloads Generator guardrail artifacts, so the cache must be writable
-(NGC access can be required) and `NIM_DISABLE_MODEL_DOWNLOAD=1` is rejected.
+still downloads Generator guardrail artifacts, so the cache must be writable,
+the NIM can still need NGC access, and `NIM_DISABLE_MODEL_DOWNLOAD=1` is rejected.
 
 ### Hugging Face Source
 

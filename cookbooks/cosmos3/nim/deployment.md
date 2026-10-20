@@ -5,7 +5,7 @@ SPDX-License-Identifier: OpenMDW-1.1 -->
 
 Use this page to authenticate to NGC, choose a model, launch Generator or
 Reasoner, and verify the selected service. The commands pin the current 2.1.0
-release image. Use the [Support matrix](support-matrix.md) to choose a
+release image. Use the [Support Matrix](support-matrix.md) to choose a
 compatible configuration.
 
 ## How Selection Works
@@ -71,7 +71,7 @@ and Nano-DROID are BF16 only.
 ## Before You Deploy
 
 Verify the host against [Prerequisites](prerequisites.md) and choose a
-compatible configuration from the [Support matrix](support-matrix.md). For a
+compatible configuration from the [Support Matrix](support-matrix.md). For a
 Kubernetes deployment, follow [Deploy with Helm](helm.md).
 
 ## Authenticate to NGC
@@ -130,7 +130,7 @@ export NIM_GPU_MEMORY_UTILIZATION=0.60
 
 If you set a value, pass `-e NIM_GPU_MEMORY_UTILIZATION` in every Reasoner
 preflight and launch command on that system. Do not set it for Generator. Refer to
-[Reasoner context and scheduling](configuration.md#context-and-scheduling).
+[Reasoner Context and Scheduling](configuration.md#context-and-scheduling).
 
 ## Run the Pre-Download Profile Preflight
 
@@ -226,7 +226,7 @@ without stopping the container.
 
 On a discrete-GPU host, a non-offloading Nano profile needs at least 40 GiB of
 system memory for BF16 or 35 GiB for FP8; selection enforces these
-[floors](support-matrix.md#generator-configurations).
+[floors](support-matrix.md#generator-profiles).
 
 Change the model and objective as needed, expose every GPU a multi-GPU
 configuration requires, and add `-e NIM_PRECISION=fp8` only to pin precision.
@@ -267,7 +267,7 @@ docker run -d --name cosmos3-reasoner \
 This example launches Super FP8 Reasoner, which needs compute capability 8.9+,
 67 GiB of VRAM usable after the 4-GiB Reasoner reserve, and 43 GiB of system
 memory (refer to
-[Reasoner Configurations](support-matrix.md#reasoner-configurations)):
+[Reasoner Profiles](support-matrix.md#reasoner-profiles)):
 
 ```bash
 docker run -d --name cosmos3-reasoner \
@@ -292,10 +292,10 @@ the GPUs it needs.
 To run both runtimes concurrently, publish one on another host port and set
 that client's `NIM_URL` accordingly.
 
-## Edge Experiments
+## Deploy Edge Models
 
 Use an image whose manifest includes the Edge profiles. For Edge Reasoner, add
-these selectors to the [Reasoner launch](#launch-reasoner), with `fp8` or
+these selectors to the command in [Launch Reasoner](#launch-reasoner), with `fp8` or
 `bf16`:
 
 ```text
@@ -311,7 +311,7 @@ For streaming, also set `NIM_ENABLE_STREAMING=true` and
 
 For Edge-DROID, which is
 [experimental](support-matrix.md#choose-a-model), add these selectors to the
-[Generator launch](#launch-generator):
+command in [Launch Generator](#launch-generator):
 
 ```text
 -e NIM_MODEL_TYPE=generator \
@@ -412,14 +412,14 @@ refer to [Configuration](configuration.md#advanced-profile-controls).
 | `-v ...:/opt/nim/.cache` | Persist model artifacts |
 
 GPU counts, VRAM floors, and host RAM are in the
-[support matrix](support-matrix.md).
+[Support Matrix](support-matrix.md).
 
 ## Next Steps
 
 - [Configuration](configuration.md) lists user-facing and advanced variables.
-- [Bring your own checkpoint](bring-your-own-checkpoint.md) covers local and
+- [Bring Your Own Checkpoint](bring-your-own-checkpoint.md) covers local and
   Hugging Face model sources.
-- [API reference](api-reference.md) routes requests to the right task guide.
+- [API Reference](api-reference.md) routes requests to the right task guide.
 - [Operations](operations.md) covers health, logs, metrics, and failures.
 
 Remove the example containers when finished:

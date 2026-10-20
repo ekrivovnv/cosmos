@@ -17,13 +17,13 @@ Image: `nvcr.io/nim/nvidia/cosmos3:2.1.0`.
 - **Streaming video sessions** for the Reasoner over WebSocket and REST
   (`NIM_ENABLE_STREAMING=true`); refer to [Streaming](streaming.md).
 - **Dynamo deployment** for the Reasoner, including REST streaming; refer to
-  [Dynamo deployment](dynamo/dynamo_deployment.md).
+  [Dynamo Deployment](dynamo/dynamo_deployment.md).
 - **Reasoner optimization presets** (`NIM_OPTIMIZATION_PRESET=TTFT` or `TPOT`),
   experimental; refer to [Configuration](configuration.md#optimization-presets).
 - **Generator Hugging Face BYOC**: `NIM_MODEL_PATH` accepts
   `hf://owner/repository[:revision]` for both runtimes.
 - **Transfer control weights**: each control object accepts a relative
-  `control_weight`; refer to [Transfer](transfer.md#advanced-multiple-controls).
+  `control_weight`; refer to [Transfer](transfer.md#combine-multiple-controls).
 - **AVI video input** for both runtimes.
 
 ### Behavior Changes
@@ -39,10 +39,11 @@ Image: `nvcr.io/nim/nvidia/cosmos3:2.1.0`.
   capability 8.0 through 9.x without sequence parallelism, and the
   channels-last VAE decode path is the default. If you notice a quality issue
   in a specific workload, try `NIM_CACHE_BACKEND=none` or
-  `NIM_VAE_FAST_PATH=lossless`; refer to [Configuration](configuration.md#diffusion-cache-attention-and-vae-decode).
+  `NIM_VAE_FAST_PATH=lossless`; refer to
+  [Configuration](configuration.md#diffusion-cache-attention-and-vae-decode).
 - **System-memory floors are enforced**: each profile carries its measured
   system-memory floor instead of a 16-GiB admission tag, and FP8 offload floors
-  are lower; refer to the [Support matrix](support-matrix.md#generator-configurations).
+  are lower; refer to the [Support Matrix](support-matrix.md#generator-profiles).
 - **Unified memory**: on DGX Spark and Jetson AGX Thor, 70% of the shared pool
   counts toward profile floors, and the Reasoner defaults to
   `NIM_GPU_MEMORY_UTILIZATION=0.70`. Super Generator profiles no longer fit

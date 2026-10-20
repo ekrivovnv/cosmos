@@ -14,7 +14,8 @@ disconnecting releases its resources. REST provides the same session behavior
 for clients that cannot maintain a WebSocket connection.
 
 [Deploy the Cosmos3 NIM Reasoner](deployment.md) with `NIM_ENABLE_STREAMING=true` using
-an image with streaming support. Refer to [Streaming video session settings](configuration.md#streaming-video-sessions)
+an image with streaming support. Refer to [Streaming Video
+Sessions](configuration.md#streaming-video-sessions)
 for enablement, capacity, and idle timeouts.
 
 For a shared Dynamo frontend, use the [Dynamo streaming deployment](dynamo/dynamo_with_streaming.md)
@@ -29,7 +30,7 @@ Nano and Super streaming default to DFlash speculation when DFlash is enabled;
 set `NIM_STREAMING_SPEC_METHOD=ngram` for GPU n-gram speculation or `none` to
 disable it. Edge works with the same clients, which discover its model ID;
 launch it with `NIM_USE_DFLASH=0` and `NIM_STREAMING_SPEC_METHOD=none`, in
-standalone ([Edge Experiments](deployment.md#edge-experiments)) or
+standalone ([Deploy Edge Models](deployment.md#deploy-edge-models)) or
 [Dynamo](dynamo/dynamo_with_streaming.md#use-edge-reasoner) mode. Refer to
 [Advanced Streaming Controls](configuration.md#advanced-streaming-controls).
 
@@ -157,7 +158,7 @@ the server's policy. Admission also requires `max_session_tokens + max_tokens`
 to remain below the engine context limit, and `max_session_tokens` to remain
 below the re-prefill position threshold.
 
-## REST Example: Create, Send Frames, Close
+## Run a REST Session
 
 Prepare two local image files, `frame1.jpg` and `frame2.jpg`, from your feed.
 Run this Bash example with `NIM_URL` set as above. It uses cURL and Python's
@@ -377,5 +378,5 @@ check startup logs, readiness, runtime, and image selection.
 Close WebSocket connections or explicitly delete REST sessions when finished.
 [Idle timeouts](configuration.md#streaming-video-sessions) are a cleanup
 backstop. Expired or disconnected sessions cannot be resumed: create a new
-one. Do not resubmit a timed-out frame while its original request can still
-be running.
+one. Do not resubmit a timed-out frame while its original request is still
+running.

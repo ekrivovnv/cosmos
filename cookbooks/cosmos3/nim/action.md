@@ -8,7 +8,7 @@ Send forward dynamics, policy, and inverse dynamics requests to a compatible
 task.
 
 > Confirm model and domain availability for the selected image in the
-> [Support matrix](support-matrix.md).
+> [Support Matrix](support-matrix.md).
 
 Start the NIM with [Deployment](deployment.md). General Action models return
 visual rollouts for all three modes; the Edge-DROID and Nano-DROID specialists
@@ -64,7 +64,7 @@ forbidden `resolution`.
 
 ## Run the Examples
 
-Install the [Client Tooling](prerequisites.md#client-tooling), then enter the
+Install the [client tooling](prerequisites.md#client-tooling), then enter the
 cookbook directory:
 
 ```bash
@@ -287,7 +287,7 @@ object:
 `data` is shortened here; real responses have every row in `shape`. Before
 use, check that `shape` matches `data`, that rows, width, `raw_action_dim`,
 `action_mode`, and `domain_id` match the request, and that values are finite.
-[Edge-/Nano-DROID policy](#edge-droid-and-nano-droid-policy) returns the same
+[Edge-/Nano-DROID Policy](#edge-droid-and-nano-droid-policy) returns the same
 object without media.
 
 ## Action Parameter Reference

@@ -8,7 +8,7 @@ example uses a pinned Dynamo frontend image and a Cosmos3 NIM worker image,
 launching `python3 -m dynamo.frontend` for
 Chat Completions, with round-robin routing and session affinity. It starts
 two Nano FP8 workers, each on one GPU, with persistent video sessions disabled.
-For those sessions, use [Dynamo with streaming](dynamo_with_streaming.md).
+For those sessions, use [Dynamo With Streaming](dynamo_with_streaming.md).
 
 For required worker environment variables, discovery, and proxy settings,
 refer to [Dynamo Configuration](../configuration.md#dynamo-configuration), including
@@ -45,7 +45,7 @@ every cookbook client against that deployment. Validate those paths separately.
   frontend requests another 4 CPUs and 8 GiB (limits: 8 CPUs and 16 GiB).
   These are deployment resource settings, not profile memory floors; verify
   each GPU and effective host/container RAM against the
-  [support matrix](../support-matrix.md). Do not add memory across GPUs.
+  [Support Matrix](../support-matrix.md). Do not add memory across GPUs.
 - A ReadWriteMany (RWX) storage class and a 200 GiB model cache writable by
   the image's user with group 1000. All workers and the download Job must be
   able to mount it; workers must be able to download model artifacts if needed.

@@ -5,7 +5,7 @@ SPDX-License-Identifier: OpenMDW-1.1 -->
 
 Prepare and verify a host before pulling or launching the Cosmos3 NIM;
 per-configuration GPU, VRAM, and host RAM requirements are in the
-[support matrix](support-matrix.md).
+[Support Matrix](support-matrix.md).
 
 ## Hardware Requirements
 
@@ -13,16 +13,16 @@ per-configuration GPU, VRAM, and host RAM requirements are in the
 | --- | --- |
 | CPU architecture | The release image provides `amd64` and `arm64` variants; use the variant selected by the container runtime |
 | GPU compute capability | Generator: BF16 `>=8.0`, FP8 `>=8.9`; Reasoner: BF16 `>=8.0`, FP8 `>=8.9`, NVFP4 `>=10.0` |
-| GPU count and per-device VRAM | Refer to the [Generator](support-matrix.md#generator-configurations) and [Reasoner](support-matrix.md#reasoner-configurations) tables |
-| Host RAM | System-memory floor per configuration, enforced by profile selection, in the [Generator](support-matrix.md#generator-configurations) and [Reasoner](support-matrix.md#reasoner-configurations) tables; treat it as a minimum for the workload |
+| GPU count and per-device VRAM | Refer to the [Generator](support-matrix.md#generator-profiles) and [Reasoner](support-matrix.md#reasoner-profiles) tables |
+| Host RAM | System-memory floor per configuration, enforced by profile selection, in the [Generator](support-matrix.md#generator-profiles) and [Reasoner](support-matrix.md#reasoner-profiles) tables; treat it as a minimum for the workload |
 | Free disk | Provision for the image, selected model artifacts, materialization, and outputs; no single workload-independent floor is documented |
 | Container shared memory | The Docker reference launch allocates 16 GiB; validate the requirement for the selected media workload and concurrency |
 
 Do not add together memory from multiple GPUs to satisfy a per-device floor.
 If the deployment must serve Transfer, provision each GPU against the
-**Transfer minimum VRAM/device** column in the
-[Generator Configurations](support-matrix.md#generator-configurations), not the
-**Generation minimum VRAM/device** value.
+**Transfer Minimum VRAM/Device** column in the
+[Generator Profiles](support-matrix.md#generator-profiles), not the
+**Generation Minimum VRAM/Device** value.
 
 Use homogeneous GPUs; Reasoner requires the same compute capability on every
 GPU. Each GPU must also have enough free memory at startup, so stop unrelated
@@ -30,7 +30,7 @@ GPU workloads before launch.
 
 Lower-VRAM offload profiles keep model weights in system memory and carry
 their own system-memory floors; refer to the
-[Generator Configurations](support-matrix.md#generator-configurations). A
+[Generator Profiles](support-matrix.md#generator-profiles). A
 container memory limit counts before host physical memory.
 
 ### Inspect Unified-Memory Capacity and Current State
@@ -197,7 +197,7 @@ docker run --rm --runtime=nvidia --gpus all ubuntu nvidia-smi
 ```
 
 The GPU query reports memory in MiB; divide by 1024 to compare with the
-binary-GiB floors in the [support matrix](support-matrix.md). The Docker check
+binary-GiB floors in the [Support Matrix](support-matrix.md). The Docker check
 verifies GPU container access, not Cosmos3 profile compatibility.
 
 For installation and verification failures, refer to

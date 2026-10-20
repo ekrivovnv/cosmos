@@ -45,7 +45,7 @@ After startup, follow
 - Unified-memory systems (DGX Spark, Jetson AGX Thor): default to Nano for both
   runtimes. Some Super Reasoner rows fit, but turnaround is impractical.
 - Smallest GPUs: Edge Reasoner and Edge-DROID have the lowest floors; refer to
-  [Edge Verified GPUs](#edge-verified-gpus).
+  [Edge Reasoner Verified GPUs](#edge-reasoner-verified-gpus).
 
 ## GPU Architecture and Topology
 
@@ -162,7 +162,7 @@ both systems' total capacity, so freeing cache cannot make it fit.
 Nominal memory only orders this inventory. For GH200 480 GB, 480 GB is CPU
 memory; the table shows HBM GPU memory.
 
-## Generator Configurations
+## Generator Profiles
 
 The `super` rows in this table also apply to `super-t2i`,
 `super-t2i-4step`, `super-i2v`, and `super-i2v-4step`. Transfer thresholds apply
@@ -204,7 +204,7 @@ GeForce RTX 5090, which does not meet their 35-GiB Transfer minimum.
 Leave offload and guardrail residency on automatic selection unless a
 configuration is validated for the deployment.
 
-## Reasoner Configurations
+## Reasoner Profiles
 
 Reasoner does not use Generator latency/throughput or model-offload selectors:
 
@@ -221,11 +221,11 @@ Reasoner does not use Generator latency/throughput or model-offload selectors:
 | `super` | NVFP4 | 1 | 1 | 73 GiB | 33 GiB | 10.0 |
 
 System memory follows the note under
-[Generator Configurations](#generator-configurations). Selection prefers Super
+[Generator Profiles](#generator-profiles). Selection prefers Super
 BF16 TP1 and can fall back to TP2 when TP1 lacks free memory; to require TP2,
 set `NIM_TAGS_SELECTOR='n_gpus=2,nim_tp=2'`.
 
-## Edge Verified GPUs
+## Edge Reasoner Verified GPUs
 
 Edge Reasoner was verified on these GPUs. Edge-DROID policy was not validated;
 it is [experimental](#choose-a-model). Each deployment must still meet the
@@ -258,5 +258,5 @@ bypasses the check for diagnosis only and can cause out-of-memory failures.
 | Output | Generator video | VP9 in MP4 |
 
 Inputs are base64 or data URLs; HTTP(S) input works only when enabled and
-reachable from the container. Refer to [API reference](api-reference.md) for the
+reachable from the container. Refer to [API Reference](api-reference.md) for the
 media rules.

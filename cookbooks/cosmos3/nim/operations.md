@@ -9,7 +9,7 @@ and [Configuration](configuration.md) for environment variables.
 
 ## Health and Startup
 
-| Probe | Healthy Meaning | It Does Not Prove |
+| Probe | Healthy Meaning | Not Verified |
 | --- | --- | --- |
 | `/v1/health/live` | HTTP process is alive | Model artifacts are loaded or inference can run |
 | `/v1/health/ready` | Selected backend reports ready after startup work | Every capability/media case has passed a smoke test |
@@ -202,14 +202,14 @@ Task-specific validation belongs to [Generation](generation.md),
 ### Startup and Deployment
 
 For Kubernetes Pod, volume, and probe failures, refer to [Helm
-troubleshooting](helm.md#troubleshooting).
+Troubleshooting](helm.md#troubleshooting).
 
 | Symptom | Likely Cause | Action |
 | --- | --- | --- |
 | Image pull unauthorized | Docker is not logged in or key lacks repository access | Review the complete [NGC authentication and credential-storage workflow](deployment.md#authenticate-to-ngc), then log in with `NGC_API_KEY` and literal `$oauthtoken` |
 | Artifact download fails | Container lacks `NGC_API_KEY`, entitlement, DNS/network, or storage | Verify key injection and NGC connectivity; inspect cache capacity/ownership |
 | Cache permission denied | Host mount is not writable by the container | Fix ownership/ACLs and retain a persistent writable `/opt/nim/.cache` |
-| No compatible profile | Compute capability, requested precision, total or free per-device VRAM, or system memory (container cgroup or host RAM below the profile's [system-memory floor](support-matrix.md#generator-configurations)) does not fit the selected model/precision/offload; on integrated GPUs, only 70% of the shared pool counts and offload profiles are not eligible; or the NVML/utility-capability availability probe failed | Run the [pre-download profile preflight](deployment.md#run-the-pre-download-profile-preflight), free unrelated GPU memory, raise the container memory limit, remove unnecessary pins, choose a smaller model or compatible precision, or use supported hardware; if the probe failed, verify the driver, Container Toolkit, GPU visibility, and utility capability |
+| No compatible profile | Compute capability, requested precision, total or free per-device VRAM, or system memory (container cgroup or host RAM below the profile's [system-memory floor](support-matrix.md#generator-profiles)) does not fit the selected model/precision/offload; on integrated GPUs, only 70% of the shared pool counts and offload profiles are not eligible; or the NVML/utility-capability availability probe failed | Run the [pre-download profile preflight](deployment.md#run-the-pre-download-profile-preflight), free unrelated GPU memory, raise the container memory limit, remove unnecessary pins, choose a smaller model or compatible precision, or use supported hardware; if the probe failed, verify the driver, Container Toolkit, GPU visibility, and utility capability |
 | Preflight passes but cold start fails | Host RAM is too low for the workload, or artifact download/materialization or runtime initialization failed | Preserve the failed container, inspect its logs, and compare host RAM with the support-matrix floors |
 | Conflicting selectors | A shorthand disagrees with `NIM_TAGS_SELECTOR` | Set each selector in one place and inspect the full launch environment |
 | Visible GPUs sit idle | Selected profile uses fewer GPUs than Docker exposed | Restrict `--gpus` or intentionally pin an available layout matching the desired count |
@@ -221,9 +221,9 @@ troubleshooting](helm.md#troubleshooting).
 
 ### Generator and Media
 
-For Action and Transfer request failures, refer to [Action common
-failures](action.md#common-failures) and [Transfer validation and common
-failures](transfer.md#validation-and-common-failures).
+For Action and Transfer request failures, refer to [Action Common
+Failures](action.md#common-failures) and [Transfer Validation and Common
+Failures](transfer.md#validation-and-common-failures).
 
 | Symptom | Likely Cause | Action |
 | --- | --- | --- |
@@ -252,7 +252,7 @@ For DFlash and checkpoint-source failures, refer to [BYOC](#byoc).
 
 ### BYOC
 
-Refer to [Bring your own checkpoint common
-failures](bring-your-own-checkpoint.md#common-failures). A long first start
+Refer to [Bring Your Own Checkpoint Common
+Failures](bring-your-own-checkpoint.md#common-failures). A long first start
 with a new engine or remote checkpoint is expected; keep a writable persistent
 cache and wait for readiness.

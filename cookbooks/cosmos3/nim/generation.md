@@ -7,7 +7,7 @@ Send text-to-image (T2I), text-to-video (T2V), image-to-video (I2V), and
 video-to-video (V2V) requests to a running **Generator** with synchronous JSON
 `POST /v1/infer`. Launch it with [Deployment](deployment.md); the shared
 request envelope is in the
-[API reference](api-reference.md#common-generator-request-fields).
+[API Reference](api-reference.md#common-generator-request-fields).
 
 ## Prerequisites
 
@@ -22,7 +22,7 @@ Requests are synchronous and can stay quiet until done; the examples allow 30
 minutes, so do not retry a quiet connection (refer to
 [Long-Running Requests](operations.md#long-running-requests)).
 
-Install the [Client Tooling](prerequisites.md#client-tooling), then run the
+Install the [client tooling](prerequisites.md#client-tooling), then run the
 examples from the cookbook directory. They use the included prompts and media
 and write output under `examples/outputs/`:
 
@@ -225,7 +225,7 @@ size. Refer to [Media Inputs](api-reference.md#media-inputs) for codecs.
 Super also ships task-specific variants. Each accepts only its task; select it
 before launch (`NIM_MODEL_VARIANT=super` is the general-purpose contract).
 Edge has no general-purpose, T2I, or I2V Generator; its only Generator variant
-is [Edge-DROID policy](action.md#edge-droid-and-nano-droid-policy).
+is [Edge-DROID Policy](action.md#edge-droid-and-nano-droid-policy).
 
 | Variant | Accepted Request | Sampling Behavior | Script |
 | --- | --- | --- | --- |
@@ -275,7 +275,7 @@ costs more latency.
 ## Media Inputs
 
 Data-URL and URL rules, size caps, and accepted codecs are in the
-[API reference](api-reference.md#media-inputs).
+[API Reference](api-reference.md#media-inputs).
 
 ## Reproducibility
 
@@ -315,7 +315,7 @@ ffmpeg -i examples/outputs/t2v_robot_kitchen.mp4 -c:v libx264 -crf 18 \
 
 | Symptom | Likely Cause | Action |
 | --- | --- | --- |
-| HTTP 422, field or mode | Unknown field, missing `model_mode`, or fields that conflict with the mode | Set the explicit mode and send only its fields ([API reference](api-reference.md)) |
+| HTTP 422, field or mode | Unknown field, missing `model_mode`, or fields that conflict with the mode | Set the explicit mode and send only its fields ([API Reference](api-reference.md)) |
 | HTTP 422, frame count | `num_frames` is not an integer, is fewer than 25 for video, or exceeds its tier ceiling | Pick an integer within the resolution-tier range |
 | HTTP 422, reference mismatch | `input_reference` is missing, forbidden, or does not match `model_mode` | Omit it for text modes; provide the required image/video for conditioned modes |
 | URL media fails | URL inputs are disabled, unreachable from the container, or rejected by the decoder | Use a data URL and verify `NIM_ALLOW_URL_INPUT` |
