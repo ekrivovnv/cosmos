@@ -34,7 +34,7 @@ The current Generator path expects this structural shape:
 
 The NIM infers Edge, Nano, or Super and the precision from
 `transformer/config.json` and checks them against the selected profile. Set
-`NIM_MODEL_VARIANT` to select a specialist Generator contract; the only Edge
+`NIM_MODEL_VARIANT` to select a specialist Generator contract. The only Edge
 Generator contract is the BF16 `edge-droid` policy.
 
 ### Launch
@@ -65,7 +65,7 @@ inferred variant and precision must match the selected profile:
 -e NIM_PRECISION=fp8
 ```
 
-Omit `:revision` to use `main`; pin a commit for reproducible deployments. Pass
+Omit `:revision` to use `main`. Pin a commit for reproducible deployments. Pass
 `HF_TOKEN` only for a private repository. Keep `NGC_API_KEY` and a writable
 cache for the guardrail artifacts.
 
@@ -73,19 +73,19 @@ cache for the guardrail artifacts.
 
 ### Local Directory
 
-A local Reasoner checkpoint must use an absolute in-container path and contain,
-at minimum:
+A local Reasoner checkpoint must use an absolute in-container path and contain
+at least the following:
 
-- a supported Cosmos3 Reasoner or Cosmos3 Omni `config.json`;
-- safetensors weights or a valid safetensors index and all referenced shards;
-- tokenizer files; and
-- processor or preprocessor configuration.
+- A supported Cosmos3 Reasoner or Cosmos3 Omni `config.json`
+- Safetensors weights or a valid safetensors index and all referenced shards
+- Tokenizer files
+- Processor or preprocessor configuration
 
-The NIM infers `edge`, `nano`, or `super`, the precision (Edge: BF16/FP8;
-Nano/Super also NVFP4), and Reasoner or Omni layout, then selects a compatible
-profile. An explicit `NIM_MODEL_VARIANT`, `NIM_PRECISION`, or
-`NIM_MODEL_PROFILE` must agree with the checkpoint. Mount it read-only and
-select the Reasoner:
+The NIM infers `edge`, `nano`, or `super`, the precision, and the Reasoner or
+Omni layout, and then selects a compatible profile. The precision is BF16 or FP8
+for Edge, and Nano and Super can also use NVFP4. An explicit
+`NIM_MODEL_VARIANT`, `NIM_PRECISION`, or `NIM_MODEL_PROFILE` must agree with the
+checkpoint. Mount it read-only and select the Reasoner:
 
 ```bash
 -e NIM_MODEL_TYPE=reasoner \
@@ -98,7 +98,7 @@ artifact downloads. With `NIM_MODEL_PATH`, the NIM does not download the
 profile's DFlash draft, which Nano and Super Reasoner enable by default. Mount a
 matching Nano or Super draft through
 `NIM_DFLASH_MODEL_PATH` (absolute local path, no `hf://`), or set
-`NIM_USE_DFLASH=0` to run target-only. Edge has no DFlash; it defaults to
+`NIM_USE_DFLASH=0` to run target-only. Edge has no DFlash. It defaults to
 `NIM_USE_DFLASH=0` and rejects `1`. The draft needs only:
 
 ```text
@@ -134,9 +134,9 @@ Omit `:revision` to use `main`. Pass `HF_TOKEN` only when the repository
 requires it, never in the URI or image. The snapshot is stored in the writable
 NIM cache.
 
-`hf://` cannot be combined with `NIM_DISABLE_MODEL_DOWNLOAD=1`; for offline
-use, pre-download the checkpoint and use an absolute local path. The DFlash
-draft rule above still applies.
+An `hf://` source cannot be combined with `NIM_DISABLE_MODEL_DOWNLOAD=1`. For
+offline use, pre-download the checkpoint and use an absolute local path. The
+DFlash draft rule above still applies.
 
 ## Verify the Active Checkpoint
 
@@ -147,7 +147,7 @@ curl -fsS http://localhost:8000/v1/metadata | python3 -m json.tool
 ```
 
 The `checkpoint` field reports `default` for bundled artifacts or identifies the
-configured source; Generator metadata also reports `model_variant`. Confirm the
+configured source. Generator metadata also reports `model_variant`. Confirm the
 selected profile, then compare a representative request with the checkpoint's
 validation baseline.
 
