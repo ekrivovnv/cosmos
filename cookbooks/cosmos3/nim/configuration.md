@@ -208,9 +208,7 @@ Change controls one at a time and measure the effect.
 On profiles with tensor parallelism above 1, both presets also set
 `NIM_MM_ENCODER_TP_MODE=data`, which replicates the vision encoder and splits
 media across TP ranks. An explicitly set variable wins over the preset; on
-Edge, set `NIM_USE_DFLASH=0` with `TPOT`. The presets are not
-performance-qualified; measure latency, throughput, and memory on the exact
-image before adopting one.
+Edge, set `NIM_USE_DFLASH=0` with `TPOT`.
 
 ### Speculative decoding
 
