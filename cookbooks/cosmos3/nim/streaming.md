@@ -18,7 +18,7 @@ an image with streaming support. Refer to [Streaming Video
 Sessions](configuration.md#streaming-video-sessions)
 for enablement, capacity, and idle timeouts.
 
-For a shared Dynamo frontend, use the [Dynamo streaming deployment](dynamo/dynamo_with_streaming.md)
+For a shared NVIDIA Dynamo frontend, use the [Dynamo streaming deployment](dynamo/dynamo_with_streaming.md)
 and the client's `--backend dynamo --transport rest` mode. Dynamo supports REST
 sessions and config GET. WebSocket is unsupported. In this mode, the client
 checks only the shared frontend's `/health`, `/v1/models`, and

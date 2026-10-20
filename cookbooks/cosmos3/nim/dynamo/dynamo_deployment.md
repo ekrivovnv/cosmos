@@ -3,7 +3,7 @@ SPDX-License-Identifier: OpenMDW-1.1 -->
 
 # Deploy Cosmos3 Reasoner With Dynamo
 
-Run a Dynamo frontend with Cosmos3 Reasoner workers on Kubernetes. This
+Run an NVIDIA Dynamo frontend with Cosmos3 Reasoner workers on Kubernetes. This
 example uses a pinned Dynamo frontend image and a Cosmos3 NIM worker image.
 It launches `python3 -m dynamo.frontend` for Chat Completions, with
 round-robin routing and session affinity. It starts
@@ -261,7 +261,7 @@ Check `/v1/models` on the interface receiving inference. A worker's NIM
 readiness check can succeed while its private frontend's model list is empty.
 In that case, check that `DYN_NAMESPACE_PREFIX` resolves to the deployment's
 namespace prefix in the worker container. A Responses
-`Model not found` error does not mean the Responses route is absent. Successful
+"Model not found" error does not mean the Responses route is absent. Successful
 requests through the shared frontend do not validate the worker proxy's routes.
 
 ## Scale or Stop

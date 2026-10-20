@@ -15,7 +15,7 @@ Choose a deployment:
 | [Dynamo With Streaming](dynamo_with_streaming.md) | [reasoner_with_streaming.yaml](reasoner_with_streaming.yaml) | Same NIM image for frontend and workers; frontend runs `streaming.dynamo.frontend` for Chat Completions plus REST video sessions. |
 
 Both use [model-cache.yaml](model-cache.yaml), the
-[model-download Job](model-download.yaml), and a Dynamo operator serving the
+[model-download Job](model-download.yaml), and an NVIDIA Dynamo operator serving the
 `nvidia.com/v1alpha1` `spec.services` schema. Both use the same NIM image for
 the download Job and workers. The regular frontend uses the pinned Dynamo
 image. The streaming frontend uses the NIM image. The regular manifest follows

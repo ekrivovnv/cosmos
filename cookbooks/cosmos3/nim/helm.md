@@ -7,7 +7,7 @@ Use this page to deploy the Cosmos3 NIM on Kubernetes with the shared
 `nim-wfm` Helm chart. Model selection, hardware floors, and verification are
 the same as in [Deployment](deployment.md).
 
-For the experimental Reasoner Dynamo stack, refer to the
+For the experimental NVIDIA Dynamo stack for the Reasoner, refer to the
 [Dynamo deployment guides](dynamo/README.md). They provide separate plain YAML
 for regular Dynamo and Dynamo with streaming, and require the Dynamo operator.
 
@@ -145,7 +145,7 @@ env:
     value: nano
 ```
 
-On DGX Spark/GB10 or Jetson AGX Thor nodes, the NIM defaults
+On NVIDIA DGX Spark/GB10 or Jetson AGX Thor nodes, the NIM defaults
 `NIM_GPU_MEMORY_UTILIZATION` to `0.70`. Set a lower value only from host
 measurements. Refer to
 [Set the Reasoner Memory Share](deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems).
@@ -292,7 +292,7 @@ page (1.3.0). For the authoritative list, run
 | `extraVolumeMounts` | Adds volume mounts to the main container from `extraVolumes`. | `{}` |
 | `sharedMemory.enabled` | Mounts a RAM-backed `emptyDir` at `/dev/shm`. | `true` |
 | `sharedMemory.sizeLimit` | Optional Kubernetes quantity limiting the shared-memory volume. | `""` |
-| `image.repository` | Specifies the NIM-WFM image to deploy. | `nvcr.io/nvidia/nemo-microservices/nemoretriever-parse` |
+| `image.repository` | Specifies the NIM-WFM image to deploy. The chart default is another NIM; set `nvcr.io/nim/nvidia/cosmos3` as in [Configure Values](#configure-values). | `nvcr.io/nvidia/nemo-microservices/nemoretriever-parse` |
 | `image.tag` | Specifies the image tag or version. | `""` |
 | `image.pullPolicy` | Sets the image pull policy. | `IfNotPresent` |
 | `imagePullSecrets` | Specifies a list of secret names that are needed for the main container and any init containers. | `[{name: ngc-secret}]` |

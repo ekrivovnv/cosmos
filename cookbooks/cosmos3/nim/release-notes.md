@@ -17,7 +17,7 @@ Image: `nvcr.io/nim/nvidia/cosmos3:2.1.0`.
   validated.
 - **Streaming video sessions** for the Reasoner over WebSocket and REST
   (`NIM_ENABLE_STREAMING=true`). Refer to [Streaming](streaming.md).
-- **Dynamo deployment** for the Reasoner, including REST streaming. Refer to
+- **NVIDIA Dynamo deployment** for the Reasoner, including REST streaming. Refer to
   [Dynamo Deployment](dynamo/dynamo_deployment.md).
 - **Reasoner optimization presets** (`NIM_OPTIMIZATION_PRESET=TTFT` or `TPOT`),
   which are experimental. Refer to
@@ -46,7 +46,7 @@ Image: `nvcr.io/nim/nvidia/cosmos3:2.1.0`.
 - **System-memory floors are enforced**: each profile carries its measured
   system-memory floor instead of a 16-GiB admission tag, and FP8 offload floors
   are lower. Refer to the [Support Matrix](support-matrix.md#generator-profiles).
-- **Unified memory**: on DGX Spark and Jetson AGX Thor, 70% of the shared pool
+- **Unified memory**: on NVIDIA DGX Spark and Jetson AGX Thor, 70% of the shared pool
   counts toward profile floors, and the Reasoner defaults to
   `NIM_GPU_MEMORY_UTILIZATION=0.70`. Super Generator profiles no longer fit
   these systems.

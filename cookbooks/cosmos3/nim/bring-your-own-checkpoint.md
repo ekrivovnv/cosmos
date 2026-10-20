@@ -50,7 +50,7 @@ to the host checkpoint directory:
 
 Choose a variant, precision, and objective that match the checkpoint. The NIM
 still downloads Generator guardrail artifacts, so the cache must be writable,
-the NIM can still need NGC access, and `NIM_DISABLE_MODEL_DOWNLOAD=1` is rejected.
+the NIM can still need NVIDIA NGC access, and `NIM_DISABLE_MODEL_DOWNLOAD=1` is rejected.
 
 ### Hugging Face Source
 
@@ -117,7 +117,7 @@ Add these options to the Reasoner `docker run` command, with
 ```
 
 To train your own matching Cosmos3-Nano DFlash draft on a custom dataset, or
-after fine-tuning the Nano Reasoner target, follow the [Model Optimizer DFlash
+after fine-tuning the Nano Reasoner target, follow the [NVIDIA Model Optimizer DFlash
 training recipe](https://github.com/NVIDIA/Model-Optimizer/blob/main/examples/speculative_decoding/recipes/train_dflash_cosmos3_nano.ipynb).
 
 ### Hugging Face Source
@@ -156,10 +156,12 @@ validation baseline.
 | Symptom | Likely Cause | Action |
 | --- | --- | --- |
 | Local path does not exist | Host path was not mounted at the exact `NIM_MODEL_PATH` value | Align the read-only bind destination and environment path |
+| Permission denied | Container cannot traverse or read the mount | Fix host ownership or ACLs while keeping the checkpoint mount read-only |
 | Required file missing | Checkpoint layout, tokenizer, processor, index, or weight shards are incomplete | Compare with the required layout and export again |
 | Model variant or precision mismatch | Explicit selector/profile disagrees with inferred checkpoint properties | Select a compatible configuration or use a matching checkpoint |
 | Generator rejects disabled downloads | Generator still needs NIM-provided guardrails | Remove `NIM_DISABLE_MODEL_DOWNLOAD=1` and provide NGC/cache access |
 | Hugging Face source rejected offline | `hf://` requires download but downloads are disabled | Use an absolute pre-downloaded local path |
+| Hugging Face authorization fails | Token, repository ID, revision, network, or cache is invalid | Check `HF_TOKEN`, the URI, connectivity, and a writable cache without logging the token |
 | DFlash path is rejected | The draft path is relative, uses `hf://`, is not mounted, or lacks one of its two required files | Use an absolute local mount containing `config.json` and `model.safetensors` |
 | DFlash configuration is rejected | DFlash is disabled, DFlash is enabled on Edge (including through `NIM_OPTIMIZATION_PRESET=TPOT`), the draft does not match the Nano/Super target, or `NIM_DFLASH_CONFIG` sets reserved `method`/`model` keys | For Edge, leave `NIM_USE_DFLASH` unset or `0`; otherwise use the selected Reasoner's matching draft, keep DFlash enabled, and remove reserved keys; refer to [Speculative Decoding](configuration.md#speculative-decoding) |
 | Metadata shows `default` | Override was omitted, rejected, or applied to another container | Inspect launch environment, mounts, startup logs, and `/v1/metadata` |

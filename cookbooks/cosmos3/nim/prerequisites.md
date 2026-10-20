@@ -35,7 +35,7 @@ container memory limit counts before host physical memory.
 
 ### Inspect Unified-Memory Capacity and Current State
 
-DGX Spark/GB10 and Jetson AGX Thor share one physical memory pool between CPU
+NVIDIA DGX Spark/GB10 and Jetson AGX Thor share one physical memory pool between CPU
 and GPU. Summarize the host memory state with this read-only command:
 
 ```bash
@@ -156,7 +156,7 @@ after either file changes. `uv run python examples/...` reuses it.
 For a normal cold start, the host must reach:
 
 - The `nvcr.io` registry, to pull the container
-- The NGC model storage, to download and materialize profile artifacts
+- The NVIDIA NGC model storage, to download and materialize profile artifacts
 
 You also need an
 [NGC personal API key](https://docs.nvidia.com/ngc/latest/ngc-catalog-user-guide.html)

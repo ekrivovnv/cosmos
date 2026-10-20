@@ -194,7 +194,7 @@ resident-guardrail rows of their base model. Multi-GPU rows use every GPU. A
 parallelism `n_gpus / 2`. A `throughput` profile runs one engine replica per
 GPU, and there is no one-GPU `throughput` profile. To limit the GPU count, refer
 to
-[Advanced Profile Controls](configuration.md#advanced-profile-controls).
+[GPU Selection](configuration.md#gpu-selection).
 
 The 31-GiB Nano layer-offload rows target 32-GB client GPUs such as the
 GeForce RTX 5090, which does not meet their 35-GiB Transfer minimum.

@@ -104,7 +104,7 @@ them, the Generator uses as many visible GPUs as a compatible profile supports
 offload is available only on one GPU. To keep the Generator on fewer GPUs,
 expose fewer GPUs with `--gpus`.
 
-On an integrated GPU with unified host/device memory (DGX Spark/GB10, Jetson
+On an integrated GPU with unified host/device memory (NVIDIA DGX Spark/GB10, Jetson
 AGX Thor), the NIM treats 70% of the shared pool as GPU memory for profile
 floors and as the default Reasoner `NIM_GPU_MEMORY_UTILIZATION`.
 
