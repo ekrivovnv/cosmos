@@ -166,17 +166,18 @@ If you notice a quality issue in a specific workload, try
   unless the profile uses sequence parallelism; NVIDIA Blackwell GPUs and
   sequence-parallel profiles use automatic selection.
   `DIFFUSION_ATTENTION_BACKEND` overrides the default.
-- **VAE decode**: `NIM_VAE_FAST_PATH=channels_last` (default) is the fastest
-  path; `lossless` keeps the reference decoder output and `off` uses the
-  reference decoder. On a replica spanning several
-  GPUs, decode is sharded (`NIM_ENABLE_VAE_PARALLELISM`); disabling it can
-  raise per-GPU memory, and a larger `NIM_VAE_SPATIAL_TEMPORAL_CHUNK_SIZE`
-  raises peak memory and can change rounding.
+- **Variational autoencoder (VAE) decode**: `NIM_VAE_FAST_PATH=channels_last`
+  (default) is the fastest path; `lossless` keeps the reference decoder output
+  and `off` uses the reference decoder. On a replica spanning several GPUs,
+  decode is sharded (`NIM_ENABLE_VAE_PARALLELISM`); disabling it can raise
+  per-GPU memory, and a larger `NIM_VAE_SPATIAL_TEMPORAL_CHUNK_SIZE` raises peak
+  memory and can change rounding.
 
 ### Prompt Upsampling
 
-Prompt upsampling is optional and applies only to Generator T2I, T2V, and I2V.
-It sends the request to an operator-provided OpenAI-compatible endpoint.
+Prompt upsampling is optional and applies only to Generator text-to-image (T2I),
+text-to-video (T2V), and image-to-video (I2V) requests. It sends the request to
+an operator-provided OpenAI-compatible endpoint.
 
 | Name | Default | Use |
 | --- | --- | --- |
@@ -385,7 +386,7 @@ Leave these at their defaults unless you have measured a need.
 | `NIM_OFFLOAD_MODE` | Generator | Automatic | Request `none`, `model`, or `layer` when the model provides it |
 | `NIM_GPU_MEMORY_HEADROOM_GIB` | Reasoner | `4` | Free binary GiB reserved per discrete GPU for selection and sizing; lowering it raises OOM risk |
 | `NIM_MODEL_PROFILE` | Both | Empty | Pin an exact profile ID from the current image |
-| `NIM_VIDEO_SAVE_QUALITY` | Generator | `7` | VP9 output quality 1-9; affects encoding, not diffusion |
+| `NIM_VIDEO_SAVE_QUALITY` | Generator | `7` | VP9 output quality 1–9; affects encoding, not diffusion |
 | `NIM_ENABLE_TORCH_COMPILE` | Generator | `true` | Enable the compilation path |
 | `NIM_CACHE_BACKEND` | Generator | Edge-DROID: `none`; other variants: `sea_cache` | Diffusion cache: `sea_cache`, `cache_dit`, or `none`; refer to [Diffusion Cache, Attention, and VAE Decode](#diffusion-cache-attention-and-vae-decode) |
 | `NIM_CACHE_CONFIG` | Generator | Empty object | Override individual diffusion-cache settings as JSON; rejected when the backend is `none` |

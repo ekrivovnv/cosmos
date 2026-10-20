@@ -10,7 +10,7 @@ compatible configuration.
 
 ## How Selection Works
 
-Users normally select a runtime and model, not a profile ID:
+You normally select a runtime and model, not a profile ID:
 
 1. Choose Generator or Reasoner.
 2. Choose a model variant.
@@ -177,16 +177,16 @@ docker run --rm \
 ```
 
 Do not pass `NGC_API_KEY`, `NIM_MODEL_PATH`, or `NIM_DFLASH_MODEL_PATH` to this
-bundled-profile check. Checkpoint-source validation is a separate BYOC step,
-and an `hf://` source can download files.
+bundled-profile check. Checkpoint-source validation is a separate bring your own
+checkpoint (BYOC) step, and an `hf://` source can download files.
 
-Preflight success is necessary, not sufficient: it confirms that the image
-has a profile matching the selectors, compute capability, system-memory floor,
-and total and free VRAM (and logs Generator Transfer admission), but it does
-not load the model. Only a cold start and representative requests confirm host
-RAM, disk, shared memory, the driver stack, media, and inference. Preflight
-writes nothing outside its removed container. Resolve any reported failure
-before a cold download.
+Preflight success is necessary, not sufficient: it confirms that the image has a
+profile matching the selectors, compute capability, system-memory floor, and
+total and free video memory (VRAM). It also logs Generator Transfer admission.
+It does not load the model. Only a cold start and representative requests
+confirm host RAM, disk, shared memory, the driver stack, media, and inference.
+Preflight writes nothing outside its removed container. Resolve any reported
+failure before a cold download.
 
 ## Prepare the Model Cache
 
@@ -360,7 +360,7 @@ Metadata reports the selected model and profile. Confirm that `model_type` and
 
 The NIM can start offline from a cache filled by an earlier online start. The
 cache holds only the selected profile's artifacts, so fill it for every
-configuration you will run offline.
+configuration you run offline.
 
 1. On a host with NGC access, launch each configuration as shown in
    [Launch Generator](#launch-generator) or [Launch Reasoner](#launch-reasoner),

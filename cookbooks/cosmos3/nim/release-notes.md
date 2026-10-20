@@ -20,7 +20,7 @@ Image: `nvcr.io/nim/nvidia/cosmos3:2.1.0`.
   [Dynamo Deployment](dynamo/dynamo_deployment.md).
 - **Reasoner optimization presets** (`NIM_OPTIMIZATION_PRESET=TTFT` or `TPOT`),
   experimental; refer to [Configuration](configuration.md#optimization-presets).
-- **Generator Hugging Face BYOC**: `NIM_MODEL_PATH` accepts
+- **Generator Hugging Face checkpoints**: `NIM_MODEL_PATH` accepts
   `hf://owner/repository[:revision]` for both runtimes.
 - **Transfer control weights**: each control object accepts a relative
   `control_weight`; refer to [Transfer](transfer.md#combine-multiple-controls).
@@ -34,11 +34,11 @@ Image: `nvcr.io/nim/nvidia/cosmos3:2.1.0`.
   differ from 2.0.0 baselines. To approximate the 2.0.0 strength, multiply the
   previous `control_guidance` by `guidance_scale`, up to the 10.0 maximum; refer to
   [Control Guidance Behavior](transfer.md#control-guidance-behavior).
-- **Generator performance defaults**: SeaCache is on for every Generator
-  variant except Edge-DROID, SageAttention 2.2 is the default on compute
-  capability 8.0 through 9.x without sequence parallelism, and the
-  channels-last VAE decode path is the default. If you notice a quality issue
-  in a specific workload, try `NIM_CACHE_BACKEND=none` or
+- **Generator performance defaults**: SeaCache is on for every Generator variant
+  except Edge-DROID, SageAttention 2.2 is the default on compute capability 8.0
+  through 9.x without sequence parallelism, and the channels-last variational
+  autoencoder (VAE) decode path is the default. If you notice a quality issue in
+  a specific workload, try `NIM_CACHE_BACKEND=none` or
   `NIM_VAE_FAST_PATH=lossless`; refer to
   [Configuration](configuration.md#diffusion-cache-attention-and-vae-decode).
 - **System-memory floors are enforced**: each profile carries its measured
@@ -61,7 +61,7 @@ Image: `nvcr.io/nim/nvidia/cosmos3:2.1.0`.
 | `NIM_UNIFIED_MEMORY_HOST_RESERVE_GIB` | Removed; unified-memory systems use a fixed 70% share |
 | `NIM_QWEN3GUARD_MAX_GPU_MEMORY_GB` | Removed |
 
-## 2.0.0: Initial Unified Cosmos3 NIM Release
+## 2.0.0
 
 This is the first release of the unified Cosmos3 NIM, published as
 `nvcr.io/nim/nvidia/cosmos3:2.0.0`. One container image includes both runtime

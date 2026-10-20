@@ -292,32 +292,32 @@ authoritative list.
 | `image.repository` | Specifies the NIM-WFM image to deploy. | `nvcr.io/nvidia/nemo-microservices/nemoretriever-parse` |
 | `image.tag` | Specifies the image tag or version. | `""` |
 | `image.pullPolicy` | Sets the image pull policy. | `IfNotPresent` |
-| `imagePullSecrets` | Specifies a list of secret names that are needed for the main container and any init containers. | |
-| `initContainers` | Specifies model init containers, if needed. | |
+| `imagePullSecrets` | Specifies a list of secret names that are needed for the main container and any init containers. | `[{name: ngc-secret}]` |
+| `initContainers` | Specifies model init containers, if needed. | Refer to subkeys |
 | `initContainers.extraInit` | Fully specify any additional init containers your use case requires. | `[]` |
 | `nodeSelector` | Sets node selectors for the NIM—for example `nvidia.com/gpu.present: "true"`. | `{}` |
 | `runtimeClassName` | Selects the container runtime class for workload pods. | `""` |
 | `priorityClassName` | Selects the Kubernetes priority class for workload pods. | `""` |
 | `topologySpreadConstraints` | Configures pod topology spreading. | `[]` |
 | `podAnnotations` | Sets additional annotations on the main deployment pods. | `{}` |
-| `podSecurityContext` | Specifies security context settings for pod. | |
+| `podSecurityContext` | Specifies security context settings for pod. | Refer to subkeys |
 | `podSecurityContext.runAsUser` | Specify user UID for pod. | `1000` |
 | `podSecurityContext.runAsGroup` | Specify group ID for pod. | `1000` |
 | `podSecurityContext.fsGroup` | Specify file system owner group id. | `1000` |
-| `proxyCA` | Specify a certificate for a custom proxy. When `proxyCA` is set native TLS is used for downloading from NGC. | |
+| `proxyCA` | Specify a certificate for a custom proxy. When `proxyCA` is set native TLS is used for downloading from NGC. | Refer to subkeys |
 | `proxyCA.enabled` | Specify true if NIM is run behind a proxy. | `false` |
 | `proxyCA.secretName` | Specify a name of the Kubernetes secret containing the certificate. The secret is created before the deployment. Must be used together with `proxyCA.keyName` | `""` |
-| `proxyCA.keyName` | Specify a name of the key inside the secret which contains the certificate. Must be used together with `proxyCA.secretName` | `""` |
+| `proxyCA.keyName` | Specify a name of the key inside the secret that contains the certificate. Must be used together with `proxyCA.secretName` | `""` |
 | `terminationGracePeriodSeconds` | Seconds Kubernetes allows the NIM to terminate gracefully. | `60` |
 | `replicaCount` | Specify static replica count for deployment. | `1` |
-| `resources` | Specify resources limits and requests for the running service. | |
+| `resources` | Specify resources limits and requests for the running service. | `{limits: {nvidia.com/gpu: 1}}` |
 | `resources.limits.nvidia.com/gpu` | Specify number of GPUs to present to the running service. | `1` |
-| `serviceAccount` | Options to specify service account for the deployment. | |
+| `serviceAccount` | Options to specify service account for the deployment. | Refer to subkeys |
 | `serviceAccount.create` | Specifies whether a service account should be created. | `false` |
 | `serviceAccount.annotations` | Sets annotations to be added to the service account. | `{}` |
 | `serviceAccount.name` | Specifies the name of the service account to use. If it is not set and create is `true`, a name is generated using a `fullname` template. | `""` |
 | `statefulSet.enabled` | Enables `statefulset` deployment. Enabling `statefulSet` allows PVC templates for scaling. If using central PVC with RWX `accessMode`, this is not needed. | `true` |
-| `tolerations` | Specify tolerations for pod assignment. Allows the scheduler to schedule pods with matching taints. | |
+| `tolerations` | Specify tolerations for pod assignment. Allows the scheduler to schedule pods with matching taints. | `[{key: nvidia.com/gpu, operator: Exists, effect: NoSchedule}]` |
 
 ### Autoscaling Parameters
 
@@ -340,7 +340,7 @@ and memory are of limited use in scaling NIM.
 | `ingress.enabled` | Enables ingress. | `false` |
 | `ingress.className` | Specify class name for Ingress. | `""` |
 | `ingress.annotations` | Specify additional annotations for ingress. | `{}` |
-| `ingress.hosts` | Specify list of hosts each containing lists of paths. | |
+| `ingress.hosts` | Specify list of hosts each containing lists of paths. | Refer to subkeys |
 | `ingress.hosts[0].host` | Specify name of host. | `chart-example.local` |
 | `ingress.hosts[0].paths[0].path` | Specify ingress path. | `/` |
 | `ingress.hosts[0].paths[0].pathType` | Specify path type. | `ImplementationSpecific` |
@@ -405,8 +405,8 @@ payloads are model-specific, and it is only rendered for
 
 | Name | Description | Value |
 | --- | --- | --- |
-| `metrics` | Configures Prometheus integration for the NIM HTTP metrics endpoint. | |
-| `metrics.serviceMonitor` | Options for `serviceMonitor` to use the Prometheus Operator and the primary service object. | |
+| `metrics` | Configures Prometheus integration for the NIM HTTP metrics endpoint. | Refer to subkeys |
+| `metrics.serviceMonitor` | Options for `serviceMonitor` to use the Prometheus Operator and the primary service object. | Refer to subkeys |
 | `metrics.serviceMonitor.enabled` | Enables `serviceMonitor` creation. | `false` |
 | `metrics.serviceMonitor.additionalLabels` | Specify additional labels for `serviceMonitor`. | `{}` |
 | `metrics.serviceMonitor.port` | Named Service port scraped by ServiceMonitor. | `http-api` |
@@ -438,7 +438,7 @@ payloads are model-specific, and it is only rendered for
 
 | Name | Description | Value |
 | --- | --- | --- |
-| `persistence` | Specify settings to modify the behavior and use of persistent volumes for model weights. | |
+| `persistence` | Specify settings to modify the behavior and use of persistent volumes for model weights. | Refer to subkeys |
 | `persistence.enabled` | Enables the use of persistent volumes. | `false` |
 | `persistence.existingClaim` | Specifies an existing persistent volume claim. If using `existingClaim`, run only one replica or use a `ReadWriteMany` storage setup. | `""` |
 | `persistence.storageClass` | Specifies the persistent volume storage class. If set to `"-"`, this disables dynamic provisioning. If left undefined or set to null, the cluster default storage provisioner is used. | `""` |
@@ -447,10 +447,10 @@ payloads are model-specific, and it is only rendered for
 | `persistence.stsPersistentVolumeClaimRetentionPolicy.whenScaled` | Specifies persistent volume claim retention policy when scaled. Only used with Stateful Set volume templates. | `Retain` |
 | `persistence.size` | Specifies the size of the persistent volume claim (for example 40Gi). | `50Gi` |
 | `persistence.annotations` | Adds annotations to the persistent volume claim. | `{}` |
-| `hostPath` | Configures model cache on local disk on the nodes using `hostPath`—for special cases. You should understand the security implications before using this option. | |
+| `hostPath` | Configures model cache on local disk on the nodes using `hostPath`—for special cases. You should understand the security implications before using this option. | Refer to subkeys |
 | `hostPath.enabled` | Enable `hostPath`. | `false` |
 | `hostPath.path` | Specifies path on the node used as a `hostPath` volume. | `/model-store` |
-| `nfs` | Configures the model cache to sit on shared direct-mounted NFS. NOTE: you cannot set mount options using direct NFS mount to pods without a node-intalled nfsmount.conf. An NFS-based `PersistentVolumeClaim` is likely better in most cases. | |
+| `nfs` | Configures the model cache to sit on shared direct-mounted NFS. NOTE: you cannot set mount options using direct NFS mount to pods without a node-intalled nfsmount.conf. An NFS-based `PersistentVolumeClaim` is likely better in most cases. | Refer to subkeys |
 | `nfs.enabled` | Enables direct pod NFS mount. | `false` |
 | `nfs.path` | Specify path on NFS server to mount. | `/exports` |
 | `nfs.server` | Specify NFS server address. | `nfs-server.example.com` |

@@ -92,10 +92,10 @@ Run one case (`--case` is a runner option, not a NIM API field):
 uv run python examples/reasoner.py --case image_caption
 ```
 
-Every video case requests 4 FPS sampling, and all cases read the answer from
-`message.content`. `--case all` sends all 18 requests sequentially and takes
-substantial time; use it for deliberate catalog validation, not as a first
-request:
+Every video case requests 4 frames per second (FPS) sampling, and all cases read
+the answer from `message.content`. `--case all` sends all 18 requests
+sequentially and takes substantial time; use it for deliberate catalog
+validation, not as a first request:
 
 ```bash
 uv run python examples/reasoner.py --case all
@@ -162,7 +162,7 @@ large data URLs in a request file, not shell arguments.
 ## Video Reasoning With Chat Completions
 
 Use `video_url` content and pass NIM request extensions through `extra_body`.
-Input videos can be at most 3840 pixels wide and 2160 pixels tall, so portrait
+Input videos can be at most 3,840 pixels wide and 2,160 pixels tall, so portrait
 4K is also rejected; larger videos return HTTP 422, so downscale them first:
 
 ```python

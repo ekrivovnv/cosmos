@@ -12,7 +12,7 @@ and [Configuration](configuration.md) for environment variables.
 | Probe | Healthy Meaning | Not Verified |
 | --- | --- | --- |
 | `/v1/health/live` | HTTP process is alive | Model artifacts are loaded or inference can run |
-| `/v1/health/ready` | Selected backend reports ready after startup work | Every capability/media case has passed a smoke test |
+| `/v1/health/ready` | Selected backend reports ready after startup work | Every capability/media case has passed a basic verification test |
 
 Check both:
 
@@ -129,7 +129,8 @@ deployment policy. Do so only for an approved, isolated diagnostic:
 ```
 
 Disabling video guardrails also disables SigLIP; disabling SigLIP alone keeps
-the face path. Generator BYOC does not replace the NIM-owned guardrails.
+the face path. Generator bring your own checkpoint (BYOC) does not replace the
+NIM-owned guardrails.
 
 ## Prompt-Upsampling Diagnostics
 
@@ -138,8 +139,8 @@ required templates. At request time, external failures log a warning and
 generation continues with the original prompt. When debugging, confirm:
 
 - the configured URL is OpenAI-compatible and reaches `/v1/chat/completions`;
-- the model supports image input when upsampling I2V; T2I and T2V send text
-  only;
+- the model supports image input when upsampling image-to-video (I2V);
+  text-to-image (T2I) and text-to-video (T2V) send text only;
 - the external secret is present but not logged;
 - timeout and token limits suit the endpoint; and
 - provider-specific fields are placed in
@@ -234,7 +235,7 @@ Failures](transfer.md#validation-and-common-failures).
 | Content-policy 422 | Text or generated frames triggered guardrails | Rephrase and review content; disable only under approved diagnostic policy |
 | Backend 500/OOM | Profile fit or runtime workload exceeded available memory | Reduce workload/concurrency, choose Nano/offload, or use a larger supported GPU; retain logs |
 | Request/client timeout | Image or video generation exceeded client/backend timeout | Refer to [Long-Running Requests](#long-running-requests); inspect NIM logs and runtime metrics |
-| MP4 will not play | Player lacks VP9-in-MP4 support | Use `mpv`/`ffplay` or re-encode to H.264 |
+| MP4 does not play | Player lacks VP9-in-MP4 support | Use `mpv`/`ffplay` or re-encode to H.264 |
 
 ### Reasoner
 
