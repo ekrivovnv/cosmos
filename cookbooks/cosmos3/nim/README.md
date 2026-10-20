@@ -21,7 +21,7 @@ Cosmos3 is a Mixture-of-Transformers (MoT) world foundation model with two
 jointly trained towers that share latent representations: a **Reasoner**
 (vision-language) tower that grounds the prompt, and a **Generator** (world
 simulator) tower that produces the output, such as video. The Generator runtime
-uses both towers; the Reasoner runtime serves understanding. For details, see
+uses both towers; the Reasoner runtime serves understanding. For details, refer to
 the
 [Cosmos3 technical report](https://research.nvidia.com/labs/cosmos-lab/cosmos3/technical-report.pdf).
 
@@ -149,10 +149,10 @@ pages and examples as their source of truth and default to read-only assistance.
 ## Safety, license, and notices
 
 Generator guardrails are enabled by default. Disabling them can remove
-content-policy and face-privacy protections; see
+content-policy and face-privacy protections; refer to
 [Guardrails](operations.md#guardrails).
 
-See [License and notices](license.md) for the terms. This cookbook is licensed
+Refer to [License and notices](license.md) for the terms. This cookbook is licensed
 under the repository [LICENSE](../../../LICENSE). The running NIM serves its
 license at `/v1/license`; the image also contains product terms, notices,
 component licenses, and the package-modification source described in

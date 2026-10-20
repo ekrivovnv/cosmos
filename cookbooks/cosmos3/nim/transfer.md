@@ -12,7 +12,7 @@ world-space-map (WSM) video controls: send `POST /v1/infer` with
 
 Start a compatible Generator with [Deployment](deployment.md) and begin with
 one precomputed control. To choose between V2V, Transfer, and inverse
-dynamics, see
+dynamics, refer to
 [Choose a video-conditioned workflow](generation.md#choose-a-video-conditioned-workflow).
 
 ## Control types
@@ -40,7 +40,7 @@ floors but is much slower and not recommended. Check memory against
 
 The client allows 60 minutes per request, but the backend defaults to 30. To
 match, add `-e NIM_TRITON_REQUEST_TIMEOUT=3600000000` (microseconds) to the
-Generator launch and restart; see
+Generator launch and restart; refer to
 [long-running requests](operations.md#long-running-requests).
 
 Install the [client tooling](prerequisites.md#client-tooling). Then, from the
@@ -146,7 +146,7 @@ precomputed control video.
 | `<control>.control_weight` | Finite number `>= 0`; enabled weights need a positive sum | 1.0 |
 
 `num_first_chunk_conditional_frames > 0` requires `input_reference`.
-`control_weight` belongs inside a control object; see
+`control_weight` belongs inside a control object; refer to
 [Advanced multiple controls](#advanced-multiple-controls).
 
 ### Control guidance behavior
@@ -200,14 +200,14 @@ are spatially and temporally aligned.
 ## Transfer VRAM admission
 
 A ready deployment can serve generation but reject Transfer when GPU headroom
-is too small; use a larger GPU or lower-VRAM configuration (see
+is too small; use a larger GPU or lower-VRAM configuration (refer to
 [Transfer headroom](support-matrix.md#transfer-headroom), including the
 `NIM_ALLOW_UNSAFE_TRANSFER` diagnostic override).
 
 ## Media and output
 
 Control videos and video `input_reference` values accept up to 100,000,000
-encoded characters; see [media inputs](api-reference.md#media-inputs) for
+encoded characters; refer to [media inputs](api-reference.md#media-inputs) for
 formats, codecs, and URL rules.
 
 - The source video and each control video must have at least `num_frames`
@@ -232,4 +232,4 @@ or non-finite `control_weight` or enabled weights without a positive sum.
 | Control/output lengths are incompatible | Recheck the output frame count, chunk size, and conditional frame values |
 | Transfer is disabled while T2V works | Selected configuration fits T2V but GPU headroom is below Transfer overhead; use a larger GPU or lower-VRAM configuration |
 
-For service-level failures, see [operations.md](operations.md#troubleshooting).
+For service-level failures, refer to [operations.md](operations.md#troubleshooting).

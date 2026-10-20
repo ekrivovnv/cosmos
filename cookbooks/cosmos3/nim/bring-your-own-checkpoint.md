@@ -161,8 +161,8 @@ validation baseline.
 | Generator rejects disabled downloads | Generator still needs NIM-provided guardrails | Remove `NIM_DISABLE_MODEL_DOWNLOAD=1` and provide NGC/cache access |
 | Hugging Face source rejected offline | `hf://` requires download but downloads are disabled | Use an absolute pre-downloaded local path |
 | DFlash path is rejected | The draft path is relative, uses `hf://`, is not mounted, or lacks one of its two required files | Use an absolute local mount containing `config.json` and `model.safetensors` |
-| DFlash configuration is rejected | DFlash is disabled, DFlash is enabled on Edge (including through `NIM_OPTIMIZATION_PRESET=TPOT`), the draft does not match the Nano/Super target, or `NIM_DFLASH_CONFIG` sets reserved `method`/`model` keys | For Edge, leave `NIM_USE_DFLASH` unset or `0`; otherwise use the selected Reasoner's matching draft, keep DFlash enabled, and remove reserved keys; see [Speculative decoding](configuration.md#speculative-decoding) |
+| DFlash configuration is rejected | DFlash is disabled, DFlash is enabled on Edge (including through `NIM_OPTIMIZATION_PRESET=TPOT`), the draft does not match the Nano/Super target, or `NIM_DFLASH_CONFIG` sets reserved `method`/`model` keys | For Edge, leave `NIM_USE_DFLASH` unset or `0`; otherwise use the selected Reasoner's matching draft, keep DFlash enabled, and remove reserved keys; refer to [Speculative decoding](configuration.md#speculative-decoding) |
 | Metadata shows `default` | Override was omitted, rejected, or applied to another container | Inspect launch environment, mounts, startup logs, and `/v1/metadata` |
 
-For broader startup, cache, GPU, and readiness diagnosis, see
+For broader startup, cache, GPU, and readiness diagnosis, refer to
 [Operations](operations.md#byoc).

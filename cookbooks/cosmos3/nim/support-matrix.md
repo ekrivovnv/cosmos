@@ -8,7 +8,7 @@ and system memory. All memory values are binary GiB per device.
 
 ## Choose a model
 
-Choose the model; the NIM selects a compatible profile and precision (see
+Choose the model; the NIM selects a compatible profile and precision (refer to
 [Precision selection](deployment.md#precision-selection)).
 
 | Runtime | Model | Supported use |
@@ -44,7 +44,7 @@ After startup,
   Nano, especially for video. Use Super only for an explicit model requirement.
 - Unified-memory systems (DGX Spark, Jetson AGX Thor): default to Nano for both
   runtimes. Some Super Reasoner rows fit, but turnaround is impractical.
-- Smallest GPUs: Edge Reasoner and Edge-DROID have the lowest floors; see
+- Smallest GPUs: Edge Reasoner and Edge-DROID have the lowest floors; refer to
   [Edge verified GPUs](#edge-verified-gpus).
 
 ## GPU architecture and topology
@@ -188,7 +188,7 @@ Specialist variants (`nano-droid`, `edge-droid`, and `super-*`) use only the
 resident-guardrail rows of their base model. Multi-GPU rows use every GPU: a
 `latency` profile splits each request with guidance parallelism 2 and sequence
 parallelism `n_gpus / 2`; a `throughput` profile runs one engine replica per
-GPU, and there is no one-GPU `throughput` profile. To limit the GPU count, see
+GPU, and there is no one-GPU `throughput` profile. To limit the GPU count, refer to
 [Advanced profile controls](configuration.md#advanced-profile-controls).
 
 The 31-GiB Nano layer-offload rows target 32-GB client GPUs such as the
@@ -258,5 +258,5 @@ bypasses the check for diagnosis only and can cause out-of-memory failures.
 | Output | Generator video | VP9 in MP4 |
 
 Inputs are base64 or data URLs; HTTP(S) input works only when enabled and
-reachable from the container. See [API reference](api-reference.md) for the
+reachable from the container. Refer to [API reference](api-reference.md) for the
 media rules.

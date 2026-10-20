@@ -43,7 +43,7 @@ Workers start `/opt/nim/start_server.sh`: `NIM_DYNAMO_WORKER=true` and
 The worker's `DYN_NAMESPACE_PREFIX` comes from the operator's pod label, allowing
 the private frontend to discover models in suffixed worker namespaces. The
 streaming pool still uses the separate `NIM_DYNAMO_STREAMING_ENDPOINT` setting.
-See [Dynamo worker configuration](../configuration.md#run-nim-as-a-dynamo-worker)
+Refer to [Dynamo worker configuration](../configuration.md#run-nim-as-a-dynamo-worker)
 and [Dynamo streaming configuration](../configuration.md#dynamo-streaming)
 for environment variables, defaults, precedence, and timeouts.
 The tested image bundled Dynamo `1.5.0.dev20260902`; the graph's operator runtime
@@ -167,7 +167,7 @@ For video, decode frames on the client and wait for each reply before sending
 the next. Keep the returned `session_id` unchanged: frame uploads and deletion
 route to its owner even through a different frontend replica. This ownership
 does not depend on the Chat Completions affinity header or its 300-second TTL.
-See [Streaming](../streaming.md#session-configuration) for session fields and
+Refer to [Streaming](../streaming.md#session-configuration) for session fields and
 [streaming settings](../configuration.md#streaming-video-sessions) for limits;
 the REST idle timeout defaults to 120 seconds.
 

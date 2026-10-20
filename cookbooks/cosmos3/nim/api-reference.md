@@ -65,7 +65,7 @@ Defaults are for video / T2I; Transfer and Action defaults are on their pages.
 | `guidance_scale` | finite number in `[1.0,7.0]` | `6.0` / `4.0` | Sampling when not owned by a specialist model |
 | `num_inference_steps` | integer in `[1,100]` | `35` / `50` | Sampling when not owned by a specialist model |
 | `flow_shift` | finite number greater than 0 | `10.0` / `3.0` | Sampling when not owned by a specialist model |
-| `resolution` | enum | `720` / `720_1_1` | Generation and Transfer; see [resolution keys](generation.md#resolution-keys) |
+| `resolution` | enum | `720` / `720_1_1` | Generation and Transfer; refer to [resolution keys](generation.md#resolution-keys) |
 | `num_frames` | integer | `189` / `1` | Generation and Transfer; Action derives it and rejects the field |
 | `fps` | finite number in `[1.0,60.0]` | `24.0` | Video tasks; retained but not encoded for T2I |
 | `condition_frame_indexes_vision` | integer array or null | `[0, 1]` | V2V only |
@@ -148,12 +148,12 @@ A specialist action-only policy can return:
 
 In that case both `b64_image` and `b64_video` are absent or null. Clients must
 branch on the fields actually present rather than assuming every non-T2I
-request has `b64_video`. See [Edge-/Nano-DROID policy](action.md#edge-droid-and-nano-droid-policy).
+request has `b64_video`. Refer to [Edge-/Nano-DROID policy](action.md#edge-droid-and-nano-droid-policy).
 
 ## Errors and live schema
 
 A request for the other runtime's primary route returns HTTP 404 with the
-common NIM error envelope naming the active runtime and its endpoint. See
+common NIM error envelope naming the active runtime and its endpoint. Refer to
 [Errors](operations.md#errors) and
 [Troubleshooting](operations.md#troubleshooting); do not automate on exact
 error-message text.

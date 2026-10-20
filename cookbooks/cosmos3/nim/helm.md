@@ -7,7 +7,7 @@ Use this page to deploy the Cosmos3 NIM on Kubernetes with the shared
 `nim-wfm` Helm chart. Model selection, hardware floors, and verification are
 the same as in [Deployment](deployment.md).
 
-For the experimental Reasoner Dynamo stack, see the
+For the experimental Reasoner Dynamo stack, refer to the
 [Dynamo deployment guides](dynamo/README.md). They provide separate plain YAML
 for regular Dynamo and Dynamo with streaming, and require the Dynamo operator.
 
@@ -144,7 +144,7 @@ env:
 
 On DGX Spark/GB10 or Jetson AGX Thor nodes, the NIM defaults
 `NIM_GPU_MEMORY_UTILIZATION` to `0.70`; set a lower value only from host
-measurements; see
+measurements; refer to
 [Set the Reasoner memory share](deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems).
 
 ### OpenTelemetry
@@ -179,14 +179,14 @@ The chart README documents these optional features; all are off by default:
 
 - **Prometheus metrics:** Set `metrics.serviceMonitor.enabled: true` to create
   a Prometheus Operator `ServiceMonitor` that scrapes `/v1/metrics` on the
-  `http-api` port. See [Metrics](operations.md#metrics).
+  `http-api` port. Refer to [Metrics](operations.md#metrics).
 - **Ingress:** `ingress.enabled`, `ingress.className`, `ingress.hosts`, and
   `ingress.tls`. The NIM does not authenticate requests, so protect any
   ingress outside the cluster.
 - **Autoscaling:** `autoscaling.enabled` with `minReplicas`, `maxReplicas`, and
   `metrics`. CPU and memory metrics are of limited use for scaling a NIM; use
   custom metrics, for example through `prometheus-adapter`. Each new replica
-  must download or mount the model before it becomes ready; see
+  must download or mount the model before it becomes ready; refer to
   [Storage and scaling](#storage-and-scaling).
 
 ## Install
@@ -255,8 +255,8 @@ start downloads the model again.
 | --- | --- |
 | Pod stays `Pending` | Run `kubectl describe pod <pod>` and check `Events` for insufficient GPUs, untolerated taints, or an unbound volume claim |
 | Pod restarts while preparing the model workspace | The startup probe ran out before the download finished; increase `startupProbe.failureThreshold` |
-| Scaling or upgrade fails with `statefulSet.enabled: false` | The cache volume is `ReadWriteOnce`; see [Storage and scaling](#storage-and-scaling) |
-| Profile selection fails | Compare GPU type, count, free memory, and pod memory limit with the [Support matrix](support-matrix.md); see [Troubleshooting](operations.md#troubleshooting) |
+| Scaling or upgrade fails with `statefulSet.enabled: false` | The cache volume is `ReadWriteOnce`; refer to [Storage and scaling](#storage-and-scaling) |
+| Profile selection fails | Compare GPU type, count, free memory, and pod memory limit with the [Support matrix](support-matrix.md); refer to [Troubleshooting](operations.md#troubleshooting) |
 
 ## Remove the deployment
 

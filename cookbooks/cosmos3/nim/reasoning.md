@@ -5,13 +5,13 @@ SPDX-License-Identifier: OpenMDW-1.1 -->
 
 Use this page for Cosmos3 Reasoner requests through OpenAI-compatible Chat
 Completions and Responses APIs. These workflows require a running **Reasoner**
-model; `/v1/infer` is a Generator endpoint and is not used here. See
+model; `/v1/infer` is a Generator endpoint and is not used here. Refer to
 [Deployment](deployment.md) to select and launch a Reasoner model.
 
 The same clients work with `edge`, `nano`, and `super`; launch Edge with the
 [Edge experiments](deployment.md#edge-experiments) selectors.
 
-For stateful reasoning over successive video frames, see
+For stateful reasoning over successive video frames, refer to
 [Streaming video](streaming.md). Its [example client](streaming.md#example-client)
 is bundled in this cookbook and uses the same pinned environment and `NIM_URL`
 setting, with a flag to choose WebSocket or REST.
@@ -230,7 +230,7 @@ tags, which appear in `message.content` as ordinary text.
 
 Nano and Super Reasoner use their bundled DFlash drafts by default; set
 `NIM_USE_DFLASH=0` to run target-only. Edge has no DFlash and rejects
-`NIM_USE_DFLASH=1`. Requests do not change. See
+`NIM_USE_DFLASH=1`. Requests do not change. Refer to
 [Speculative decoding](configuration.md#speculative-decoding) and
 [Reasoner checkpoint](bring-your-own-checkpoint.md#reasoner-checkpoint).
 
@@ -347,7 +347,7 @@ pixel_y = normalized_y / 1000 * image_height
 
 A Reasoner next-action answer or 2D trajectory is text/JSON describing a
 semantic proposal in visual coordinates. It is not a domain-specific Generator
-Action tensor and must not be sent directly to a robot. See
+Action tensor and must not be sent directly to a robot. Refer to
 [Generator Action representations](action.md#domains-and-representations).
 
 The catalog reuses the exact user prompts from the
@@ -362,8 +362,8 @@ run and are not golden NIM output.
 | Chat Completions or Responses route 404 | `NIM_URL` reaches Generator, Responses is disabled, or the route is absent | Inspect `/v1/metadata`; start Reasoner or check `NIM_DISABLE_RESPONSES_ROUTE` |
 | HTTP 422 | Media validation or preprocessing failed | Check the data URL, media ordering, and media limits |
 
-See [Reasoner troubleshooting](operations.md#reasoner) for other errors, and
+Refer to [Reasoner troubleshooting](operations.md#reasoner) for other errors, and
 check the [live schema](api-reference.md#errors-and-live-schema) before
 depending on additional fields. To serve a local or Hugging Face Reasoner
-checkpoint, see
+checkpoint, refer to
 [Bring your own checkpoint](bring-your-own-checkpoint.md#reasoner-checkpoint).

@@ -15,15 +15,15 @@ Image: `nvcr.io/nim/nvidia/cosmos3:2.1.0`.
   policy with action-only output; [experimental](support-matrix.md#choose-a-model)
   because it has not been validated.
 - **Streaming video sessions** for the Reasoner over WebSocket and REST
-  (`NIM_ENABLE_STREAMING=true`); see [Streaming](streaming.md).
-- **Dynamo deployment** for the Reasoner, including REST streaming; see
+  (`NIM_ENABLE_STREAMING=true`); refer to [Streaming](streaming.md).
+- **Dynamo deployment** for the Reasoner, including REST streaming; refer to
   [Dynamo deployment](dynamo/dynamo_deployment.md).
 - **Reasoner optimization presets** (`NIM_OPTIMIZATION_PRESET=TTFT` or `TPOT`),
-  experimental; see [Configuration](configuration.md#optimization-presets).
+  experimental; refer to [Configuration](configuration.md#optimization-presets).
 - **Generator Hugging Face BYOC**: `NIM_MODEL_PATH` accepts
   `hf://owner/repository[:revision]` for both runtimes.
 - **Transfer control weights**: each control object accepts a relative
-  `control_weight`; see [Transfer](transfer.md#advanced-multiple-controls).
+  `control_weight`; refer to [Transfer](transfer.md#advanced-multiple-controls).
 - **AVI video input** for both runtimes.
 
 ### Behavior changes
@@ -32,17 +32,17 @@ Image: `nvcr.io/nim/nvidia/cosmos3:2.1.0`.
   control term is no longer also multiplied by `guidance_scale` (effective
   edge-family coefficient 1.5 instead of 4.5), so combined-guidance outputs
   differ from 2.0.0 baselines. To approximate the 2.0.0 strength, multiply the
-  previous `control_guidance` by `guidance_scale`, up to the 10.0 maximum; see
+  previous `control_guidance` by `guidance_scale`, up to the 10.0 maximum; refer to
   [Control guidance behavior](transfer.md#control-guidance-behavior).
 - **Generator performance defaults**: SeaCache is on for every Generator
   variant except Edge-DROID, SageAttention 2.2 is the default on compute
   capability 8.0 through 9.x without sequence parallelism, and the
   channels-last VAE decode path is the default. If you notice a quality issue
   in a specific workload, try `NIM_CACHE_BACKEND=none` or
-  `NIM_VAE_FAST_PATH=lossless`; see [Configuration](configuration.md#diffusion-cache-attention-and-vae-decode).
+  `NIM_VAE_FAST_PATH=lossless`; refer to [Configuration](configuration.md#diffusion-cache-attention-and-vae-decode).
 - **System-memory floors are enforced**: each profile carries its measured
   system-memory floor instead of a 16-GiB admission tag, and FP8 offload floors
-  are lower; see the [Support matrix](support-matrix.md#generator-configurations).
+  are lower; refer to the [Support matrix](support-matrix.md#generator-configurations).
 - **Unified memory**: on DGX Spark and Jetson AGX Thor, 70% of the shared pool
   counts toward profile floors, and the Reasoner defaults to
   `NIM_GPU_MEMORY_UTILIZATION=0.70`. Super Generator profiles no longer fit
@@ -71,4 +71,4 @@ choices:
 - **Reasoner** serves OpenAI-compatible image and video understanding through
   Chat Completions and the Responses API.
 
-See [Deployment](deployment.md) for launch instructions.
+Refer to [Deployment](deployment.md) for launch instructions.

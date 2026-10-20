@@ -24,7 +24,7 @@ Selection prefers a resident profile that uses the visible GPUs well and can
 fall back to an equivalent lower-memory offload or tensor-parallel layout when
 current free GPU memory is short. On unified-memory systems, selection counts
 70% of the shared pool as GPU memory and uses only resident Generator profiles.
-If no profile fits, startup fails; free GPU memory and restart. See
+If no profile fits, startup fails; free GPU memory and restart. Refer to
 [GPU architecture and topology](support-matrix.md#gpu-architecture-and-topology)
 for the memory rules.
 
@@ -57,7 +57,7 @@ Set `NIM_MODEL_TYPE=reasoner` and choose `NIM_MODEL_VARIANT=edge`, `nano`, or
 `super`. Reasoner rejects `NIM_PERF_PROFILE` at startup. DFlash speculative
 decoding is on by default for Nano and Super; set `NIM_USE_DFLASH=0` to disable
 it. Edge has no DFlash draft: its profiles disable DFlash and reject
-`NIM_USE_DFLASH=1` (see [Configuration](configuration.md#speculative-decoding)).
+`NIM_USE_DFLASH=1` (refer to [Configuration](configuration.md#speculative-decoding)).
 
 ### Precision selection
 
@@ -129,7 +129,7 @@ export NIM_GPU_MEMORY_UTILIZATION=0.60
 ```
 
 If you set a value, pass `-e NIM_GPU_MEMORY_UTILIZATION` in every Reasoner
-preflight and launch command on that system. Do not set it for Generator. See
+preflight and launch command on that system. Do not set it for Generator. Refer to
 [Reasoner context and scheduling](configuration.md#context-and-scheduling).
 
 ## Run the pre-download profile preflight
@@ -230,7 +230,7 @@ system memory for BF16 or 35 GiB for FP8; selection enforces these
 
 Change the model and objective as needed, expose every GPU a multi-GPU
 configuration requires, and add `-e NIM_PRECISION=fp8` only to pin precision.
-The Generator uses as many exposed GPUs as a compatible profile supports; see
+The Generator uses as many exposed GPUs as a compatible profile supports; refer to
 [Advanced profile controls](configuration.md#advanced-profile-controls).
 
 ## Launch Reasoner
@@ -266,7 +266,7 @@ docker run -d --name cosmos3-reasoner \
 
 This example launches Super FP8 Reasoner, which needs compute capability 8.9+,
 67 GiB of VRAM usable after the 4-GiB Reasoner reserve, and 43 GiB of system
-memory (see
+memory (refer to
 [Reasoner configurations](support-matrix.md#reasoner-configurations)):
 
 ```bash
@@ -306,7 +306,7 @@ these selectors to the [Reasoner launch](#launch-reasoner), with `fp8` or
 
 The Responses API stays enabled by default (`NIM_DISABLE_RESPONSES_ROUTE=false`).
 For streaming, also set `NIM_ENABLE_STREAMING=true` and
-`NIM_STREAMING_SPEC_METHOD=none` (see
+`NIM_STREAMING_SPEC_METHOD=none` (refer to
 [Advanced streaming controls](configuration.md#advanced-streaming-controls)).
 
 For Edge-DROID, which is
@@ -397,7 +397,7 @@ docker exec cosmos3-generator python3 -c \
 
 Offload modes, guardrail-offload selectors, GPU-count and parallelism
 selectors, tag selectors, and profile-ID pins are for validated needs only;
-see [Configuration](configuration.md#advanced-profile-controls).
+refer to [Configuration](configuration.md#advanced-profile-controls).
 
 ## Docker flag summary
 

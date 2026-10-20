@@ -11,7 +11,7 @@ two Nano FP8 workers, each on one GPU, with persistent video sessions disabled.
 For those sessions, use [Dynamo with streaming](dynamo_with_streaming.md).
 
 For required worker environment variables, discovery, and proxy settings,
-see [Dynamo configuration](../configuration.md#dynamo-configuration), including
+refer to [Dynamo configuration](../configuration.md#dynamo-configuration), including
 [running NIM as a Dynamo worker](../configuration.md#run-nim-as-a-dynamo-worker).
 
 The manifests use the tested operator's `nvidia.com/v1alpha1` API and
@@ -54,7 +54,7 @@ every cookbook client against that deployment. Validate those paths separately.
   image-specific profile selection and downloads artifacts without serving.
   Its memory limit is not evidence that a serving worker fits that limit.
 - `kubectl`, cURL, Python 3, and an exported `NGC_API_KEY` with image and model
-  access; see [Network and NGC access](../prerequisites.md#network-and-ngc-access).
+  access; refer to [Network and NGC access](../prerequisites.md#network-and-ngc-access).
 
 Both services and the download Job tolerate the `nvidia.com/gpu` taint and
 the `kubernetes.io/arch=arm64:NoSchedule` taint. They leave node architecture
@@ -186,11 +186,11 @@ curl -fsS "$NIM_URL/v1/chat/completions" \
   -d "{\"model\":\"$MODEL\",\"messages\":[{\"role\":\"user\",\"content\":\"Describe how a robot can avoid obstacles.\"}],\"max_tokens\":128}"
 ```
 
-See [Reasoning](../reasoning.md) for image/video request formats. The frontend
+Refer to [Reasoning](../reasoning.md) for image/video request formats. The frontend
 uses Dynamo's API, including OpenAI `response_format`; NIM-specific aliases
 are handled by the worker's NIM proxy. The frontend does not expose NIM
 metadata. The Python Reasoner and Responses examples require a worker NIM URL;
-see [Run the cookbook clients](#run-the-cookbook-clients). Older experimental
+refer to [Run the cookbook clients](#run-the-cookbook-clients). Older experimental
 worker images can also omit `model_type` and
 `inference_endpoint` from `/v1/metadata`, so cookbook clients requiring those
 fields reject those workers before inference. Use a worker image that exposes

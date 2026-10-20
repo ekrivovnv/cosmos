@@ -4,7 +4,7 @@ SPDX-License-Identifier: OpenMDW-1.1 -->
 # Operate and troubleshoot the Cosmos3 NIM
 
 Interpret health, inspect the selected profile, configure logging and
-guardrails, and diagnose failures. See [Deployment](deployment.md) for launch
+guardrails, and diagnose failures. Refer to [Deployment](deployment.md) for launch
 and [Configuration](configuration.md) for environment variables.
 
 ## Health and startup
@@ -80,7 +80,7 @@ docker logs --since 10m cosmos3-reasoner
 
 ## Metrics
 
-Scrape `$NIM_URL/v1/metrics`; see [Monitoring](monitoring.md) for Prometheus
+Scrape `$NIM_URL/v1/metrics`; refer to [Monitoring](monitoring.md) for Prometheus
 and Grafana setup and the metric families of each runtime.
 
 ## Long-running requests
@@ -201,7 +201,7 @@ Task-specific validation belongs to [Generation](generation.md),
 
 ### Startup and deployment
 
-For Kubernetes Pod, volume, and probe failures, see [Helm
+For Kubernetes Pod, volume, and probe failures, refer to [Helm
 troubleshooting](helm.md#troubleshooting).
 
 | Symptom | Likely cause | Action |
@@ -221,7 +221,7 @@ troubleshooting](helm.md#troubleshooting).
 
 ### Generator and media
 
-For Action and Transfer request failures, see [Action common
+For Action and Transfer request failures, refer to [Action common
 failures](action.md#common-failures) and [Transfer validation and common
 failures](transfer.md#validation-and-common-failures).
 
@@ -233,7 +233,7 @@ failures](transfer.md#validation-and-common-failures).
 | HTTP 422, frame or resolution | Request violates T2I/video cadence rules or supplies `num_frames` for Action | Recompute with the task tables; Action derives frames from its chunk size |
 | Content-policy 422 | Text or generated frames triggered guardrails | Rephrase and review content; disable only under approved diagnostic policy |
 | Backend 500/OOM | Profile fit or runtime workload exceeded available memory | Reduce workload/concurrency, choose Nano/offload, or use a larger supported GPU; retain logs |
-| Request/client timeout | Image or video generation exceeded client/backend timeout | See [Long-running requests](#long-running-requests); inspect NIM logs and runtime metrics |
+| Request/client timeout | Image or video generation exceeded client/backend timeout | Refer to [Long-running requests](#long-running-requests); inspect NIM logs and runtime metrics |
 | MP4 will not play | Player lacks VP9-in-MP4 support | Use `mpv`/`ffplay` or re-encode to H.264 |
 
 ### Reasoner
@@ -248,11 +248,11 @@ failures](transfer.md#validation-and-common-failures).
 | Host OOM or near-zero `MemAvailable` on unified memory | The Reasoner memory share is too large for the shared host/device pool and the host workload | Remove any explicit `NIM_GPU_MEMORY_UTILIZATION` above the `0.70` default, or lower it from host measurements, then restart |
 | KV-cache/context OOM | Context, media tokens, batching, or concurrency is too large | Reduce media FPS and concurrency; the default unchunked multimodal path enforces a 16,384 batched-token minimum, so enable multimodal chunking with `NIM_DISABLE_CHUNKED_MM_INPUT=0` only after validation before lowering that budget |
 
-For DFlash and checkpoint-source failures, see [BYOC](#byoc).
+For DFlash and checkpoint-source failures, refer to [BYOC](#byoc).
 
 ### BYOC
 
-See [Bring your own checkpoint common
+Refer to [Bring your own checkpoint common
 failures](bring-your-own-checkpoint.md#common-failures). A long first start
 with a new engine or remote checkpoint is expected; keep a writable persistent
 cache and wait for readiness.

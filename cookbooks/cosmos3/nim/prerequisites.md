@@ -13,7 +13,7 @@ per-configuration GPU, VRAM, and host RAM requirements are in the
 | --- | --- |
 | CPU architecture | The release image provides `amd64` and `arm64` variants; use the variant selected by the container runtime |
 | GPU compute capability | Generator: BF16 `>=8.0`, FP8 `>=8.9`; Reasoner: BF16 `>=8.0`, FP8 `>=8.9`, NVFP4 `>=10.0` |
-| GPU count and per-device VRAM | See the [Generator](support-matrix.md#generator-configurations) and [Reasoner](support-matrix.md#reasoner-configurations) tables |
+| GPU count and per-device VRAM | Refer to the [Generator](support-matrix.md#generator-configurations) and [Reasoner](support-matrix.md#reasoner-configurations) tables |
 | Host RAM | System-memory floor per configuration, enforced by profile selection, in the [Generator](support-matrix.md#generator-configurations) and [Reasoner](support-matrix.md#reasoner-configurations) tables; treat it as a minimum for the workload |
 | Free disk | Provision for the image, selected model artifacts, materialization, and outputs; no single workload-independent floor is documented |
 | Container shared memory | The Docker reference launch allocates 16 GiB; validate the requirement for the selected media workload and concurrency |
@@ -29,7 +29,7 @@ GPU. Each GPU must also have enough free memory at startup, so stop unrelated
 GPU workloads before launch.
 
 Lower-VRAM offload profiles keep model weights in system memory and carry
-their own system-memory floors; see the
+their own system-memory floors; refer to the
 [Generator configurations](support-matrix.md#generator-configurations). A
 container memory limit counts before host physical memory.
 
@@ -76,7 +76,7 @@ A memory-related preflight failure has two materially different causes:
 On these systems the Reasoner defaults to a 0.70
 [`NIM_GPU_MEMORY_UTILIZATION`](deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems)
 share; if you lower it, keep the same value from preflight through launch. Clearing page cache or deleting the model cache is
-not part of normal deployment; see
+not part of normal deployment; refer to
 [Unified-memory diagnostics](operations.md#unified-memory-diagnostics).
 
 ## Software requirements
@@ -172,7 +172,7 @@ echo
 The variable is `NGC_API_KEY`, not `NGC_TOKEN`. Do not save the key in source
 control; continue with [Authenticate to NGC](deployment.md#authenticate-to-ngc).
 
-An air-gapped host needs a pre-populated cache; see
+An air-gapped host needs a pre-populated cache; refer to
 [Offline and air-gapped deployment](deployment.md#offline-and-air-gapped-deployment).
 
 ## Verify the host
@@ -200,5 +200,5 @@ The GPU query reports memory in MiB; divide by 1024 to compare with the
 binary-GiB floors in the [support matrix](support-matrix.md). The Docker check
 verifies GPU container access, not Cosmos3 profile compatibility.
 
-For installation and verification failures, see
+For installation and verification failures, refer to
 [Troubleshooting](operations.md#troubleshooting).

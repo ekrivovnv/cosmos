@@ -19,7 +19,7 @@ curl -f "$NIM_URL/v1/health/ready"
 ```
 
 Requests are synchronous and can stay quiet until done; the examples allow 30
-minutes, so do not retry a quiet connection (see
+minutes, so do not retry a quiet connection (refer to
 [long-running requests](operations.md#long-running-requests)).
 
 Install the [client tooling](prerequisites.md#client-tooling), then run the
@@ -42,7 +42,7 @@ uv run python examples/t2i.py
 
 Standard scripts run on a general-purpose `nano` or `super` variant whose image
 includes the task; T2I and I2V also run on their full-step specialists.
-Four-step specialists need their own scripts (see
+Four-step specialists need their own scripts (refer to
 [Specialist T2I and I2V variants](#specialist-t2i-and-i2v-variants)).
 
 ## Text-to-image
@@ -218,7 +218,7 @@ empty list or a negative index returns HTTP 422. `condition_video_keep` takes
 frames from the `first` (default) or `last` part of the input.
 
 Decoded video is capped at 75 MB; data URLs add about one third to the JSON
-size. See [media inputs](api-reference.md#media-inputs) for codecs.
+size. Refer to [media inputs](api-reference.md#media-inputs) for codecs.
 
 ## Specialist T2I and I2V variants
 
@@ -287,7 +287,7 @@ model artifacts, precisions, or hardware layouts.
 
 Operators can enable prompt upsampling for T2I, T2V, and I2V (not V2V, Action,
 or Transfer); it keeps the request's resolution, aspect, duration, and FPS,
-and falls back to the original prompt on failure. See
+and falls back to the original prompt on failure. Refer to
 [configuration.md](configuration.md#prompt-upsampling).
 
 ## Output and playback
@@ -322,4 +322,4 @@ ffmpeg -i examples/outputs/t2v_robot_kitchen.mp4 -c:v libx264 -crf 18 \
 | Request times out in the client | Generation exceeded the client timeout, not necessarily the server timeout | Use the examples' 30-minute timeout and inspect NIM logs |
 | MP4 does not play | Player lacks VP9-in-MP4 support | Use `ffplay` or re-encode to H.264 with the declared FFmpeg tooling |
 
-For service-level diagnosis, see [operations.md](operations.md#troubleshooting).
+For service-level diagnosis, refer to [operations.md](operations.md#troubleshooting).

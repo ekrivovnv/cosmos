@@ -5,7 +5,7 @@ SPDX-License-Identifier: OpenMDW-1.1 -->
 
 This page lists launch-time environment variables. Start with the
 model-selection variables and keep automatic defaults unless the workload
-requires an override. See [Deployment](deployment.md) for complete Docker
+requires an override. Refer to [Deployment](deployment.md) for complete Docker
 commands.
 
 ## Essential configuration
@@ -23,7 +23,7 @@ commands.
 | --- | --- | --- |
 | `NIM_MODEL_TYPE` | `generator` | Select `generator` or `reasoner` |
 | `NIM_MODEL_VARIANT` | `nano` preference | Select `nano` or `super` for either runtime; Reasoner also accepts `edge`, and Generator also accepts `edge-droid`, `nano-droid`, `super-t2i`, `super-t2i-4step`, `super-i2v`, and `super-i2v-4step` |
-| `NIM_PRECISION` | Generator: FP8 preference; Reasoner: GPU-derived preference | Optionally pin a precision available in the image; see [Precision selection](deployment.md#precision-selection) |
+| `NIM_PRECISION` | Generator: FP8 preference; Reasoner: GPU-derived preference | Optionally pin a precision available in the image; refer to [Precision selection](deployment.md#precision-selection) |
 | `NIM_PERF_PROFILE` | `latency` | Generator only: choose `latency` or `throughput` |
 
 Reasoner rejects `NIM_PERF_PROFILE`, including `profile=` in
@@ -61,8 +61,8 @@ processes, so a passed value can place work outside the intended GPUs.
 | `NIM_DISABLE_MODEL_DOWNLOAD` | `false` | Disable profile download for a completely local Reasoner override; incompatible with Reasoner `hf://` and rejected for Generator |
 | `HF_TOKEN` | Empty | Authenticate to a private Hugging Face repository named by `NIM_MODEL_PATH` |
 
-To override the DFlash draft, see `NIM_DFLASH_MODEL_PATH` under [Speculative
-decoding](#speculative-decoding). See [Bring your own
+To override the DFlash draft, refer to `NIM_DFLASH_MODEL_PATH` under [Speculative
+decoding](#speculative-decoding). Refer to [Bring your own
 checkpoint](bring-your-own-checkpoint.md) for layouts, mounts, and
 compatibility checks.
 
@@ -80,7 +80,7 @@ Use these only when automatic model selection is not sufficient:
 
 | Name | Default | Use |
 | --- | --- | --- |
-| `NIM_TAGS_SELECTOR` | Empty | Filter by comma-separated exact manifest tags as `key=value` pairs; see the valid keys below |
+| `NIM_TAGS_SELECTOR` | Empty | Filter by comma-separated exact manifest tags as `key=value` pairs; refer to the valid keys below |
 
 `NIM_TAGS_SELECTOR` accepts only these keys; any other key is an error. Values
 are lowercased.
@@ -113,7 +113,7 @@ floors and as the default Reasoner `NIM_GPU_MEMORY_UTILIZATION`.
 A shorthand variable that conflicts with `NIM_TAGS_SELECTOR` is a startup
 error; use the `model_variant` tag to filter by model. Exact tags and profile
 IDs are tied to an image release. For the offload, memory-headroom, and
-profile-pin variables, see [Advanced settings](#advanced-settings).
+profile-pin variables, refer to [Advanced settings](#advanced-settings).
 
 ## Generator configuration
 
@@ -124,7 +124,7 @@ profile-pin variables, see [Advanced settings](#advanced-settings).
 | `NIM_ALLOW_URL_INPUT` | `true` | Allow HTTP(S) image, video, and Transfer inputs; set `false` to require encoded input |
 | `NIM_TRITON_REQUEST_TIMEOUT` | 30 minutes (`1800000000` microseconds) | Set the queue-plus-execution timeout in microseconds |
 
-Client HTTP timeouts do not change this backend ceiling; see [Long-running
+Client HTTP timeouts do not change this backend ceiling; refer to [Long-running
 requests](operations.md#long-running-requests).
 
 ### Startup and execution
@@ -144,7 +144,7 @@ requests](operations.md#long-running-requests).
 
 The selected profile owns guardrail residency; choose it with the
 `text_guard_offload` and `video_guard_offload` selector keys under
-[Advanced profile controls](#advanced-profile-controls). See
+[Advanced profile controls](#advanced-profile-controls). Refer to
 [Guardrails](operations.md#guardrails) for what each layer does.
 
 ### Diffusion cache, attention, and VAE decode
@@ -215,7 +215,7 @@ Edge, set `NIM_USE_DFLASH=0` with `TPOT`.
 | Name | Default | Use |
 | --- | --- | --- |
 | `NIM_USE_DFLASH` | `true` for Nano/Super Reasoner; `false` for Edge | Use the bundled Nano or Super DFlash draft; set `false` to run the target model without speculative decoding |
-| `NIM_DFLASH_MODEL_PATH` | Empty | Nano or Super Reasoner: use an independent absolute local DFlash directory containing `config.json` and `model.safetensors`; see [Local directory](bring-your-own-checkpoint.md#local-directory) for the mount |
+| `NIM_DFLASH_MODEL_PATH` | Empty | Nano or Super Reasoner: use an independent absolute local DFlash directory containing `config.json` and `model.safetensors`; refer to [Local directory](bring-your-own-checkpoint.md#local-directory) for the mount |
 
 DFlash is on by default for Nano and Super Reasoner and does not change the
 request API; set `NIM_USE_DFLASH=0` to disable it (Generator rejects an
@@ -232,7 +232,7 @@ is enabled.
 | Name | Default | Use |
 | --- | --- | --- |
 | `NIM_MAX_MODEL_LEN` | `-1` (auto) | Let the runtime choose a context length, bounded by the checkpoint limit of 262,144 tokens |
-| `NIM_GPU_MEMORY_UTILIZATION` | Discrete GPU: `0.93`, capped to leave `NIM_GPU_MEMORY_HEADROOM_GIB` free; unified memory: `0.70` | Set the Reasoner GPU-memory target in `(0,1]`; startup warns when it exceeds current free memory but does not reduce it. On DGX Spark/GB10 and Jetson AGX Thor, lower it only from host measurements; see [Set the Reasoner memory share](deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems) |
+| `NIM_GPU_MEMORY_UTILIZATION` | Discrete GPU: `0.93`, capped to leave `NIM_GPU_MEMORY_HEADROOM_GIB` free; unified memory: `0.70` | Set the Reasoner GPU-memory target in `(0,1]`; startup warns when it exceeds current free memory but does not reduce it. On DGX Spark/GB10 and Jetson AGX Thor, lower it only from host measurements; refer to [Set the Reasoner memory share](deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems) |
 
 ### Caching and multimodal processing
 
@@ -297,7 +297,7 @@ streaming path, so pinning V1 is not required for normal operation.
 
 Inspect `GET /v1/streaming/config` for the served model and default retention
 and sampling policy. Standalone NIM and the Dynamo streaming adapter expose
-this route. See [Streaming](streaming.md) for session requests and error handling,
+this route. Refer to [Streaming](streaming.md) for session requests and error handling,
 and [Dynamo REST streaming](dynamo/dynamo_with_streaming.md#stream-video-frames-over-rest)
 for the client's shared-frontend checks, which require no worker URLs or metadata.
 
@@ -373,7 +373,7 @@ ownership does not depend on the Chat Completions affinity TTL.
 frontend and worker NIM endpoints. The streaming adapter and enabled worker NIM
 proxy expose `GET /v1/streaming/config` and the REST session routes. The stock
 `dynamo.frontend` launcher does not attach these streaming routes.
-See [Dynamo with streaming](dynamo/dynamo_with_streaming.md) for the manifest
+Refer to [Dynamo with streaming](dynamo/dynamo_with_streaming.md) for the manifest
 and REST request examples.
 
 ## Advanced settings
@@ -387,7 +387,7 @@ Leave these at their defaults unless you have measured a need.
 | `NIM_MODEL_PROFILE` | Both | Empty | Pin an exact profile ID from the current image |
 | `NIM_VIDEO_SAVE_QUALITY` | Generator | `7` | VP9 output quality 1-9; affects encoding, not diffusion |
 | `NIM_ENABLE_TORCH_COMPILE` | Generator | `true` | Enable the compilation path |
-| `NIM_CACHE_BACKEND` | Generator | Edge-DROID: `none`; other variants: `sea_cache` | Diffusion cache: `sea_cache`, `cache_dit`, or `none`; see [Diffusion cache, attention, and VAE decode](#diffusion-cache-attention-and-vae-decode) |
+| `NIM_CACHE_BACKEND` | Generator | Edge-DROID: `none`; other variants: `sea_cache` | Diffusion cache: `sea_cache`, `cache_dit`, or `none`; refer to [Diffusion cache, attention, and VAE decode](#diffusion-cache-attention-and-vae-decode) |
 | `NIM_CACHE_CONFIG` | Generator | Empty object | Override individual diffusion-cache settings as JSON; rejected when the backend is `none` |
 | `DIFFUSION_ATTENTION_BACKEND` | Generator | `SAGE_ATTN` on compute capability 8.0 through 9.x without sequence parallelism; otherwise automatic | Override the diffusion attention backend |
 | `NIM_VAE_FAST_PATH` | Generator | `channels_last` | VAE decode path: `channels_last`, `lossless`, or `off` |

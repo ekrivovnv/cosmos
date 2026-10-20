@@ -14,7 +14,7 @@ disconnecting releases its resources. REST provides the same session behavior
 for clients that cannot maintain a WebSocket connection.
 
 [Deploy the Cosmos3 NIM Reasoner](deployment.md) with `NIM_ENABLE_STREAMING=true` using
-an image with streaming support. See [Streaming video session settings](configuration.md#streaming-video-sessions)
+an image with streaming support. Refer to [Streaming video session settings](configuration.md#streaming-video-sessions)
 for enablement, capacity, and idle timeouts.
 
 For a shared Dynamo frontend, use the [Dynamo streaming deployment](dynamo/dynamo_with_streaming.md)
@@ -30,7 +30,7 @@ set `NIM_STREAMING_SPEC_METHOD=ngram` for GPU n-gram speculation or `none` to
 disable it. Edge works with the same clients, which discover its model ID;
 launch it with `NIM_USE_DFLASH=0` and `NIM_STREAMING_SPEC_METHOD=none`, in
 standalone ([Edge experiments](deployment.md#edge-experiments)) or
-[Dynamo](dynamo/dynamo_with_streaming.md#use-edge-reasoner) mode. See
+[Dynamo](dynamo/dynamo_with_streaming.md#use-edge-reasoner) mode. Refer to
 [Advanced streaming controls](configuration.md#advanced-streaming-controls).
 
 ## Example client
@@ -278,7 +278,7 @@ the session.
 | `op` | Fields | Meaning |
 | --- | --- | --- |
 | `created` | `session_id`, `model`, `fps`, `retention`, `frame_format` | Session accepted; effective retention and negotiated image format |
-| `frame` | `frame_index`, `text`, `finish_reason`, `token_count`, timing fields | Completed answer to one image; see [Frame replies](#frame-replies) |
+| `frame` | `frame_index`, `text`, `finish_reason`, `token_count`, timing fields | Completed answer to one image; refer to [Frame replies](#frame-replies) |
 | `closed` | `session_id`, `frames`, `closed` | Session released; `frames` counts answered frames and `closed` is `true` |
 | `error` | `message`, `code`, `fatal` | Protocol, admission, or processing error; `code` is HTTP-style, not a WebSocket close code |
 

@@ -218,7 +218,7 @@ top-level `fps`, `num_frames`, and `negative_prompt`. The model returns 32
 actions of width 8 and defaults to 4 steps, guidance `3.0`, and flow shift
 `5.0`; those and `seed` are overridable.
 
-The response is action-only, with no `b64_image` or `b64_video` (see the
+The response is action-only, with no `b64_image` or `b64_video` (refer to the
 [response example](api-reference.md#generator-response)).
 
 After readiness, run the [policy client](examples/policy_droid.py):
