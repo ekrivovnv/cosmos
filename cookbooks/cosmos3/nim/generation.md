@@ -5,7 +5,7 @@ SPDX-License-Identifier: OpenMDW-1.1 -->
 
 Send text-to-image (T2I), text-to-video (T2V), image-to-video (I2V), and
 video-to-video (V2V) requests to a running **Generator** with synchronous JSON
-`POST /v1/infer`. Launch it with [Deployment](deployment.md); the shared
+`POST /v1/infer`. Launch it with [Deployment](deployment.md). The shared
 request envelope is in the
 [API Reference](api-reference.md#common-generator-request-fields).
 
@@ -18,9 +18,9 @@ export NIM_URL=${NIM_URL:-http://localhost:8000}
 curl -f "$NIM_URL/v1/health/ready"
 ```
 
-Requests are synchronous and can stay quiet until done; the examples allow 30
-minutes, so do not retry a quiet connection (refer to
-[Long-Running Requests](operations.md#long-running-requests)).
+Requests are synchronous and can stay quiet until done. The examples allow 30
+minutes, so do not retry a quiet connection. Refer to
+[Long-Running Requests](operations.md#long-running-requests).
 
 Install the [client tooling](prerequisites.md#client-tooling), then run the
 examples from the cookbook directory. They use the included prompts and media
@@ -41,9 +41,9 @@ uv run python examples/t2i.py
 | V2V | Continue or transform a car-driving video | `car_driving_plain.mp4` | `b64_video` | `uv run python examples/v2v.py` |
 
 Standard scripts run on a general-purpose `nano` or `super` variant whose image
-includes the task; T2I and I2V also run on their full-step specialists.
-Four-step specialists need their own scripts (refer to
-[Specialist T2I and I2V Variants](#specialist-t2i-and-i2v-variants)).
+includes the task. T2I and I2V also run on their full-step specialists.
+Four-step specialists need their own scripts. Refer to
+[Specialist T2I and I2V Variants](#specialist-t2i-and-i2v-variants).
 
 ## Text-to-Image
 
@@ -82,7 +82,7 @@ PY
 Full example: `uv run python examples/t2i.py`.
 
 Set `model_mode=text2image`, omit `input_reference`, and use `num_frames=1`.
-Image-to-image is not supported; use `image2video` to condition on an image.
+Image-to-image is not supported. Use `image2video` to condition on an image.
 
 When their fields are omitted, T2I uses:
 
@@ -175,8 +175,9 @@ Path("i2v_car_driving.mp4").write_bytes(video)
 
 Full example: `uv run python examples/i2v.py`.
 
-`input_reference` is required (an image, up to 20,000,000 encoded characters).
-Use JPEG, PNG, or WebP; verify other formats on the deployed image.
+The `input_reference` field is required and takes an image of up to 20,000,000
+encoded characters. Use JPEG, PNG, or WebP. Verify other formats on the
+deployed image.
 
 ## Choose a Video-Conditioned Workflow
 
@@ -212,19 +213,20 @@ Full example: `uv run python examples/v2v.py`.
 
 `condition_frame_indexes_vision` indexes latent frames, not pixel frames,
 defaults to `[0, 1]`, and is sorted and deduplicated. The source video needs at
-least `max(index) * 4 + 1` frames, and the largest index must be below the
-output latent count (for `num_frames=93`: 24 latent frames, so at most 23). An
-empty list or a negative index returns HTTP 422. `condition_video_keep` takes
-frames from the `first` (default) or `last` part of the input.
+least `max(index) * 4 + 1` frames. The largest index must be below the output
+latent count. For example, `num_frames=93` has 24 latent frames, so the largest
+index is at most 23. An empty list or a negative index returns HTTP 422.
+`condition_video_keep` takes frames from the `first` (default) or `last` part of
+the input.
 
-Decoded video is capped at 75 MB; data URLs add about one third to the JSON
+Decoded video is capped at 75 MB. Data URLs add about one third to the JSON
 size. Refer to [Media Inputs](api-reference.md#media-inputs) for codecs.
 
 ## Specialist T2I and I2V Variants
 
-Super also ships task-specific variants. Each accepts only its task; select it
-before launch (`NIM_MODEL_VARIANT=super` is the general-purpose contract).
-Edge has no general-purpose, T2I, or I2V Generator; its only Generator variant
+Super also ships task-specific variants. Each accepts only its task. Select it
+before launch. The general-purpose contract is `NIM_MODEL_VARIANT=super`.
+Edge has no general-purpose, T2I, or I2V Generator. Its only Generator variant
 is [Edge-DROID Policy](action.md#edge-droid-and-nano-droid-policy).
 
 | Variant | Accepted Request | Sampling Behavior | Script |
@@ -236,8 +238,8 @@ is [Edge-DROID Policy](action.md#edge-droid-and-nano-droid-policy).
 
 Launch with the matching `NIM_MODEL_VARIANT`, then run the script with
 `uv run python`. Four-step requests must omit `num_inference_steps`,
-`guidance_scale`, and `flow_shift` (HTTP 422 otherwise); `seed` and other
-fields remain available.
+`guidance_scale`, and `flow_shift` (HTTP 422 otherwise). Four-step
+requests can still set `seed` and other fields.
 
 ## Choose Resolution, Frames, and FPS
 
@@ -268,9 +270,9 @@ Bare keys alias the 16:9 shape of their tier (width × height):
 
 ### FPS and Denoising Steps
 
-`fps` accepts 1–60 (10–30 recommended); video duration is about
+The `fps` field accepts 1–60 (10–30 recommended). Video duration is about
 `num_frames / fps` seconds. Fractional `fps` reaches the model and encoder
-unchanged; only prompt-upsampling text rounds it. More `num_inference_steps`
+unchanged. Only prompt-upsampling text rounds it. More `num_inference_steps`
 costs more latency.
 
 ## Media Inputs
@@ -280,20 +282,20 @@ Data-URL and URL rules, size caps, and accepted codecs are in the
 
 ## Reproducibility
 
-Set a non-negative integer `seed` when comparing runs; omitted, the service
-picks one. The same seed is not guaranteed bit-identical across NIM releases,
-model artifacts, precisions, or hardware layouts.
+Set a non-negative integer `seed` when comparing runs. If you omit it, the
+service picks one. The same seed is not guaranteed bit-identical across NIM
+releases, model artifacts, precisions, or hardware layouts.
 
 ## Optional Prompt Upsampling
 
 Operators can enable prompt upsampling for T2I, T2V, and I2V (not V2V, Action,
-or Transfer); it keeps the request's resolution, aspect, duration, and frames
+or Transfer). It keeps the request's resolution, aspect, duration, and frames
 per second (FPS), and falls back to the original prompt on failure. Refer to
 [Prompt Upsampling](configuration.md#prompt-upsampling).
 
 ## Output and Playback
 
-T2I returns raw JPEG base64 in `b64_image`; video modes return raw base64
+T2I returns raw JPEG base64 in `b64_image`. Video modes return raw base64
 VP9-in-MP4 in `b64_video`. The inactive media field is omitted. Examples write
 `t2i_robot_draping.jpg`, `t2v_robot_kitchen.mp4`, `i2v_car_driving.mp4`, or
 `v2v.mp4` under `examples/outputs/` (`_4step` suffix for specialists).
