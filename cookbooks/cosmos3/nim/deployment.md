@@ -14,7 +14,7 @@ You normally select a runtime and model, not a profile ID:
 
 1. Choose Generator or Reasoner.
 2. Choose a model variant.
-3. Optionally pin precision. Generator prefers FP8 when compatible; Reasoner
+3. Optionally pin precision. Generator prefers FP8 when compatible. Reasoner
    derives its preference from GPU compute capability.
 4. For Generator, choose latency or throughput.
 5. The NIM selects the best compatible profile for those choices and the
@@ -24,7 +24,7 @@ Selection prefers a resident profile that uses the visible GPUs well and can
 fall back to an equivalent lower-memory offload or tensor-parallel layout when
 current free GPU memory is short. On unified-memory systems, selection counts
 70% of the shared pool as GPU memory and uses only resident Generator profiles.
-If no profile fits, startup fails; free GPU memory and restart. Refer to
+If no profile fits, startup fails. Free GPU memory and restart. Refer to
 [GPU Architecture and Topology](support-matrix.md#gpu-architecture-and-topology)
 for the memory rules.
 
@@ -55,17 +55,17 @@ The default is `latency`.
 
 Set `NIM_MODEL_TYPE=reasoner` and choose `NIM_MODEL_VARIANT=edge`, `nano`, or
 `super`. Reasoner rejects `NIM_PERF_PROFILE` at startup. DFlash speculative
-decoding is on by default for Nano and Super; set `NIM_USE_DFLASH=0` to disable
-it. Edge has no DFlash draft: its profiles disable DFlash and reject
+decoding is on by default for Nano and Super. Set `NIM_USE_DFLASH=0` to
+disable it. Edge has no DFlash draft: its profiles disable DFlash and reject
 `NIM_USE_DFLASH=1` (refer to [Configuration](configuration.md#speculative-decoding)).
 
 ### Precision Selection
 
-Omit `NIM_PRECISION` normally: Generator prefers FP8 when compatible, and
-Reasoner prefers BF16 on compute capability 8.0 through 8.8, FP8 on 8.9 through
-9.x, and NVFP4 on 10.0 or newer, falling back to another compatible precision.
+Omit `NIM_PRECISION` normally. Generator prefers FP8 when compatible. Reasoner
+prefers BF16 on compute capability 8.0 through 8.8, FP8 on 8.9 through 9.x, and
+NVFP4 on 10.0 or newer, falling back to another compatible precision.
 Set `NIM_PRECISION=bf16`, `fp8`, or another available value only when the
-workload requires it; Edge Reasoner is BF16 or FP8 (no NVFP4), and Edge-DROID
+workload requires it. Edge Reasoner is BF16 or FP8 (no NVFP4), and Edge-DROID
 and Nano-DROID are BF16 only.
 
 ## Before You Deploy
@@ -77,11 +77,11 @@ Kubernetes deployment, follow [Deploy with Helm](helm.md).
 ## Authenticate to NGC
 
 Export `NGC_API_KEY` (not `NGC_TOKEN`) as described under
-[Network and NGC Access](prerequisites.md#network-and-ngc-access); never put the
-key in source control. Docker saves the registry login after `docker login`:
-Docker Desktop uses a native credential store, while standalone Docker Engine
-without a helper stores it base64-encoded in `$HOME/.docker/config.json` and
-prints a warning.
+[Network and NGC Access](prerequisites.md#network-and-ngc-access). Never put
+the key in source control. Docker saves the registry login after
+`docker login`. Docker Desktop uses a native credential store. Standalone
+Docker Engine without a helper stores it base64-encoded in
+`$HOME/.docker/config.json` and prints a warning.
 
 For stronger at-rest protection, configure a
 [supported credential helper](https://docs.docker.com/reference/cli/docker/login/#credential-stores)
@@ -105,7 +105,7 @@ echo "$NGC_API_KEY" \
 ```
 
 `--password-stdin` keeps the key out of shell history but does not encrypt the
-saved credential; without a helper, log out when you finish evaluating.
+saved credential. Without a helper, log out when you finish evaluating.
 
 Pin and pull the current release image:
 
@@ -119,7 +119,7 @@ Do not replace the versioned tag with `latest` or another unvalidated image.
 ### Set the Reasoner Memory Share on Unified-Memory Systems
 
 On DGX Spark/GB10 and Jetson AGX Thor, the NIM gives the model 70% of the
-unified host/device memory pool: it applies that share to profile floors and
+unified host/device memory pool. It applies that share to profile floors and
 uses it as the Reasoner `NIM_GPU_MEMORY_UTILIZATION` default. No variable is
 required. Lower the share only when host measurements show that media
 processing or other host workloads need more memory, for example:
@@ -180,8 +180,8 @@ Do not pass `NGC_API_KEY`, `NIM_MODEL_PATH`, or `NIM_DFLASH_MODEL_PATH` to this
 bundled-profile check. Checkpoint-source validation is a separate bring your own
 checkpoint (BYOC) step, and an `hf://` source can download files.
 
-Preflight success is necessary, not sufficient: it confirms that the image has a
-profile matching the selectors, compute capability, system-memory floor, and
+Preflight success is necessary, not sufficient. It confirms that the image has
+a profile matching the selectors, compute capability, system-memory floor, and
 total and free video memory (VRAM). It also logs Generator Transfer admission.
 It does not load the model. Only a cold start and representative requests
 confirm host RAM, disk, shared memory, the driver stack, media, and inference.
@@ -197,7 +197,8 @@ chmod -R a+rwX "$LOCAL_NIM_CACHE"
 ```
 
 These permissions suit local development. The container runs as UID/GID 1000
-(`nvs`); in production grant that UID/GID write access through a group or ACL.
+(`nvs`). In production, grant that UID/GID write access through a group or
+ACL.
 Keep the cache between runs to avoid repeated downloads.
 
 ## Launch Generator
@@ -221,21 +222,21 @@ docker run -d --name cosmos3-generator \
 ```
 
 The container starts in the background. Follow startup logs with
-`docker logs -f <container>` (here `cosmos3-generator`); Ctrl+C stops following
-without stopping the container.
+`docker logs -f <container>` (here `cosmos3-generator`). Ctrl+C stops
+following without stopping the container.
 
 On a discrete-GPU host, a non-offloading Nano profile needs at least 40 GiB of
-system memory for BF16 or 35 GiB for FP8; selection enforces these
+system memory for BF16 or 35 GiB for FP8. Selection enforces these
 [floors](support-matrix.md#generator-profiles).
 
 Change the model and objective as needed, expose every GPU a multi-GPU
 configuration requires, and add `-e NIM_PRECISION=fp8` only to pin precision.
-The Generator uses as many exposed GPUs as a compatible profile supports; refer to
-[Advanced Profile Controls](configuration.md#advanced-profile-controls).
+The Generator uses as many exposed GPUs as a compatible profile supports.
+Refer to [Advanced Profile Controls](configuration.md#advanced-profile-controls).
 
 ## Launch Reasoner
 
-Reasoner uses the same host port; remove a running Generator first:
+Reasoner uses the same host port. Remove a running Generator first:
 
 ```bash
 docker rm -f cosmos3-generator
@@ -243,7 +244,7 @@ docker rm -f cosmos3-generator
 
 ### DGX Spark and Jetson AGX Thor
 
-Use Nano. The NIM applies the unified-memory default; add
+Use Nano. The NIM applies the unified-memory default. Add
 `-e NIM_GPU_MEMORY_UTILIZATION="$NIM_GPU_MEMORY_UTILIZATION"` only if you
 exported a lower measured value:
 
@@ -264,7 +265,7 @@ docker run -d --name cosmos3-reasoner \
 
 ### Discrete GPU Example
 
-This example launches Super FP8 Reasoner, which needs compute capability 8.9+,
+This example launches Super FP8 Reasoner. It needs compute capability 8.9+,
 67 GiB of VRAM usable after the 4-GiB Reasoner reserve, and 43 GiB of system
 memory (refer to
 [Reasoner Profiles](support-matrix.md#reasoner-profiles)):
@@ -321,9 +322,9 @@ command in [Launch Generator](#launch-generator):
 -e NIM_CACHE_BACKEND=none
 ```
 
-Edge-DROID disables SeaCache by default; `NIM_CACHE_BACKEND=none` keeps that
-visible, so leave `NIM_CACHE_CONFIG` unset. Guardrails stay enabled. After
-readiness, follow [Verify the Selection](#verify-the-selection)
+Edge-DROID disables SeaCache by default (`NIM_CACHE_BACKEND=none`), so leave
+`NIM_CACHE_CONFIG` unset. Guardrails stay enabled. After readiness, follow
+[Verify the Selection](#verify-the-selection)
 and run the [Reasoner catalog](reasoning.md#run-the-task-catalog) or the
 [DROID policy client](action.md#edge-droid-and-nano-droid-policy). Edge-DROID
 serves policy only, not image/video generation or forward/inverse dynamics.
@@ -377,12 +378,12 @@ configuration you run offline.
    `find /path/to/offline-cache -xtype l` must print nothing. Apply the
    ownership from [Prepare the Model Cache](#prepare-the-model-cache).
 3. On the offline host, set `LOCAL_NIM_CACHE` to the copy and run the same
-   launch command. Generator can omit `-e NGC_API_KEY`; keep it for Reasoner,
+   launch command. Generator can omit `-e NGC_API_KEY`. Keep it for Reasoner,
    whose keyless offline start has not been validated.
-4. For Generator, do not set `NIM_DISABLE_MODEL_DOWNLOAD=1`; startup rejects it
+4. For Generator, do not set `NIM_DISABLE_MODEL_DOWNLOAD=1`. Startup rejects it
    because guardrail artifacts must be materialized from the cached files.
 5. [Wait for Readiness](#wait-for-readiness). With a complete cache, every
-   artifact logs `Skipping download, using cached copy of file`; the
+   artifact logs `Skipping download, using cached copy of file`. The
    `Downloading manifest profile` line does not indicate network access.
 
 To test a cache on a connected host before moving it, replace `-p 8000:8000`
@@ -396,8 +397,8 @@ docker exec cosmos3-generator python3 -c \
 ## Advanced Profile Controls
 
 Offload modes, guardrail-offload selectors, GPU-count and parallelism
-selectors, tag selectors, and profile-ID pins are for validated needs only;
-refer to [Configuration](configuration.md#advanced-profile-controls).
+selectors, tag selectors, and profile-ID pins are for validated needs only.
+Refer to [Configuration](configuration.md#advanced-profile-controls).
 
 ## Docker Flag Summary
 
@@ -430,5 +431,5 @@ docker rm -f cosmos3-reasoner
 docker logout nvcr.io
 ```
 
-Logout does not revoke the NGC key; deactivate or delete an evaluation key in
+Logout does not revoke the NGC key. Deactivate or delete an evaluation key in
 the NGC user interface. The model cache remains.
