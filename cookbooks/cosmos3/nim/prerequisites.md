@@ -3,8 +3,8 @@ SPDX-License-Identifier: OpenMDW-1.1 -->
 
 # Prerequisites for the Cosmos3 NIM
 
-Prepare and verify a host before pulling or launching the Cosmos3 NIM;
-per-configuration GPU, video memory (VRAM), and host RAM requirements are in the
+Prepare and verify a host before pulling or launching the Cosmos3 NIM.
+Per-configuration GPU, video memory (VRAM), and host RAM requirements are in the
 [Support Matrix](support-matrix.md).
 
 ## Hardware Requirements
@@ -24,12 +24,12 @@ If the deployment must serve Transfer, provision each GPU against the
 [Generator Profiles](support-matrix.md#generator-profiles), not the
 **Generation Minimum VRAM/Device** value.
 
-Use homogeneous GPUs; Reasoner requires the same compute capability on every
+Use homogeneous GPUs. Reasoner requires the same compute capability on every
 GPU. Each GPU must also have enough free memory at startup, so stop unrelated
 GPU workloads before launch.
 
 Lower-VRAM offload profiles keep model weights in system memory and carry
-their own system-memory floors; refer to the
+their own system-memory floors. Refer to the
 [Generator Profiles](support-matrix.md#generator-profiles). A
 container memory limit counts before host physical memory.
 
@@ -60,7 +60,7 @@ PY
 ```
 
 `MemFree` is immediately unused memory. `MemAvailable` already includes
-reclaimable cache; do not add the cache value to it, and do not assume every
+reclaimable cache. Do not add the cache value to it, and do not assume every
 cached byte can be reclaimed.
 
 A memory-related preflight failure has two materially different causes:
@@ -75,8 +75,9 @@ A memory-related preflight failure has two materially different causes:
 
 On these systems the Reasoner defaults to a 0.70
 [`NIM_GPU_MEMORY_UTILIZATION`](deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems)
-share; if you lower it, keep the same value from preflight through launch. Clearing page cache or deleting the model cache is
-not part of normal deployment; refer to
+share. If you lower it, keep the same value from preflight through launch.
+Clearing page cache or deleting the model cache is not part of normal
+deployment. Refer to
 [Unified-Memory Diagnostics](operations.md#unified-memory-diagnostics).
 
 ## Software Requirements
@@ -98,9 +99,9 @@ versions, not minimums):
 | Docker Engine | 27.0.3 |
 | NVIDIA Container Toolkit | 1.20.1 |
 
-The image provides the CUDA user-space libraries; do not install a host CUDA
+The image provides the CUDA user-space libraries. Do not install a host CUDA
 toolkit solely for the NIM. Do not narrow the image's
-`NVIDIA_DRIVER_CAPABILITIES=compute,utility,video`; Reasoner needs the `video`
+`NVIDIA_DRIVER_CAPABILITIES=compute,utility,video`. Reasoner needs the `video`
 capability for NVDEC decoding.
 
 ## Client Tooling
@@ -136,7 +137,7 @@ ffplay -version | head -n 1
 ```
 
 For another supported client distribution, use its package manager for
-`curl`, Python 3, and FFmpeg; use the same official installer for `uv`.
+`curl`, Python 3, and FFmpeg. Use the same official installer for `uv`.
 
 ### Initialize the Example Environment
 
@@ -147,15 +148,15 @@ cd cookbooks/cosmos3/nim
 uv sync --locked
 ```
 
-This creates the project `.venv` from `pyproject.toml` and `uv.lock`; rerun it
+This creates the project `.venv` from `pyproject.toml` and `uv.lock`. Rerun it
 after either file changes. `uv run python examples/...` reuses it.
 
 ## Network and NGC Access
 
 For a normal cold start, the host must reach:
 
-- `nvcr.io` to pull the container; and
-- the NGC model storage used to download and materialize profile artifacts.
+- The `nvcr.io` registry, to pull the container
+- The NGC model storage, to download and materialize profile artifacts
 
 You also need an
 [NGC personal API key](https://docs.nvidia.com/ngc/latest/ngc-catalog-user-guide.html)
@@ -170,9 +171,9 @@ echo
 ```
 
 The variable is `NGC_API_KEY`, not `NGC_TOKEN`. Do not save the key in source
-control; continue with [Authenticate to NGC](deployment.md#authenticate-to-ngc).
+control. Continue with [Authenticate to NGC](deployment.md#authenticate-to-ngc).
 
-An air-gapped host needs a pre-populated cache; refer to
+An air-gapped host needs a pre-populated cache. Refer to
 [Offline and Air-Gapped Deployment](deployment.md#offline-and-air-gapped-deployment).
 
 ## Verify the Host
@@ -196,7 +197,7 @@ Then verify that Docker can expose the intended GPUs:
 docker run --rm --runtime=nvidia --gpus all ubuntu nvidia-smi
 ```
 
-The GPU query reports memory in MiB; divide by 1,024 to compare with the
+The GPU query reports memory in MiB. Divide by 1,024 to compare with the
 binary-GiB floors in the [Support Matrix](support-matrix.md). The Docker check
 verifies GPU container access, not Cosmos3 profile compatibility.
 
