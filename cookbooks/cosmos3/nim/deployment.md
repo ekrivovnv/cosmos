@@ -4,7 +4,7 @@ SPDX-License-Identifier: OpenMDW-1.1 -->
 # Deploy the Cosmos3 NIM
 
 Use this page to authenticate to NGC, choose a model, launch Generator or
-Reasoner, and verify the selected service. The commands pin the current 2.0.0
+Reasoner, and verify the selected service. The commands pin the current 2.1.0
 release image. Use the [Support matrix](support-matrix.md) to choose a
 compatible configuration.
 
@@ -22,8 +22,9 @@ Users normally select a runtime and model, not a profile ID:
 
 Selection prefers a resident profile that uses the visible GPUs well and can
 fall back to an equivalent lower-memory offload or tensor-parallel layout when
-current free GPU memory is short. If no profile fits, startup fails; free GPU
-memory and restart. See
+current free GPU memory is short. On unified-memory systems, selection counts
+70% of the shared pool as GPU memory and uses only resident Generator profiles.
+If no profile fits, startup fails; free GPU memory and restart. See
 [GPU architecture and topology](support-matrix.md#gpu-architecture-and-topology)
 for the memory rules.
 
@@ -32,7 +33,7 @@ for the memory rules.
 | `NIM_MODEL_VARIANT` | Supported use |
 | --- | --- |
 | `nano` | General-purpose Nano Generator |
-| `edge-droid` | Edge-DROID policy with an action-only response; BF16 only |
+| `edge-droid` | Edge-DROID policy with an action-only response; BF16 only; [experimental](support-matrix.md#choose-a-model) |
 | `nano-droid` | Nano-DROID policy with an action-only response; BF16 only |
 | `super` | General-purpose Super Generator |
 | `super-t2i` | Full-step T2I specialist |
@@ -55,8 +56,8 @@ The default is `latency`.
 Set `NIM_MODEL_TYPE=reasoner` and choose `NIM_MODEL_VARIANT=edge`, `nano`, or
 `super`. Reasoner rejects `NIM_PERF_PROFILE` at startup. DFlash speculative
 decoding is on by default for Nano and Super; set `NIM_USE_DFLASH=0` to disable
-it, and always for Edge, which has no DFlash (see
-[Configuration](configuration.md#speculative-decoding)).
+it. Edge has no DFlash draft: its profiles disable DFlash and reject
+`NIM_USE_DFLASH=1` (see [Configuration](configuration.md#speculative-decoding)).
 
 ### Precision selection
 
@@ -109,7 +110,7 @@ saved credential; without a helper, log out when you finish evaluating.
 Pin and pull the current release image:
 
 ```bash
-export NIM_IMAGE='nvcr.io/nim/nvidia/cosmos3:2.0.0'
+export NIM_IMAGE='nvcr.io/nim/nvidia/cosmos3:2.1.0'
 docker pull "$NIM_IMAGE"
 ```
 
@@ -117,25 +118,18 @@ Do not replace the versioned tag with `latest` or another unvalidated image.
 
 ### Set the Reasoner memory share on unified-memory systems
 
-Before the first Reasoner preflight or launch on DGX Spark/GB10 or Jetson AGX
-Thor, set a workload-specific share of the unified host/device memory pool. For
-an image-only Reasoner workload, use:
+On DGX Spark/GB10 and Jetson AGX Thor, the NIM gives the model 70% of the
+unified host/device memory pool: it applies that share to profile floors and
+uses it as the Reasoner `NIM_GPU_MEMORY_UTILIZATION` default. No variable is
+required. Lower the share only when host measurements show that media
+processing or other host workloads need more memory, for example:
 
 ```bash
-export NIM_GPU_MEMORY_UTILIZATION=0.80
+export NIM_GPU_MEMORY_UTILIZATION=0.60
 ```
 
-For any Reasoner workload that includes video, or a mix of images and video,
-use:
-
-```bash
-export NIM_GPU_MEMORY_UTILIZATION=0.70
-```
-
-The `0.93` default is not reduced automatically and can starve the host and
-media processing. Pass `-e NIM_GPU_MEMORY_UTILIZATION` in every Reasoner
-preflight and launch command on these systems. Do not set it for Generator or
-routinely on a discrete GPU; see
+If you set a value, pass `-e NIM_GPU_MEMORY_UTILIZATION` in every Reasoner
+preflight and launch command on that system. Do not set it for Generator. See
 [Reasoner context and scheduling](configuration.md#context-and-scheduling).
 
 ## Run the pre-download profile preflight
@@ -161,11 +155,10 @@ docker run --rm \
 ```
 
 Use the selectors, GPU exposure, and container memory limit of the real
-deployment. For Reasoner, set `NIM_MODEL_TYPE=reasoner`, select `nano` or
-`super`, and omit `NIM_PERF_PROFILE`.
-
-On DGX Spark or Jetson AGX Thor, pass the
-[exported memory share](#set-the-reasoner-memory-share-on-unified-memory-systems).
+deployment. For Reasoner, set `NIM_MODEL_TYPE=reasoner`, select `edge`, `nano`,
+or `super`, and omit `NIM_PERF_PROFILE`. On DGX Spark or Jetson AGX Thor, add
+`-e NIM_GPU_MEMORY_UTILIZATION` only if you
+[lowered the memory share](#set-the-reasoner-memory-share-on-unified-memory-systems).
 This example checks Nano Reasoner:
 
 ```bash
@@ -173,7 +166,6 @@ docker run --rm \
   --gpus '"device=0"' \
   -e NIM_MODEL_TYPE=reasoner \
   -e NIM_MODEL_VARIANT=nano \
-  -e NIM_GPU_MEMORY_UTILIZATION="$NIM_GPU_MEMORY_UTILIZATION" \
   --entrypoint /bin/bash \
   "$NIM_IMAGE" \
   -lc '
@@ -232,8 +224,14 @@ The container starts in the background. Follow startup logs with
 `docker logs -f <container>` (here `cosmos3-generator`); Ctrl+C stops following
 without stopping the container.
 
+On a discrete-GPU host, a non-offloading Nano profile needs at least 40 GiB of
+system memory for BF16 or 35 GiB for FP8; selection enforces these
+[floors](support-matrix.md#generator-configurations).
+
 Change the model and objective as needed, expose every GPU a multi-GPU
 configuration requires, and add `-e NIM_PRECISION=fp8` only to pin precision.
+The Generator uses as many exposed GPUs as a compatible profile supports; see
+[Advanced profile controls](configuration.md#advanced-profile-controls).
 
 ## Launch Reasoner
 
@@ -245,7 +243,9 @@ docker rm -f cosmos3-generator
 
 ### DGX Spark and Jetson AGX Thor
 
-Use Nano and pass the exported unified-memory share (`0.80` or `0.70`):
+Use Nano. The NIM applies the unified-memory default; add
+`-e NIM_GPU_MEMORY_UTILIZATION="$NIM_GPU_MEMORY_UTILIZATION"` only if you
+exported a lower measured value:
 
 ```bash
 docker run -d --name cosmos3-reasoner \
@@ -258,7 +258,6 @@ docker run -d --name cosmos3-reasoner \
   -e NGC_API_KEY \
   -e NIM_MODEL_TYPE=reasoner \
   -e NIM_MODEL_VARIANT=nano \
-  -e NIM_GPU_MEMORY_UTILIZATION="$NIM_GPU_MEMORY_UTILIZATION" \
   -v "$LOCAL_NIM_CACHE:/opt/nim/.cache" \
   "$NIM_IMAGE"
 ```
@@ -266,7 +265,8 @@ docker run -d --name cosmos3-reasoner \
 ### Discrete GPU example
 
 This example launches Super FP8 Reasoner, which needs compute capability 8.9+,
-67 GiB of usable VRAM, and 46 GiB of host RAM (see
+67 GiB of VRAM usable after the 4-GiB Reasoner reserve, and 43 GiB of system
+memory (see
 [Reasoner configurations](support-matrix.md#reasoner-configurations)):
 
 ```bash
@@ -301,8 +301,7 @@ these selectors to the [Reasoner launch](#launch-reasoner), with `fp8` or
 ```text
 -e NIM_MODEL_TYPE=reasoner \
 -e NIM_MODEL_VARIANT=edge \
--e NIM_PRECISION=fp8 \
--e NIM_USE_DFLASH=0
+-e NIM_PRECISION=fp8
 ```
 
 The Responses API stays enabled by default (`NIM_DISABLE_RESPONSES_ROUTE=false`).
@@ -310,7 +309,9 @@ For streaming, also set `NIM_ENABLE_STREAMING=true` and
 `NIM_STREAMING_SPEC_METHOD=none` (see
 [Advanced streaming controls](configuration.md#advanced-streaming-controls)).
 
-For Edge-DROID, add these selectors to the [Generator launch](#launch-generator):
+For Edge-DROID, which is
+[experimental](support-matrix.md#choose-a-model), add these selectors to the
+[Generator launch](#launch-generator):
 
 ```text
 -e NIM_MODEL_TYPE=generator \
@@ -320,8 +321,9 @@ For Edge-DROID, add these selectors to the [Generator launch](#launch-generator)
 -e NIM_CACHE_BACKEND=none
 ```
 
-`NIM_CACHE_BACKEND=none` disables SeaCache; leave `NIM_CACHE_CONFIG` unset.
-Guardrails stay enabled. After readiness, [verify the selection](#verify-the-selection)
+Edge-DROID disables SeaCache by default; `NIM_CACHE_BACKEND=none` keeps that
+visible, so leave `NIM_CACHE_CONFIG` unset. Guardrails stay enabled. After
+readiness, [verify the selection](#verify-the-selection)
 and run the [Reasoner catalog](reasoning.md#run-the-task-catalog) or the
 [DROID policy client](action.md#edge-droid-and-nano-droid-policy). Edge-DROID
 serves policy only, not image/video generation or forward/inverse dynamics.
@@ -393,7 +395,8 @@ docker exec cosmos3-generator python3 -c \
 
 ## Advanced profile controls
 
-Offload modes, tag selectors, and profile-ID pins are for validated needs only;
+Offload modes, guardrail-offload selectors, GPU-count and parallelism
+selectors, tag selectors, and profile-ID pins are for validated needs only;
 see [Configuration](configuration.md#advanced-profile-controls).
 
 ## Docker flag summary
@@ -405,7 +408,7 @@ see [Configuration](configuration.md#advanced-profile-controls).
 | `--ulimit` | Raise memory-lock, stack, and open-file limits |
 | `-p HOST:8000` | Publish the selected host port |
 | `-e NGC_API_KEY` | Pass the exported NGC credential |
-| `-e NIM_GPU_MEMORY_UTILIZATION=...` | Set the required Reasoner memory share on DGX Spark or Jetson AGX Thor |
+| `-e NIM_GPU_MEMORY_UTILIZATION=...` | Optionally lower the Reasoner memory share on DGX Spark or Jetson AGX Thor |
 | `-v ...:/opt/nim/.cache` | Persist model artifacts |
 
 GPU counts, VRAM floors, and host RAM are in the

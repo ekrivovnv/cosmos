@@ -55,8 +55,10 @@ rules while doing so:
   DGX Spark.
 - **Reasoner on DGX Spark or Jetson AGX Thor**
   ([memory share](../../../deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems)):
-  include `-e NIM_GPU_MEMORY_UTILIZATION=0.80` (images only) or `0.70` (video or
-  mixed) in the first preflight command you show and in every launch command.
+  the NIM counts 70% of the shared pool toward profile floors and defaults
+  `NIM_GPU_MEMORY_UTILIZATION` to `0.70`. Suggest a lower value only from host
+  measurements, then include it from the first preflight command you show
+  through every launch command.
 - **NGC login** ([authenticate](../../../deployment.md#authenticate-to-ngc)):
   mention that Docker stores the login unless a credential helper is configured
   (the helper is optional) and that `--password-stdin` protects only shell
@@ -79,7 +81,8 @@ rules while doing so:
 
 When checking hardware, compare each device's total and free memory with the
 per-device floor and never add memory across devices. On discrete GPUs, require
-the support matrix's practical host RAM, not the 16-GiB admission tag. The
+the support matrix's system-memory floor, which profile selection enforces, as
+a minimum. The
 tested-GPU inventory is the validation scope, not an allowlist.
 
 ### Unified-memory decision procedure
@@ -89,9 +92,9 @@ tested-GPU inventory is the validation scope, not an allowlist.
    and show `MemFree`, `MemAvailable`, and the cache components. `MemAvailable`
    already includes reclaimable cache; do not add cache to it, and do not add a
    separate host-RAM requirement to the shared pool.
-2. For Reasoner, classify the workload (images only vs video or mixed) before
-   showing any command, and set the memory share as above.
-3. If the profile floor exceeds the pool's effective capacity, report **exceeds
+2. For Reasoner, apply the memory-share rule above.
+3. Effective capacity is 70% of the device-reported total. If the profile floor
+   exceeds it, report **exceeds
    total capacity** (for example, Reasoner Super BF16 TP1 on DGX Spark). If it
    fits but preflight rejects current free memory, report **fits hardware but
    not the current memory state** and ask the operator to stop only the

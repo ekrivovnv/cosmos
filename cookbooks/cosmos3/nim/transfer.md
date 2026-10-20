@@ -143,8 +143,18 @@ precomputed control video.
 | `num_video_frames_per_chunk` | Integer `>= 1` | 93 generally, 101 WSM-only |
 | `num_conditional_frames` | Integer `>= 0` and smaller than chunk size | 1 |
 | `num_first_chunk_conditional_frames` | Integer `>= 0`; bounded by chunk and output | 0 |
+| `<control>.control_weight` | Finite number `>= 0`; enabled weights need a positive sum | 1.0 |
 
 `num_first_chunk_conditional_frames > 0` requires `input_reference`.
+`control_weight` belongs inside a control object; see
+[Advanced multiple controls](#advanced-multiple-controls).
+
+### Control guidance behavior
+
+When control and text guidance are both active, the control term is scaled by
+`control_guidance` alone; with the edge-family defaults the effective control
+coefficient is 1.5. `control_guidance=1.0` disables the extra control-guidance
+branch.
 
 Current defaults by family (explicit valid values override them; recheck on
 another image):
@@ -160,7 +170,30 @@ The example script uses a 121-frame chunk, or 101 for WSM.
 ## Advanced multiple controls
 
 A `transfer` object can enable several controls; mixed requests use the edge
-family defaults. This guide does not validate any combination, so use one
+family defaults. Each control object (`edge`, `blur`, `depth`, `seg`, `wsm`)
+accepts an optional relative `control_weight`, normalized across the enabled
+controls. This example gives edge and depth normalized weights of 0.25 and
+0.75:
+
+```json
+{
+  "model_mode": "video2video",
+  "prompt": "A snowy mountain road",
+  "input_reference": "data:video/mp4;base64,<BASE64_SOURCE_VIDEO>",
+  "guidance_scale": 3.0,
+  "transfer": {
+    "edge": {"control_weight": 1.0},
+    "depth": {
+      "video": "data:video/mp4;base64,<BASE64_DEPTH_CONTROL>",
+      "control_weight": 3.0
+    },
+    "control_guidance": 1.5
+  }
+}
+```
+
+An omitted weight, `"edge": true`, and `"blur": true` use 1.0. A zero weight is
+accepted only when another enabled control has a positive weight. This guide does not validate any combination, so use one
 control per request unless yours is validated, and only combine controls that
 are spatially and temporally aligned.
 
@@ -189,7 +222,8 @@ The response is `b64_video` plus `action: null`.
 
 Besides the failures below, Transfer rejects V2V fields
 (`condition_frame_indexes_vision`, `condition_video_keep`) and `action_params`,
-and a nested precomputed edge/blur video combined with its preset.
+a nested precomputed edge/blur video combined with its preset, and a negative
+or non-finite `control_weight` or enabled weights without a positive sum.
 
 | Failure | Fix |
 | --- | --- |

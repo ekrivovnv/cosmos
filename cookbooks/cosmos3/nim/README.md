@@ -12,7 +12,7 @@ contains two runtimes, but each container runs only one:
   Completions and, when enabled, the Responses API.
 
 > Deployment commands pin the current release image,
-> `nvcr.io/nim/nvidia/cosmos3:2.0.0`; compatible configurations are in the
+> `nvcr.io/nim/nvidia/cosmos3:2.1.0`; compatible configurations are in the
 > [Support matrix](support-matrix.md).
 
 ## Architecture
@@ -45,7 +45,7 @@ a compatible profile, as described in
 | Forward dynamics | Generator | Image + action trajectory | Rollout video | [Action](action.md#forward-dynamics) |
 | Policy | Generator | Image + task/state | Video + predicted action | [Action](action.md#policy) |
 | Nano-DROID policy | Generator | Image + task/current state | Predicted action | [Action](action.md#edge-droid-and-nano-droid-policy) |
-| Edge-DROID policy | Generator | Composed camera views + task/current state | Predicted action | [Action](action.md#edge-droid-and-nano-droid-policy) |
+| Edge-DROID policy ([experimental](support-matrix.md#choose-a-model)) | Generator | Composed camera views + task/current state | Predicted action | [Action](action.md#edge-droid-and-nano-droid-policy) |
 | Inverse dynamics | Generator | Video | Video + predicted action | [Action](action.md#inverse-dynamics) |
 | Video Transfer | Generator | Prompt + spatial control | Controlled MP4 video | [Transfer](transfer.md) |
 | Image/video reasoning | Reasoner | Media + text | Text or structured result | [Reasoning](reasoning.md) |
@@ -90,10 +90,11 @@ uv run python examples/reasoner.py --case image_caption
 1. Verify the GPU host against [Prerequisites](prerequisites.md).
 2. Choose a compatible model and hardware configuration from the
    [Support matrix](support-matrix.md).
-3. Follow [Deployment](deployment.md) to authenticate, pull the image, set the
+3. Follow [Deployment](deployment.md) to authenticate, pull the image, run the
+   preflight, and launch Generator or Reasoner. On DGX Spark or Jetson AGX
+   Thor, the NIM applies a 70%
    [unified-memory share](deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems)
-   for a Reasoner on DGX Spark or Jetson AGX Thor, run the preflight, and
-   launch Generator or Reasoner.
+   automatically.
 4. Return to [Use an existing NIM endpoint](#use-an-existing-nim-endpoint) to
    verify the service and run the first request.
 

@@ -12,7 +12,7 @@ preserving the Cosmos3 NIM server, profile selection, and runtime contract.
 
 | Runtime | Accepted source | What the NIM still provides |
 | --- | --- | --- |
-| Generator | Absolute local directory | Server, profile, and Generator guardrail artifacts |
+| Generator | Absolute local directory or `hf://owner/repository[:revision]` | Server, profile, and Generator guardrail artifacts |
 | Reasoner | Absolute local directory or `hf://owner/repository[:revision]` | Server, selected runtime layout, and profile compatibility policy |
 | Nano or Super Reasoner DFlash draft | Absolute local directory only | Primary Reasoner checkpoint, server, and profile policy |
 
@@ -52,6 +52,23 @@ Choose a variant, precision, and objective that match the checkpoint. The NIM
 still downloads Generator guardrail artifacts, so the cache must be writable
 (NGC access may be required) and `NIM_DISABLE_MODEL_DOWNLOAD=1` is rejected.
 
+### Hugging Face source
+
+The Generator also accepts `hf://owner/repository[:revision]`, downloaded into
+the NIM cache. The repository root must contain the layout above, and the
+inferred variant and precision must match the selected profile:
+
+```text
+-e NIM_MODEL_PATH='hf://owner/repository:revision' \
+-e HF_TOKEN \
+-e NIM_MODEL_VARIANT=nano \
+-e NIM_PRECISION=fp8
+```
+
+Omit `:revision` to use `main`; pin a commit for reproducible deployments. Pass
+`HF_TOKEN` only for a private repository. Keep `NGC_API_KEY` and a writable
+cache for the guardrail artifacts.
+
 ## Reasoner checkpoint
 
 ### Local directory
@@ -81,8 +98,8 @@ artifact downloads. With `NIM_MODEL_PATH`, the NIM does not download the
 profile's DFlash draft, which Nano and Super Reasoner enable by default. Mount a
 matching Nano or Super draft through
 `NIM_DFLASH_MODEL_PATH` (absolute local path, no `hf://`), or set
-`NIM_USE_DFLASH=0` to run target-only; Edge has no DFlash, so always set
-`NIM_USE_DFLASH=0` for Edge. The draft needs only:
+`NIM_USE_DFLASH=0` to run target-only. Edge has no DFlash; it defaults to
+`NIM_USE_DFLASH=0` and rejects `1`. The draft needs only:
 
 ```text
 /byoc/cosmos3-dflash/
@@ -144,7 +161,7 @@ validation baseline.
 | Generator rejects disabled downloads | Generator still needs NIM-provided guardrails | Remove `NIM_DISABLE_MODEL_DOWNLOAD=1` and provide NGC/cache access |
 | Hugging Face source rejected offline | `hf://` requires download but downloads are disabled | Use an absolute pre-downloaded local path |
 | DFlash path is rejected | The draft path is relative, uses `hf://`, is not mounted, or lacks one of its two required files | Use an absolute local mount containing `config.json` and `model.safetensors` |
-| DFlash configuration is rejected | DFlash is disabled, the target is Edge (no DFlash), the draft does not match the Nano/Super target, or `NIM_DFLASH_CONFIG` sets reserved `method`/`model` keys | For Edge, set `NIM_USE_DFLASH=0`; otherwise use the selected Reasoner's matching draft, keep DFlash enabled, and remove reserved keys; see [Speculative decoding](configuration.md#speculative-decoding) |
+| DFlash configuration is rejected | DFlash is disabled, DFlash is enabled on Edge (including through `NIM_OPTIMIZATION_PRESET=TPOT`), the draft does not match the Nano/Super target, or `NIM_DFLASH_CONFIG` sets reserved `method`/`model` keys | For Edge, leave `NIM_USE_DFLASH` unset or `0`; otherwise use the selected Reasoner's matching draft, keep DFlash enabled, and remove reserved keys; see [Speculative decoding](configuration.md#speculative-decoding) |
 | Metadata shows `default` | Override was omitted, rejected, or applied to another container | Inspect launch environment, mounts, startup logs, and `/v1/metadata` |
 
 For broader startup, cache, GPU, and readiness diagnosis, see

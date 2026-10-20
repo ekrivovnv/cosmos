@@ -64,7 +64,7 @@ Defaults are for video / T2I; Transfer and Action defaults are on their pages.
 | `seed` | non-negative integer or null | Service-generated | Reproducibility |
 | `guidance_scale` | finite number in `[1.0,7.0]` | `6.0` / `4.0` | Sampling when not owned by a specialist model |
 | `num_inference_steps` | integer in `[1,100]` | `35` / `50` | Sampling when not owned by a specialist model |
-| `flow_shift` | finite number | `10.0` / `3.0` | Sampling when not owned by a specialist model |
+| `flow_shift` | finite number greater than 0 | `10.0` / `3.0` | Sampling when not owned by a specialist model |
 | `resolution` | enum | `720` / `720_1_1` | Generation and Transfer; see [resolution keys](generation.md#resolution-keys) |
 | `num_frames` | integer | `189` / `1` | Generation and Transfer; Action derives it and rejects the field |
 | `fps` | finite number in `[1.0,60.0]` | `24.0` | Video tasks; retained but not encoded for T2I |
@@ -98,9 +98,9 @@ with a `Content-Type` of `image/*` or `video/*`. Generic
 `Content-Disposition` names an `.mp4` file. Prefer data URLs; remote inputs
 need container network access and can time out or change.
 
-Input videos must use H.264, H.265/HEVC, MPEG-4, VP8, VP9, or AV1; other codecs
-return HTTP 422. The container can be any format the decoder opens. Image
-formats are summarized in the
+Input videos must use an MP4/MOV, Matroska/WebM, FLV, or AVI container with
+H.264, H.265/HEVC, MPEG-4 Part 2, VP8, VP9, or AV1; other codecs return HTTP
+422. Decode paths and image formats are in the
 [support matrix](support-matrix.md#media-and-codecs).
 
 Size caps: I2V images 20,000,000 encoded characters; V2V decoded video 75 MB;

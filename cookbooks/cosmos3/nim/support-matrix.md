@@ -14,7 +14,7 @@ Choose the model; the NIM selects a compatible profile and precision (see
 | Runtime | Model | Supported use |
 | --- | --- | --- |
 | Generator | `nano` | General-purpose Generator tasks |
-| Generator | `edge-droid` | DROID policy with action-only output; BF16 only |
+| Generator | `edge-droid` | DROID policy with action-only output; BF16 only; **experimental** |
 | Generator | `nano-droid` | DROID policy with action-only output; BF16 only |
 | Generator | `super` | General-purpose Generator tasks |
 | Generator | `super-t2i` | Full-step T2I only |
@@ -26,7 +26,13 @@ Choose the model; the NIM selects a compatible profile and precision (see
 | Reasoner | `super` | Image/video reasoning |
 
 A Generator specialist rejects requests for other tasks. Edge has no
-general-purpose Generator. After startup,
+general-purpose Generator.
+
+> **Experimental:** Edge-DROID policy is experimental in this release because
+> NVIDIA has not validated it. Validate its accuracy, latency, and safety
+> behavior for your workload before relying on it.
+
+After startup,
 [verify the selection](deployment.md#verify-the-selection).
 
 ### Practical model recommendation
@@ -37,7 +43,9 @@ general-purpose Generator. After startup,
 - H100, RTX PRO 6000 Blackwell, and lower-throughput discrete GPUs: default to
   Nano, especially for video. Use Super only for an explicit model requirement.
 - Unified-memory systems (DGX Spark, Jetson AGX Thor): default to Nano for both
-  runtimes. Some Super rows fit, but turnaround is impractical.
+  runtimes. Some Super Reasoner rows fit, but turnaround is impractical.
+- Smallest GPUs: Edge Reasoner and Edge-DROID have the lowest floors; see
+  [Edge verified GPUs](#edge-verified-gpus).
 
 ## GPU architecture and topology
 
@@ -55,31 +63,32 @@ GPU SKU allowlist:
 Use homogeneous GPUs; mixed-GPU configurations are not supported, and
 Reasoner requires the same compute capability on every GPU. Do not add VRAM
 across devices. Each GPU in the selected layout must meet the floor in total
-and in free memory at startup; Reasoner measures free memory after a runtime
-reserve (2 GiB by default on a discrete GPU, the host reserve on an integrated
-GPU). On unified-memory systems, Generator uses only rows with
+and in free memory at startup; on a discrete GPU, Reasoner measures free
+memory after a 4-GiB runtime reserve (`NIM_GPU_MEMORY_HEADROOM_GIB`).
+On unified-memory systems, Generator uses only rows with
 **Model offload = None** and **Guardrails = Resident**.
 
 ### Unified-memory thresholds
 
-On unified-memory systems, **effective shared memory** is the device-reported
-total minus the default 16-GiB host reserve. Change that reserve with
-`NIM_UNIFIED_MEMORY_HOST_RESERVE_GIB` only from validated host measurements;
-see [Advanced profile controls](configuration.md#advanced-profile-controls).
+On unified-memory systems, **effective shared memory** is 70% of the
+device-reported total; the rest stays with the host. The same share is the
+default Reasoner `NIM_GPU_MEMORY_UTILIZATION`.
 
 | Runtime/profile | Effective shared-memory floor | Unified-memory policy |
 | --- | ---: | --- |
+| Generator `edge-droid` BF16 | 15 GiB | Resident model and guardrails |
 | Generator `nano` BF16; `nano-droid` BF16 | 58 GiB | Resident model and guardrails |
 | Generator `nano` FP8 | 44 GiB | Resident model and guardrails |
 | Generator `super` BF16 | 150 GiB | Resident model and guardrails |
 | Generator `super` FP8 | 93 GiB | Resident model and guardrails |
+| Reasoner `edge` BF16 or FP8 | 12 GiB/device | No CPU/model offload |
 | Reasoner `nano` BF16, FP8, or NVFP4 | 23.1 GiB/device | No CPU/model offload |
 | Reasoner `super` BF16, TP1 | 135 GiB/device | No CPU/model offload |
 | Reasoner `super` BF16, TP2 | 73 GiB/device | No CPU/model offload |
 | Reasoner `super` FP8, TP1 | 67 GiB/device | No CPU/model offload |
 | Reasoner `super` NVFP4, TP1 | 73 GiB/device | No CPU/model offload |
 
-Floors are compared with the binary-GiB total reported by the running system;
+Floors are compared with 70% of the binary-GiB total reported by the running system;
 current free shared memory is checked separately at startup.
 
 ## Tested GPU inventory
@@ -98,10 +107,10 @@ Capacity is a shared host/device pool, not separate VRAM:
 | Jetson AGX Thor T5000 | 123 GiB |
 | DGX Spark (GB10) | 128 GB (about 119 GiB) |
 
-These capacities fit the resident Generator Nano BF16/FP8 and Super FP8 rows,
-and the Reasoner Nano and Super FP8/NVFP4 TP1 rows. Reasoner Super BF16 TP1
-(135 GiB) exceeds both systems' total capacity, so freeing cache cannot make
-it fit.
+The effective share is roughly 83 to 86 GiB. It fits the resident Generator
+Edge-DROID and Nano rows but no Super Generator row, and the Reasoner Edge,
+Nano, and Super FP8/NVFP4 TP1 rows. Reasoner Super BF16 TP1 (135 GiB) exceeds
+both systems' total capacity, so freeing cache cannot make it fit.
 
 ### Blackwell Ultra
 
@@ -159,36 +168,37 @@ The `super` rows in this table also apply to `super-t2i`,
 `super-t2i-4step`, `super-i2v`, and `super-i2v-4step`. Transfer thresholds apply
 only to the general-purpose `nano` and `super` variants.
 
-| Variant group | Precision | Model offload | Guardrails during diffusion | GPUs | Generation minimum VRAM/device | Host RAM guidance | Transfer minimum VRAM/device |
+| Variant group | Precision | Model offload | Guardrails during diffusion | GPUs | Generation minimum VRAM/device | System-memory floor | Transfer minimum VRAM/device |
 | --- | --- | --- | --- | ---: | ---: | ---: | ---: |
-| `edge-droid` | BF16 | None | Resident | 1, 2, 4, 8 | 15 GiB profile floor | Validate on host | Not supported |
-| `nano` | BF16 | None | Resident | 1, 2, 4, 8 | 58 GiB | 40 GiB | 64 GiB |
+| `edge-droid` (experimental) | BF16 | None | Resident | 1, 2, 4, 8 | 15 GiB | 16 GiB | Not supported |
+| `nano`, `nano-droid` | BF16 | None | Resident | 1, 2, 4, 8 | 58 GiB | 40 GiB | 64 GiB |
 | `nano` | BF16 | Layer | Offloaded | 1 | 31 GiB | 64 GiB | 35 GiB |
-| `nano` | FP8 | None | Resident | 1, 2, 4, 8 | 44 GiB | 40 GiB | 50 GiB |
-| `nano` | FP8 | Model | Resident | 1 | 38 GiB | 64 GiB | 44 GiB |
-| `nano` | FP8 | Layer | Resident | 1 | 32 GiB | 64 GiB | 38 GiB |
+| `nano` | FP8 | None | Resident | 1, 2, 4, 8 | 44 GiB | 35 GiB | 50 GiB |
+| `nano` | FP8 | Model | Resident | 1 | 38 GiB | 36 GiB | 44 GiB |
+| `nano` | FP8 | Layer | Resident | 1 | 32 GiB | 36 GiB | 38 GiB |
 | `nano` | FP8 | Layer | Offloaded | 1 | 31 GiB | 64 GiB | 35 GiB |
 | `super` | BF16 | None | Resident | 1, 2, 4, 8 | 150 GiB | 112 GiB | 160 GiB |
 | `super` | BF16 | Model | Resident | 1 | 93 GiB | 150 GiB | 99 GiB |
 | `super` | BF16 | Layer | Resident | 1 | 42 GiB | 150 GiB | 50 GiB |
-| `super` | FP8 | None | Resident | 1, 2, 4, 8 | 93 GiB | 78 GiB | 103 GiB |
-| `super` | FP8 | Model | Resident | 1 | 64 GiB | 150 GiB | 76 GiB |
-| `super` | FP8 | Layer | Resident | 1 | 38 GiB | 150 GiB | 50 GiB |
+| `super` | FP8 | None | Resident | 1, 2, 4, 8 | 93 GiB | 76 GiB | 103 GiB |
+| `super` | FP8 | Model | Resident | 1 | 64 GiB | 80 GiB | 76 GiB |
+| `super` | FP8 | Layer | Resident | 1 | 38 GiB | 80 GiB | 50 GiB |
+
+Specialist variants (`nano-droid`, `edge-droid`, and `super-*`) use only the
+resident-guardrail rows of their base model. Multi-GPU rows use every GPU: a
+`latency` profile splits each request with guidance parallelism 2 and sequence
+parallelism `n_gpus / 2`; a `throughput` profile runs one engine replica per
+GPU, and there is no one-GPU `throughput` profile. To limit the GPU count, see
+[Advanced profile controls](configuration.md#advanced-profile-controls).
 
 The 31-GiB Nano layer-offload rows target 32-GB client GPUs such as the
 GeForce RTX 5090, which does not meet their 35-GiB Transfer minimum.
 
-> **Host RAM:** Values for non-offloading Nano and Super rows (Generator and
-> Reasoner) are empirical practical minimums on discrete-GPU hosts. Edge rows
-> (`edge-droid`, `edge`) are profile-selection floors, not measured
-> requirements: confirm them and their system-memory admission tags in the image
-> manifest, and validate host RAM and GPU headroom for the actual context,
-> media, and concurrency. The profiles' own
-> admission check is only 16 GiB so startup is not blocked; passing it does not
-> satisfy the practical value. Offload rows carry a profile floor (Nano 64 GiB,
-> Super 150 GiB) with no separate practical minimum established. A container
-> memory limit counts before host physical memory. Unified-memory systems have
-> no separate host RAM requirement; size them with
+> **System memory:** Profile selection enforces each row's system-memory floor
+> (Generator and Reasoner) against host memory or a smaller container memory
+> limit. Treat the floors as minimums; media processing, concurrency, and other
+> host workloads can need more. Unified-memory systems have no separate host RAM
+> requirement; size them with
 > [Unified-memory thresholds](#unified-memory-thresholds).
 
 Leave offload and guardrail residency on automatic selection unless a
@@ -198,22 +208,38 @@ configuration is validated for the deployment.
 
 Reasoner does not use Generator latency/throughput or model-offload selectors:
 
-| Model | Precision | GPUs | Tensor parallelism | Minimum VRAM/device | Practical host RAM minimum | Minimum compute capability |
+| Model | Precision | GPUs | Tensor parallelism | Minimum VRAM/device | System-memory floor | Minimum compute capability |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| `edge` | BF16 | 1 | 1 | 12 GiB profile floor | Validate on host | 8.0 |
-| `edge` | FP8 | 1 | 1 | 12 GiB profile floor | Validate on host | 8.9 |
+| `edge` | BF16 | 1 | 1 | 12 GiB | 8 GiB | 8.0 |
+| `edge` | FP8 | 1 | 1 | 12 GiB | 8 GiB | 8.9 |
 | `nano` | BF16 | 1 | 1 | 23.1 GiB | 24 GiB | 8.0 |
-| `nano` | FP8 | 1 | 1 | 23.1 GiB | 18 GiB | 8.9 |
-| `nano` | NVFP4 | 1 | 1 | 23.1 GiB | 18 GiB | 10.0 |
-| `super` | BF16 | 1 | 1 | 135 GiB | 76 GiB | 8.0 |
-| `super` | BF16 | 2 | 2 | 73 GiB | 76 GiB | 8.0 |
-| `super` | FP8 | 1 | 1 | 67 GiB | 46 GiB | 8.9 |
-| `super` | NVFP4 | 1 | 1 | 73 GiB | 36 GiB | 10.0 |
+| `nano` | FP8 | 1 | 1 | 23.1 GiB | 17 GiB | 8.9 |
+| `nano` | NVFP4 | 1 | 1 | 23.1 GiB | 17 GiB | 10.0 |
+| `super` | BF16 | 1 | 1 | 135 GiB | 72 GiB | 8.0 |
+| `super` | BF16 | 2 | 2 | 73 GiB | 72 GiB | 8.0 |
+| `super` | FP8 | 1 | 1 | 67 GiB | 43 GiB | 8.9 |
+| `super` | NVFP4 | 1 | 1 | 73 GiB | 33 GiB | 10.0 |
 
-Host RAM follows the note under
+System memory follows the note under
 [Generator configurations](#generator-configurations). Selection prefers Super
 BF16 TP1 and can fall back to TP2 when TP1 lacks free memory; to require TP2,
 set `NIM_TAGS_SELECTOR='n_gpus=2,nim_tp=2'`.
+
+## Edge verified GPUs
+
+Edge Reasoner was verified on these GPUs. Edge-DROID policy was not validated;
+it is [experimental](#choose-a-model). Each deployment must still meet the
+floors above and the exact image manifest.
+
+| Architecture | GPUs |
+| --- | --- |
+| Blackwell Ultra | B300 SXM6, GB300 |
+| Blackwell | B200, GB200, DGX Spark (GB10), RTX PRO 6000 Blackwell Server Edition, RTX PRO 6000 Blackwell Workstation Edition, GeForce RTX 5090, GeForce RTX 5080 |
+| Hopper and Grace Hopper | H100 80 GB HBM3, H100 PCIe, H100 NVL, H200, H200 NVL, H20, GH200 480 GB, GH200 144 GB HBM3e |
+| Ada Lovelace | L40S, RTX 6000 Ada Generation |
+| Ampere | A100 SXM4 40 GB, A100 SXM4 80 GB, A100 PCIe 40 GB, A100 80 GB PCIe |
+
+Ampere GPUs (compute capability 8.0) support only the BF16 Edge profiles.
 
 ## Transfer headroom
 
@@ -227,7 +253,7 @@ bypasses the check for diagnosis only and can cause out-of-memory failures.
 | Direction | Media | Documented formats/codecs and limits |
 | --- | --- | --- |
 | Input | Images | Use the included JPEG, PNG, and WebP fixtures; verify other formats against the deployed image |
-| Input | Videos | H.264, H.265/HEVC, MPEG-4, VP8, VP9, and AV1; other codecs return HTTP 422; any container the decoder opens |
+| Input | Videos | MP4/MOV, Matroska/WebM, FLV, and AVI containers; H.264, H.265/HEVC, and MPEG-4 Part 2 decode through NVDEC, VP8, VP9, and AV1 use software decode; other codecs return HTTP 422 |
 | Output | Generator image | JPEG |
 | Output | Generator video | VP9 in MP4 |
 

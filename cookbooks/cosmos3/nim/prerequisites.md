@@ -14,7 +14,7 @@ per-configuration GPU, VRAM, and host RAM requirements are in the
 | CPU architecture | The release image provides `amd64` and `arm64` variants; use the variant selected by the container runtime |
 | GPU compute capability | Generator: BF16 `>=8.0`, FP8 `>=8.9`; Reasoner: BF16 `>=8.0`, FP8 `>=8.9`, NVFP4 `>=10.0` |
 | GPU count and per-device VRAM | See the [Generator](support-matrix.md#generator-configurations) and [Reasoner](support-matrix.md#reasoner-configurations) tables |
-| Host RAM | Practical minimum per configuration in the [Generator](support-matrix.md#generator-configurations) and [Reasoner](support-matrix.md#reasoner-configurations) tables; Edge rows give only profile floors, so validate host RAM for the workload |
+| Host RAM | System-memory floor per configuration, enforced by profile selection, in the [Generator](support-matrix.md#generator-configurations) and [Reasoner](support-matrix.md#reasoner-configurations) tables; treat it as a minimum for the workload |
 | Free disk | Provision for the image, selected model artifacts, materialization, and outputs; no single workload-independent floor is documented |
 | Container shared memory | The Docker reference launch allocates 16 GiB; validate the requirement for the selected media workload and concurrency |
 
@@ -29,8 +29,9 @@ GPU. Each GPU must also have enough free memory at startup, so stop unrelated
 GPU workloads before launch.
 
 Lower-VRAM offload profiles keep model weights in system memory and carry
-higher RAM floors; see the
-[Generator configurations](support-matrix.md#generator-configurations).
+their own system-memory floors; see the
+[Generator configurations](support-matrix.md#generator-configurations). A
+container memory limit counts before host physical memory.
 
 ### Inspect unified-memory capacity and current state
 
@@ -64,7 +65,7 @@ cached byte can be reclaimed.
 
 A memory-related preflight failure has two materially different causes:
 
-- A floor above the device-reported total after the unified-memory host reserve
+- A floor above 70% of the device-reported total
   **exceeds total capacity**. Stopping processes or reclaiming cache cannot make
   that profile fit.
 - A floor that fits the effective total but fails the current-memory check
@@ -72,9 +73,9 @@ A memory-related preflight failure has two materially different causes:
   `MemAvailable`, and the cache components, stop identified competing
   workloads, and rerun preflight.
 
-Before the first Reasoner preflight on these systems, set
+On these systems the Reasoner defaults to a 0.70
 [`NIM_GPU_MEMORY_UTILIZATION`](deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems)
-and keep it through launch. Clearing page cache or deleting the model cache is
+share; if you lower it, keep the same value from preflight through launch. Clearing page cache or deleting the model cache is
 not part of normal deployment; see
 [Unified-memory diagnostics](operations.md#unified-memory-diagnostics).
 

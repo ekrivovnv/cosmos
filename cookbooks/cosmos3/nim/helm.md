@@ -63,7 +63,7 @@ optimized for latency, on one GPU:
 ```yaml
 image:
   repository: nvcr.io/nim/nvidia/cosmos3
-  tag: "2.0.0"
+  tag: "2.1.0"
 imagePullSecrets:
   - name: ngc-secret
 model:
@@ -103,7 +103,7 @@ Adjust it for the chosen configuration:
 - **Cache size:** `220Gi` is a starting size for large model files. Set `persistence.storageClass` if the
   cluster has no default storage class.
 - **Memory:** A pod memory limit counts as system memory during profile
-  selection. Keep any limit at or above the host RAM value of the selected row.
+  selection. Keep any limit at or above the system-memory floor of the selected row.
 - **Shared memory:** The chart mounts a memory-backed `emptyDir` at `/dev/shm`
   by default. `sharedMemory.sizeLimit: 16Gi` matches the 16 GiB that the Docker
   launch allocates.
@@ -142,9 +142,9 @@ env:
     value: nano
 ```
 
-On DGX Spark/GB10 or Jetson AGX Thor nodes, also set
-`NIM_GPU_MEMORY_UTILIZATION` to `"0.80"` for image-only workloads or `"0.70"`
-for video or mixed-media workloads; see
+On DGX Spark/GB10 or Jetson AGX Thor nodes, the NIM defaults
+`NIM_GPU_MEMORY_UTILIZATION` to `0.70`; set a lower value only from host
+measurements; see
 [Set the Reasoner memory share](deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems).
 
 ### OpenTelemetry

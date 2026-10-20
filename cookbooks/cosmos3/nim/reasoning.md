@@ -229,8 +229,8 @@ tags, which appear in `message.content` as ordinary text.
 ## Reasoner DFlash
 
 Nano and Super Reasoner use their bundled DFlash drafts by default; set
-`NIM_USE_DFLASH=0` to run target-only, and always for Edge, which has no
-DFlash. Requests do not change. See
+`NIM_USE_DFLASH=0` to run target-only. Edge has no DFlash and rejects
+`NIM_USE_DFLASH=1`. Requests do not change. See
 [Speculative decoding](configuration.md#speculative-decoding) and
 [Reasoner checkpoint](bring-your-own-checkpoint.md#reasoner-checkpoint).
 

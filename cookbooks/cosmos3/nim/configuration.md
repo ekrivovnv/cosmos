@@ -57,9 +57,9 @@ processes, so a passed value can place work outside the intended GPUs.
 
 | Name | Default | Use |
 | --- | --- | --- |
-| `NIM_MODEL_PATH` | Empty | Generator: absolute local directory. Reasoner: absolute local directory or `hf://owner/repository[:revision]` |
+| `NIM_MODEL_PATH` | Empty | Absolute local directory or `hf://owner/repository[:revision]` for either runtime |
 | `NIM_DISABLE_MODEL_DOWNLOAD` | `false` | Disable profile download for a completely local Reasoner override; incompatible with Reasoner `hf://` and rejected for Generator |
-| `HF_TOKEN` | Empty | Authenticate to a private Reasoner Hugging Face repository |
+| `HF_TOKEN` | Empty | Authenticate to a private Hugging Face repository named by `NIM_MODEL_PATH` |
 
 To override the DFlash draft, see `NIM_DFLASH_MODEL_PATH` under [Speculative
 decoding](#speculative-decoding). See [Bring your own
@@ -99,9 +99,20 @@ are lowercased.
 `gp`, `cp`, and `dp` are accepted as aliases for `nim_gp`, `nim_up`, and
 `nim_dp`.
 
+Selectors filter the image's existing profiles and cannot create a layout the
+manifest lacks; a selection that matches no profile fails at startup. Without
+them, the Generator uses as many visible GPUs as a compatible profile supports
+(1, 2, 4, or 8). There is no one-GPU `throughput` profile, and model or layer
+offload is available only on one GPU. To keep the Generator on fewer GPUs,
+expose fewer GPUs with `--gpus`.
+
+On an integrated GPU with unified host/device memory (DGX Spark/GB10, Jetson
+AGX Thor), the NIM treats 70% of the shared pool as GPU memory for profile
+floors and as the default Reasoner `NIM_GPU_MEMORY_UTILIZATION`.
+
 A shorthand variable that conflicts with `NIM_TAGS_SELECTOR` is a startup
 error; use the `model_variant` tag to filter by model. Exact tags and profile
-IDs are tied to an image release. For the offload, memory-reserve, and
+IDs are tied to an image release. For the offload, memory-headroom, and
 profile-pin variables, see [Advanced settings](#advanced-settings).
 
 ## Generator configuration
@@ -129,8 +140,38 @@ requests](operations.md#long-running-requests).
 | `NIM_ENABLE_TEXT_GUARDRAILS` | `true` | Enable input-prompt policy checks |
 | `NIM_ENABLE_VIDEO_GUARDRAILS` | `true` | Enable output image/video face and visual guardrails |
 | `NIM_ENABLE_SIGLIP_GUARDRAILS` | `true` | Enable the output-frame safety classifier |
+| `NIM_QWEN3GUARD_MAX_INPUT_TOKENS` | `8192` | Set the text guardrail's maximum input tokens; minimum 512 |
 
-See [Guardrails](operations.md#guardrails) for what each layer does.
+The selected profile owns guardrail residency; choose it with the
+`text_guard_offload` and `video_guard_offload` selector keys under
+[Advanced profile controls](#advanced-profile-controls). See
+[Guardrails](operations.md#guardrails) for what each layer does.
+
+### Diffusion cache, attention, and VAE decode
+
+These performance defaults are validated startup settings, not request fields.
+If you notice a quality issue in a specific workload, try
+`NIM_CACHE_BACKEND=none` and `NIM_VAE_FAST_PATH=lossless`.
+
+- **SeaCache** reuses transformer results across denoising steps. It is on for
+  every Generator variant except `edge-droid`; set `NIM_CACHE_BACKEND` to
+  `sea_cache` or `none` to change that. `NIM_CACHE_CONFIG` overrides individual
+  fields as JSON, for example
+  `-e NIM_CACHE_CONFIG='{"sea_threshold": 0.20, "sea_max_consecutive_cached": 1}'`
+  (defaults: `sea_threshold=0.25`, `sea_residual_order=1`,
+  `sea_max_consecutive_cached=2`, `sea_power_exp=3.0`;
+  `sea_max_consecutive_cached=0` means no limit). Startup logs the effective
+  settings.
+- **SageAttention 2.2** is the default on compute capability 8.0 through 9.x
+  unless the profile uses sequence parallelism; Blackwell GPUs and
+  sequence-parallel profiles use automatic selection.
+  `DIFFUSION_ATTENTION_BACKEND` overrides the default.
+- **VAE decode**: `NIM_VAE_FAST_PATH=channels_last` (default) is the fastest
+  path; `lossless` keeps the reference decoder output and `off` uses the
+  reference decoder. On a replica spanning several
+  GPUs, decode is sharded (`NIM_ENABLE_VAE_PARALLELISM`); disabling it can
+  raise per-GPU memory, and a larger `NIM_VAE_SPATIAL_TEMPORAL_CHUNK_SIZE`
+  raises peak memory and can change rounding.
 
 ### Prompt upsampling
 
@@ -151,21 +192,37 @@ external failure logs a warning and continues with the original prompt.
 
 ## Reasoner configuration
 
-On DGX Spark and Jetson AGX Thor, `NIM_GPU_MEMORY_UTILIZATION` is required;
-change other controls one at a time and measure the effect.
+Change controls one at a time and measure the effect.
+
+### Optimization presets
+
+| Name | Default | Use |
+| --- | --- | --- |
+| `NIM_OPTIMIZATION_PRESET` | Unset | Reasoner only: apply the experimental `TTFT` or `TPOT` starting configuration (case-insensitive); Generator rejects it |
+
+| Preset | `NIM_USE_DFLASH` | `NIM_MAX_NUM_BATCHED_TOKENS` | `NIM_DISABLE_CHUNKED_MM_INPUT` |
+| --- | --- | --- | --- |
+| `TTFT` | `0` | `32768` with at least 70 GiB of GPU memory; otherwise `16384` | Unchanged (`true`) |
+| `TPOT` | `1` | `4096` | `0` |
+
+On profiles with tensor parallelism above 1, both presets also set
+`NIM_MM_ENCODER_TP_MODE=data`, which replicates the vision encoder and splits
+media across TP ranks. An explicitly set variable wins over the preset; on
+Edge, set `NIM_USE_DFLASH=0` with `TPOT`.
 
 ### Speculative decoding
 
 | Name | Default | Use |
 | --- | --- | --- |
-| `NIM_USE_DFLASH` | `true` for Nano/Super Reasoner | Use the bundled Nano or Super DFlash draft; set `false` to run the target model without speculative decoding, and always for Edge |
+| `NIM_USE_DFLASH` | `true` for Nano/Super Reasoner; `false` for Edge | Use the bundled Nano or Super DFlash draft; set `false` to run the target model without speculative decoding |
 | `NIM_DFLASH_MODEL_PATH` | Empty | Nano or Super Reasoner: use an independent absolute local DFlash directory containing `config.json` and `model.safetensors`; see [Local directory](bring-your-own-checkpoint.md#local-directory) for the mount |
 
 DFlash is on by default for Nano and Super Reasoner and does not change the
 request API; set `NIM_USE_DFLASH=0` to disable it (Generator rejects an
-explicit enable). Edge Reasoner does not support DFlash in this version: set
-`NIM_USE_DFLASH=0`, plus `NIM_STREAMING_SPEC_METHOD=none` when
-[streaming](#advanced-streaming-controls) is enabled.
+explicit enable). Edge Reasoner does not support DFlash in this version: it
+defaults to `NIM_USE_DFLASH=0` and rejects `1`; set
+`NIM_STREAMING_SPEC_METHOD=none` when [streaming](#advanced-streaming-controls)
+is enabled.
 `NIM_DFLASH_MODEL_PATH` accepts only an absolute local path, not `hf://`, and
 `NIM_DFLASH_CONFIG` requires DFlash enabled and cannot set the `method` or
 `model` keys.
@@ -175,7 +232,7 @@ explicit enable). Edge Reasoner does not support DFlash in this version: set
 | Name | Default | Use |
 | --- | --- | --- |
 | `NIM_MAX_MODEL_LEN` | `-1` (auto) | Let the runtime choose a context length, bounded by the checkpoint limit of 262,144 tokens |
-| `NIM_GPU_MEMORY_UTILIZATION` | `0.93` | Set the Reasoner GPU-memory target in `(0,1]`; startup warns when it exceeds current free memory but does not reduce it. On DGX Spark/GB10 and Jetson AGX Thor, set `0.80` for image-only or `0.70` for video or mixed-media workloads from the first preflight on; see [Set the Reasoner memory share](deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems) |
+| `NIM_GPU_MEMORY_UTILIZATION` | Discrete GPU: `0.93`, capped to leave `NIM_GPU_MEMORY_HEADROOM_GIB` free; unified memory: `0.70` | Set the Reasoner GPU-memory target in `(0,1]`; startup warns when it exceeds current free memory but does not reduce it. On DGX Spark/GB10 and Jetson AGX Thor, lower it only from host measurements; see [Set the Reasoner memory share](deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems) |
 
 ### Caching and multimodal processing
 
@@ -326,17 +383,19 @@ Leave these at their defaults unless you have measured a need.
 | Name | Runtime | Default | Use |
 | --- | --- | --- | --- |
 | `NIM_OFFLOAD_MODE` | Generator | Automatic | Request `none`, `model`, or `layer` when the model provides it |
-| `NIM_UNIFIED_MEMORY_HOST_RESERVE_GIB` | Both | `16` | Binary GiB reserved for the host before profile selection on integrated GPUs; no effect on discrete GPUs |
-| `NIM_GPU_MEMORY_HEADROOM_GIB` | Reasoner | `2` | Free binary GiB reserved per discrete GPU for selection and sizing; lowering it raises OOM risk |
+| `NIM_GPU_MEMORY_HEADROOM_GIB` | Reasoner | `4` | Free binary GiB reserved per discrete GPU for selection and sizing; lowering it raises OOM risk |
 | `NIM_MODEL_PROFILE` | Both | Empty | Pin an exact profile ID from the current image |
 | `NIM_VIDEO_SAVE_QUALITY` | Generator | `7` | VP9 output quality 1-9; affects encoding, not diffusion |
 | `NIM_ENABLE_TORCH_COMPILE` | Generator | `true` | Enable the compilation path |
-| `NIM_CACHE_BACKEND` | Generator | Edge-DROID: `none`; other variants: `sea_cache` | Diffusion cache; `none` disables SeaCache (leave `NIM_CACHE_CONFIG` unset) |
+| `NIM_CACHE_BACKEND` | Generator | Edge-DROID: `none`; other variants: `sea_cache` | Diffusion cache: `sea_cache`, `cache_dit`, or `none`; see [Diffusion cache, attention, and VAE decode](#diffusion-cache-attention-and-vae-decode) |
+| `NIM_CACHE_CONFIG` | Generator | Empty object | Override individual diffusion-cache settings as JSON; rejected when the backend is `none` |
+| `DIFFUSION_ATTENTION_BACKEND` | Generator | `SAGE_ATTN` on compute capability 8.0 through 9.x without sequence parallelism; otherwise automatic | Override the diffusion attention backend |
+| `NIM_VAE_FAST_PATH` | Generator | `channels_last` | VAE decode path: `channels_last`, `lossless`, or `off` |
+| `NIM_ENABLE_VAE_PARALLELISM` | Generator | `true` when one replica spans more than one GPU | Shard VAE decode spatially across the replica's GPUs |
+| `NIM_VAE_SPATIAL_TEMPORAL_CHUNK_SIZE` | Generator | Automatic | Positive number of latent frames per sharded VAE decode chunk |
 | `NIM_LINEAR_BACKEND` | Generator | Quantized: `cutlass`; BF16: unset | `auto`, `cutlass`, `flashinfer_cutlass`, `flashinfer_cutedsl`, or `torch` for quantized DiT linear layers; an incompatible backend fails at model load |
 | `NIM_TRITON_LOG_VERBOSE` | Generator | `0` | Backend log verbosity for diagnosis |
 | `NIM_MAX_SEQUENCE_LENGTH` | Generator | `5120` | Startup prompt-token sequence length |
-| `NIM_OFFLOAD_TEXT_GUARDRAIL` | Generator | Profile policy | Override whether the text guard sleeps on CPU during diffusion |
-| `NIM_OFFLOAD_VIDEO_GUARDRAIL` | Generator | Profile policy | Override whether output guardrails sleep during diffusion |
 | `NIM_ALLOW_UNSAFE_TRANSFER` | Generator | `false` | Bypass Transfer's VRAM admission check for an approved diagnostic; can fail with OOM |
 | `NIM_DFLASH_BF16_KV_CACHE` | Reasoner | `false` on Hopper; `true` otherwise | BF16 DFlash KV cache; can improve acceptance but uses more memory |
 | `NIM_DFLASH_CONFIG` | Reasoner | Empty object | Extra vLLM DFlash speculative-config fields as JSON |
