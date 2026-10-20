@@ -65,7 +65,6 @@ Reasoner requires the same compute capability on every GPU. Do not add VRAM
 across devices. Each GPU in the selected layout must meet the floor in total
 and in free memory at startup; on a discrete GPU, Reasoner measures free
 memory after a 4-GiB runtime reserve (`NIM_GPU_MEMORY_HEADROOM_GIB`).
-Automatic selection does not choose Reasoner profiles on a GeForce RTX 4090.
 On unified-memory systems, Generator uses only rows with
 **Model offload = None** and **Guardrails = Resident**.
 
@@ -238,7 +237,7 @@ meet the floors above and the exact image manifest.
 | Blackwell Ultra | B300 SXM6, GB300 |
 | Blackwell | B200, GB200, DGX Spark (GB10), RTX PRO 6000 Blackwell Server Edition, RTX PRO 6000 Blackwell Workstation Edition, GeForce RTX 5090, GeForce RTX 5080 |
 | Hopper and Grace Hopper | H100 80 GB HBM3, H100 PCIe, H100 NVL, H200, H200 NVL, H20, GH200 480 GB, GH200 144 GB HBM3e |
-| Ada Lovelace | L40S, RTX 6000 Ada Generation, GeForce RTX 4090 |
+| Ada Lovelace | L40S, RTX 6000 Ada Generation |
 | Ampere | A100 SXM4 40 GB, A100 SXM4 80 GB, A100 PCIe 40 GB, A100 80 GB PCIe |
 
 Ampere GPUs (compute capability 8.0) support only the BF16 Edge profiles.
