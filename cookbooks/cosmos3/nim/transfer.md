@@ -232,4 +232,4 @@ or non-finite `control_weight` or enabled weights without a positive sum.
 | Control/output lengths are incompatible | Recheck the output frame count, chunk size, and conditional frame values |
 | Transfer is disabled while T2V works | Selected configuration fits T2V but GPU headroom is below Transfer overhead; use a larger GPU or lower-VRAM configuration |
 
-For service-level failures, refer to [operations.md](operations.md#troubleshooting).
+For service-level failures, refer to [Troubleshooting](operations.md#troubleshooting).

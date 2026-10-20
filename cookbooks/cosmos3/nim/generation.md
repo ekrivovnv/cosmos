@@ -5,7 +5,7 @@ SPDX-License-Identifier: OpenMDW-1.1 -->
 
 Send text-to-image (T2I), text-to-video (T2V), image-to-video (I2V), and
 video-to-video (V2V) requests to a running **Generator** with synchronous JSON
-`POST /v1/infer`. Launch it with [deployment.md](deployment.md); the shared
+`POST /v1/infer`. Launch it with [Deployment](deployment.md); the shared
 request envelope is in the
 [API reference](api-reference.md#common-generator-request-fields).
 
@@ -288,7 +288,7 @@ model artifacts, precisions, or hardware layouts.
 Operators can enable prompt upsampling for T2I, T2V, and I2V (not V2V, Action,
 or Transfer); it keeps the request's resolution, aspect, duration, and FPS,
 and falls back to the original prompt on failure. Refer to
-[configuration.md](configuration.md#prompt-upsampling).
+[Prompt upsampling](configuration.md#prompt-upsampling).
 
 ## Output and playback
 
@@ -322,4 +322,4 @@ ffmpeg -i examples/outputs/t2v_robot_kitchen.mp4 -c:v libx264 -crf 18 \
 | Request times out in the client | Generation exceeded the client timeout, not necessarily the server timeout | Use the examples' 30-minute timeout and inspect NIM logs |
 | MP4 does not play | Player lacks VP9-in-MP4 support | Use `ffplay` or re-encode to H.264 with the declared FFmpeg tooling |
 
-For service-level diagnosis, refer to [operations.md](operations.md#troubleshooting).
+For service-level diagnosis, refer to [Troubleshooting](operations.md#troubleshooting).

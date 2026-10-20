@@ -295,7 +295,7 @@ authoritative list.
 | `imagePullSecrets` | Specifies a list of secret names that are needed for the main container and any init containers. | |
 | `initContainers` | Specifies model init containers, if needed. | |
 | `initContainers.extraInit` | Fully specify any additional init containers your use case requires. | `[]` |
-| `nodeSelector` | Sets node selectors for the NIM -- for example `nvidia.com/gpu.present: "true"`. | `{}` |
+| `nodeSelector` | Sets node selectors for the NIM—for example `nvidia.com/gpu.present: "true"`. | `{}` |
 | `runtimeClassName` | Selects the container runtime class for workload pods. | `""` |
 | `priorityClassName` | Selects the Kubernetes priority class for workload pods. | `""` |
 | `topologySpreadConstraints` | Configures pod topology spreading. | `[]` |
@@ -447,7 +447,7 @@ payloads are model-specific, and it is only rendered for
 | `persistence.stsPersistentVolumeClaimRetentionPolicy.whenScaled` | Specifies persistent volume claim retention policy when scaled. Only used with Stateful Set volume templates. | `Retain` |
 | `persistence.size` | Specifies the size of the persistent volume claim (for example 40Gi). | `50Gi` |
 | `persistence.annotations` | Adds annotations to the persistent volume claim. | `{}` |
-| `hostPath` | Configures model cache on local disk on the nodes using `hostPath` -- for special cases. You should understand the security implications before using this option. | |
+| `hostPath` | Configures model cache on local disk on the nodes using `hostPath`—for special cases. You should understand the security implications before using this option. | |
 | `hostPath.enabled` | Enable `hostPath`. | `false` |
 | `hostPath.path` | Specifies path on the node used as a `hostPath` volume. | `/model-store` |
 | `nfs` | Configures the model cache to sit on shared direct-mounted NFS. NOTE: you cannot set mount options using direct NFS mount to pods without a node-intalled nfsmount.conf. An NFS-based `PersistentVolumeClaim` is likely better in most cases. | |
