@@ -81,10 +81,6 @@ Use these only when automatic model selection is not sufficient:
 | Name | Default | Use |
 | --- | --- | --- |
 | `NIM_TAGS_SELECTOR` | Empty | Filter by comma-separated exact manifest tags as `key=value` pairs; see the valid keys below |
-| `NIM_NUM_GPUS` | Automatic | Shorthand for `n_gpus` |
-| `NIM_TENSOR_PARALLEL_SIZE` | Automatic | Shorthand for `nim_tp` |
-| `NIM_GUIDANCE_PARALLEL_SIZE`, `NIM_CONTEXT_PARALLEL_SIZE`, `NIM_DATA_PARALLEL_SIZE` | Automatic | Generator only: shorthand for `nim_gp`, `nim_up`, and `nim_dp` |
-| `NIM_TEXT_GUARD_OFFLOAD`, `NIM_VIDEO_GUARD_OFFLOAD` | Automatic; `resident` preferred | Generator only: shorthand for `text_guard_offload` and `video_guard_offload` (`resident` or `offloaded` during diffusion) |
 
 `NIM_TAGS_SELECTOR` accepts only these keys; any other key is an error. Values
 are lowercased.
@@ -108,7 +104,7 @@ manifest lacks; a selection that matches no profile fails at startup. Without
 them, the Generator uses as many visible GPUs as a compatible profile supports
 (1, 2, 4, or 8). There is no one-GPU `throughput` profile, and model or layer
 offload is available only on one GPU. To keep the Generator on fewer GPUs,
-limit `--gpus` or set `NIM_NUM_GPUS`.
+limit `--gpus` or set `n_gpus` in `NIM_TAGS_SELECTOR`.
 
 On an integrated GPU with unified host/device memory (DGX Spark/GB10, Jetson
 AGX Thor), the NIM treats 70% of the shared pool as GPU memory for profile
@@ -147,8 +143,8 @@ requests](operations.md#long-running-requests).
 | `NIM_ENABLE_SIGLIP_GUARDRAILS` | `true` | Enable the output-frame safety classifier |
 | `NIM_QWEN3GUARD_MAX_INPUT_TOKENS` | `8192` | Set the text guardrail's maximum input tokens; minimum 512 |
 
-The selected profile owns guardrail residency; choose it with
-`NIM_TEXT_GUARD_OFFLOAD` and `NIM_VIDEO_GUARD_OFFLOAD` under
+The selected profile owns guardrail residency; choose it with the
+`text_guard_offload` and `video_guard_offload` selector keys under
 [Advanced profile controls](#advanced-profile-controls). This image ignores the
 earlier `NIM_OFFLOAD_TEXT_GUARDRAIL` and `NIM_OFFLOAD_VIDEO_GUARDRAIL`. See
 [Guardrails](operations.md#guardrails) for what each layer does.

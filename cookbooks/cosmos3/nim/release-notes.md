@@ -39,10 +39,7 @@ Image: `nvcr.io/nim/nvidia/cosmos3:2.1.0`.
   `NIM_VAE_FAST_PATH=lossless` for output closer to the 2.0.0 reference path;
   see [Configuration](configuration.md#diffusion-cache-attention-and-vae-decode).
 - **Multi-GPU Generator layouts**: latency profiles use guidance and sequence
-  parallelism, and throughput profiles run one engine replica per GPU. New
-  selectors: `NIM_NUM_GPUS`, `NIM_TENSOR_PARALLEL_SIZE`,
-  `NIM_GUIDANCE_PARALLEL_SIZE`, `NIM_CONTEXT_PARALLEL_SIZE`, and
-  `NIM_DATA_PARALLEL_SIZE`.
+  parallelism, and throughput profiles run one engine replica per GPU.
 - **System-memory floors are enforced**: each profile carries its measured
   system-memory floor instead of a 16-GiB admission tag, and FP8 offload floors
   are lower; see the [Support matrix](support-matrix.md#generator-configurations).
@@ -58,8 +55,8 @@ Image: `nvcr.io/nim/nvidia/cosmos3:2.1.0`.
 
 | 2.0.0 | 2.1.0 |
 | --- | --- |
-| `NIM_OFFLOAD_TEXT_GUARDRAIL` | `NIM_TEXT_GUARD_OFFLOAD` profile selector (`resident` or `offloaded`) |
-| `NIM_OFFLOAD_VIDEO_GUARDRAIL` | `NIM_VIDEO_GUARD_OFFLOAD` profile selector (`resident` or `offloaded`) |
+| `NIM_OFFLOAD_TEXT_GUARDRAIL` | `text_guard_offload` key in `NIM_TAGS_SELECTOR` (`resident` or `offloaded`) |
+| `NIM_OFFLOAD_VIDEO_GUARDRAIL` | `video_guard_offload` key in `NIM_TAGS_SELECTOR` (`resident` or `offloaded`) |
 | `NIM_UNIFIED_MEMORY_HOST_RESERVE_GIB` | Removed; unified-memory systems use a fixed 70% share |
 | `NIM_QWEN3GUARD_MAX_GPU_MEMORY_GB` | Removed |
 
