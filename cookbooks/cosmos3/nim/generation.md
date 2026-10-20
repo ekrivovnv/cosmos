@@ -187,7 +187,7 @@ Use JPEG, PNG, or WebP; verify other formats on the deployed image.
 | Follow an edge, blur, depth, segmentation, or WSM control | `video2video` | Non-empty `transfer`; top-level video only for a derived control | [Transfer](transfer.md) |
 | Estimate actions from an observed video | `inverse_dynamics` | Video `input_reference` plus `action_params` | [Action](action.md#inverse-dynamics) |
 
-Don't mix V2V fields, `transfer`, and `action_params` (HTTP 422).
+Do not mix V2V fields, `transfer`, and `action_params` (HTTP 422).
 
 ## Video-to-video
 

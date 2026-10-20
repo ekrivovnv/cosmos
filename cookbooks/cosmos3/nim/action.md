@@ -320,5 +320,5 @@ General Action profiles default to `num_inference_steps=30`,
 | Configuration cannot run the action case | Confirm the selected image's action-capable model variant and supported domain |
 | Client fails on missing `b64_video` | Handle action-only specialist responses separately from general visual Action responses |
 
-For startup, OOM, and service diagnostics, see
-[operations.md](operations.md#troubleshooting).
+For startup, out-of-memory errors, and service diagnostics, refer to
+[Troubleshooting](operations.md#troubleshooting).

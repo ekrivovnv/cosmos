@@ -316,7 +316,7 @@ authoritative list.
 | `serviceAccount.create` | Specifies whether a service account should be created. | `false` |
 | `serviceAccount.annotations` | Sets annotations to be added to the service account. | `{}` |
 | `serviceAccount.name` | Specifies the name of the service account to use. If it is not set and create is `true`, a name is generated using a `fullname` template. | `""` |
-| `statefulSet.enabled` | Enables `statefulset` deployment. Enabling `statefulSet` allows PVC templates for scaling. If using central PVC with RWX `accessMode`, this isn't needed. | `true` |
+| `statefulSet.enabled` | Enables `statefulset` deployment. Enabling `statefulSet` allows PVC templates for scaling. If using central PVC with RWX `accessMode`, this is not needed. | `true` |
 | `tolerations` | Specify tolerations for pod assignment. Allows the scheduler to schedule pods with matching taints. | |
 
 ### Autoscaling parameters

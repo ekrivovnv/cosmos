@@ -165,7 +165,7 @@ Before accepting traffic:
 | --- | --- | --- | --- |
 | Generator | 422 | Schema, field, or media validation fails, or a guardrail blocks the request | Envelope, `"type": "UnprocessableEntityError"`; a validation `message` is `<field>: <message>`, with multiple errors joined by `; ` |
 | Generator, Reasoner | 404 | Missing route, including the other runtime's inference route | Envelope, `"type": "NotFoundError"` |
-| Generator | 500 | Unhandled or backend error | Plain string instead of the envelope (below) |
+| Generator | 500 | Unhandled or backend error | JSON object with a string-valued `error` field instead of the standard envelope (below) |
 | Reasoner | 400 | Request-shape or sampling-parameter validation fails | Envelope, `"type": "BadRequestError"` |
 | Reasoner | 422 | An error whose message concerns video, image, media, decode, or codec | Envelope, `"type": "UnprocessableEntityError"` |
 
