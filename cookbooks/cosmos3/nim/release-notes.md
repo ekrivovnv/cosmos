@@ -33,7 +33,7 @@ Image: `nvcr.io/nim/nvidia/cosmos3:2.1.0`.
   edge-family coefficient 1.5 instead of 4.5), so combined-guidance outputs
   differ from 2.0.0 baselines. To approximate the 2.0.0 strength, multiply the
   previous `control_guidance` by `guidance_scale`, up to the 10.0 maximum; refer to
-  [Control guidance behavior](transfer.md#control-guidance-behavior).
+  [Control Guidance Behavior](transfer.md#control-guidance-behavior).
 - **Generator performance defaults**: SeaCache is on for every Generator
   variant except Edge-DROID, SageAttention 2.2 is the default on compute
   capability 8.0 through 9.x without sequence parallelism, and the

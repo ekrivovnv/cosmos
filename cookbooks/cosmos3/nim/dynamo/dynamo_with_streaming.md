@@ -13,7 +13,7 @@ enabled.
 > `WS /v1/streaming/ws` endpoint is unavailable on both the shared frontend
 > and worker NIM endpoints. Use the REST session API below.
 
-First complete the [prerequisites](dynamo_deployment.md#prerequisites) and
+First complete the [Prerequisites](dynamo_deployment.md#prerequisites) and
 [namespace and cache setup](dynamo_deployment.md#prepare-the-namespace-and-cache).
 Complete the shared [model-download step](dynamo_deployment.md#download-model-artifacts)
 before starting workers. If reusing a cache, set `spec.pvcs[0].name` and

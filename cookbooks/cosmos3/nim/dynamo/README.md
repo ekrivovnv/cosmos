@@ -3,7 +3,7 @@ SPDX-License-Identifier: OpenMDW-1.1 -->
 
 # Cosmos3 Reasoner With Dynamo
 
-Refer to [Dynamo configuration](../configuration.md#dynamo-configuration) for worker
+Refer to [Dynamo Configuration](../configuration.md#dynamo-configuration) for worker
 enablement, discovery, proxy settings, and
 [streaming controls](../configuration.md#dynamo-streaming).
 

@@ -9,7 +9,7 @@ and system memory. All memory values are binary GiB per device.
 ## Choose a Model
 
 Choose the model; the NIM selects a compatible profile and precision (refer to
-[Precision selection](deployment.md#precision-selection)).
+[Precision Selection](deployment.md#precision-selection)).
 
 | Runtime | Model | Supported Use |
 | --- | --- | --- |
@@ -32,8 +32,8 @@ general-purpose Generator.
 > NVIDIA has not validated it. Validate its accuracy, latency, and safety
 > behavior for your workload before relying on it.
 
-After startup,
-[verify the selection](deployment.md#verify-the-selection).
+After startup, follow
+[Verify the Selection](deployment.md#verify-the-selection).
 
 ### Practical Model Recommendation
 
@@ -45,7 +45,7 @@ After startup,
 - Unified-memory systems (DGX Spark, Jetson AGX Thor): default to Nano for both
   runtimes. Some Super Reasoner rows fit, but turnaround is impractical.
 - Smallest GPUs: Edge Reasoner and Edge-DROID have the lowest floors; refer to
-  [Edge verified GPUs](#edge-verified-gpus).
+  [Edge Verified GPUs](#edge-verified-gpus).
 
 ## GPU Architecture and Topology
 
@@ -112,7 +112,7 @@ Edge-DROID and Nano rows but no Super Generator row, and the Reasoner Edge,
 Nano, and Super FP8/NVFP4 TP1 rows. Reasoner Super BF16 TP1 (135 GiB) exceeds
 both systems' total capacity, so freeing cache cannot make it fit.
 
-### Blackwell Ultra
+### NVIDIA Blackwell Ultra
 
 | GPU | Nominal GPU Memory |
 | --- | ---: |
@@ -120,7 +120,7 @@ both systems' total capacity, so freeing cache cannot make it fit.
 | B300 SXM6 | 288 GB HBM3e |
 | GB300 | 288 GB HBM3e |
 
-### Blackwell
+### NVIDIA Blackwell
 
 | GPU | Nominal GPU Memory |
 | --- | ---: |
@@ -131,7 +131,7 @@ both systems' total capacity, so freeing cache cannot make it fit.
 | B200 | 192 GB HBM3e |
 | GB200 | 192 GB HBM3e |
 
-### Hopper and Grace Hopper
+### NVIDIA Hopper and Grace Hopper
 
 | GPU | Nominal GPU Memory |
 | --- | ---: |
@@ -144,7 +144,7 @@ both systems' total capacity, so freeing cache cannot make it fit.
 | H200 NVL | 141 GB HBM3e |
 | GH200 144 GB HBM3e | 144 GB HBM3e |
 
-### Ada Lovelace
+### NVIDIA Ada Lovelace
 
 | GPU | Nominal GPU Memory |
 | --- | ---: |
@@ -152,7 +152,7 @@ both systems' total capacity, so freeing cache cannot make it fit.
 | L40S | 48 GB GDDR6 |
 | RTX 6000 Ada Generation | 48 GB GDDR6 |
 
-### Ampere
+### NVIDIA Ampere
 
 | GPU | Nominal GPU Memory |
 | --- | ---: |
@@ -189,7 +189,7 @@ resident-guardrail rows of their base model. Multi-GPU rows use every GPU: a
 `latency` profile splits each request with guidance parallelism 2 and sequence
 parallelism `n_gpus / 2`; a `throughput` profile runs one engine replica per
 GPU, and there is no one-GPU `throughput` profile. To limit the GPU count, refer to
-[Advanced profile controls](configuration.md#advanced-profile-controls).
+[Advanced Profile Controls](configuration.md#advanced-profile-controls).
 
 The 31-GiB Nano layer-offload rows target 32-GB client GPUs such as the
 GeForce RTX 5090, which does not meet their 35-GiB Transfer minimum.
@@ -199,7 +199,7 @@ GeForce RTX 5090, which does not meet their 35-GiB Transfer minimum.
 > limit. Treat the floors as minimums; media processing, concurrency, and other
 > host workloads can need more. Unified-memory systems have no separate host RAM
 > requirement; size them with
-> [Unified-memory thresholds](#unified-memory-thresholds).
+> [Unified-Memory Thresholds](#unified-memory-thresholds).
 
 Leave offload and guardrail residency on automatic selection unless a
 configuration is validated for the deployment.
@@ -221,7 +221,7 @@ Reasoner does not use Generator latency/throughput or model-offload selectors:
 | `super` | NVFP4 | 1 | 1 | 73 GiB | 33 GiB | 10.0 |
 
 System memory follows the note under
-[Generator configurations](#generator-configurations). Selection prefers Super
+[Generator Configurations](#generator-configurations). Selection prefers Super
 BF16 TP1 and can fall back to TP2 when TP1 lacks free memory; to require TP2,
 set `NIM_TAGS_SELECTOR='n_gpus=2,nim_tp=2'`.
 
@@ -233,13 +233,13 @@ floors above and the exact image manifest.
 
 | Architecture | GPUs |
 | --- | --- |
-| Blackwell Ultra | B300 SXM6, GB300 |
-| Blackwell | B200, GB200, DGX Spark (GB10), RTX PRO 6000 Blackwell Server Edition, RTX PRO 6000 Blackwell Workstation Edition, GeForce RTX 5090, GeForce RTX 5080 |
-| Hopper and Grace Hopper | H100 80 GB HBM3, H100 PCIe, H100 NVL, H200, H200 NVL, H20, GH200 480 GB, GH200 144 GB HBM3e |
-| Ada Lovelace | L40S, RTX 6000 Ada Generation |
-| Ampere | A100 SXM4 40 GB, A100 SXM4 80 GB, A100 PCIe 40 GB, A100 80 GB PCIe |
+| NVIDIA Blackwell Ultra | B300 SXM6, GB300 |
+| NVIDIA Blackwell | B200, GB200, DGX Spark (GB10), RTX PRO 6000 Blackwell Server Edition, RTX PRO 6000 Blackwell Workstation Edition, GeForce RTX 5090, GeForce RTX 5080 |
+| NVIDIA Hopper and Grace Hopper | H100 80 GB HBM3, H100 PCIe, H100 NVL, H200, H200 NVL, H20, GH200 480 GB, GH200 144 GB HBM3e |
+| NVIDIA Ada Lovelace | L40S, RTX 6000 Ada Generation |
+| NVIDIA Ampere | A100 SXM4 40 GB, A100 SXM4 80 GB, A100 PCIe 40 GB, A100 80 GB PCIe |
 
-Ampere GPUs (compute capability 8.0) support only the BF16 Edge profiles.
+NVIDIA Ampere GPUs (compute capability 8.0) support only the BF16 Edge profiles.
 
 ## Transfer Headroom
 

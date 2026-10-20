@@ -29,9 +29,9 @@ Nano and Super streaming default to DFlash speculation when DFlash is enabled;
 set `NIM_STREAMING_SPEC_METHOD=ngram` for GPU n-gram speculation or `none` to
 disable it. Edge works with the same clients, which discover its model ID;
 launch it with `NIM_USE_DFLASH=0` and `NIM_STREAMING_SPEC_METHOD=none`, in
-standalone ([Edge experiments](deployment.md#edge-experiments)) or
+standalone ([Edge Experiments](deployment.md#edge-experiments)) or
 [Dynamo](dynamo/dynamo_with_streaming.md#use-edge-reasoner) mode. Refer to
-[Advanced streaming controls](configuration.md#advanced-streaming-controls).
+[Advanced Streaming Controls](configuration.md#advanced-streaming-controls).
 
 ## Example Client
 
@@ -128,7 +128,7 @@ REST creation accepts the following JSON fields. WebSocket creation adds
 Sampling defaults are `max_tokens: 24`, `temperature: 0.3`, `top_p: 0.9`,
 `repetition_penalty: 1.1`, and `frequency_penalty: 0.0`. `max_tokens` bounds
 each reply, not the entire session. At most one of `guided_json`,
-`guided_choice`, or `guided_regex` may constrain the replies. For example,
+`guided_choice`, or `guided_regex` can constrain the replies. For example,
 `"sampling":{"max_tokens":24,"guided_choice":["clear","hazard"]}`
 requests a classification for each frame.
 
@@ -229,7 +229,7 @@ session resources, but the client cannot rely on receiving a final reply.
 | `delete` | JSON text with `op: "delete"` | After the last reply, to close the session explicitly |
 
 **Create.** `system_prompt` is required. All other session fields and sampling
-controls are listed in [Session configuration](#session-configuration).
+controls are listed in [Session Configuration](#session-configuration).
 `frame_format` defaults to `binary`. The initial message may omit `op` (the
 server defaults it to `create`), but clients should send it explicitly:
 
@@ -278,7 +278,7 @@ the session.
 | `op` | Fields | Meaning |
 | --- | --- | --- |
 | `created` | `session_id`, `model`, `fps`, `retention`, `frame_format` | Session accepted; effective retention and negotiated image format |
-| `frame` | `frame_index`, `text`, `finish_reason`, `token_count`, timing fields | Completed answer to one image; refer to [Frame replies](#frame-replies) |
+| `frame` | `frame_index`, `text`, `finish_reason`, `token_count`, timing fields | Completed answer to one image; refer to [Frame Replies](#frame-replies) |
 | `closed` | `session_id`, `frames`, `closed` | Session released; `frames` counts answered frames and `closed` is `true` |
 | `error` | `message`, `code`, `fatal` | Protocol, admission, or processing error; `code` is HTTP-style, not a WebSocket close code |
 
@@ -377,5 +377,5 @@ check startup logs, readiness, runtime, and image selection.
 Close WebSocket connections or explicitly delete REST sessions when finished.
 [Idle timeouts](configuration.md#streaming-video-sessions) are a cleanup
 backstop. Expired or disconnected sessions cannot be resumed: create a new
-one. Do not resubmit a timed-out frame while its original request may still
+one. Do not resubmit a timed-out frame while its original request can still
 be running.

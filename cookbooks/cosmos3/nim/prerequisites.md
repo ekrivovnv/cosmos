@@ -21,7 +21,7 @@ per-configuration GPU, VRAM, and host RAM requirements are in the
 Do not add together memory from multiple GPUs to satisfy a per-device floor.
 If the deployment must serve Transfer, provision each GPU against the
 **Transfer minimum VRAM/device** column in the
-[Generator configurations](support-matrix.md#generator-configurations), not the
+[Generator Configurations](support-matrix.md#generator-configurations), not the
 **Generation minimum VRAM/device** value.
 
 Use homogeneous GPUs; Reasoner requires the same compute capability on every
@@ -30,7 +30,7 @@ GPU workloads before launch.
 
 Lower-VRAM offload profiles keep model weights in system memory and carry
 their own system-memory floors; refer to the
-[Generator configurations](support-matrix.md#generator-configurations). A
+[Generator Configurations](support-matrix.md#generator-configurations). A
 container memory limit counts before host physical memory.
 
 ### Inspect Unified-Memory Capacity and Current State
@@ -77,7 +77,7 @@ On these systems the Reasoner defaults to a 0.70
 [`NIM_GPU_MEMORY_UTILIZATION`](deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems)
 share; if you lower it, keep the same value from preflight through launch. Clearing page cache or deleting the model cache is
 not part of normal deployment; refer to
-[Unified-memory diagnostics](operations.md#unified-memory-diagnostics).
+[Unified-Memory Diagnostics](operations.md#unified-memory-diagnostics).
 
 ## Software Requirements
 
@@ -173,7 +173,7 @@ The variable is `NGC_API_KEY`, not `NGC_TOKEN`. Do not save the key in source
 control; continue with [Authenticate to NGC](deployment.md#authenticate-to-ngc).
 
 An air-gapped host needs a pre-populated cache; refer to
-[Offline and air-gapped deployment](deployment.md#offline-and-air-gapped-deployment).
+[Offline and Air-Gapped Deployment](deployment.md#offline-and-air-gapped-deployment).
 
 ## Verify the Host
 

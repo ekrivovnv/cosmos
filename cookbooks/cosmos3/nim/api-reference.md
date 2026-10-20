@@ -28,7 +28,7 @@ Reasoner features are in
 [Reasoning](reasoning.md#final-answers-instructions-and-tool-calls). Check the
 active `model_type` and `inference_endpoint` in `/v1/metadata`; other framework
 endpoints are in
-[Inspect the running service](operations.md#inspect-the-running-service).
+[Inspect the Running Service](operations.md#inspect-the-running-service).
 
 ## Generator: `POST /v1/infer`
 
@@ -65,7 +65,7 @@ Defaults are for video / T2I; Transfer and Action defaults are on their pages.
 | `guidance_scale` | finite number in `[1.0,7.0]` | `6.0` / `4.0` | Sampling when not owned by a specialist model |
 | `num_inference_steps` | integer in `[1,100]` | `35` / `50` | Sampling when not owned by a specialist model |
 | `flow_shift` | finite number greater than 0 | `10.0` / `3.0` | Sampling when not owned by a specialist model |
-| `resolution` | enum | `720` / `720_1_1` | Generation and Transfer; refer to [resolution keys](generation.md#resolution-keys) |
+| `resolution` | enum | `720` / `720_1_1` | Generation and Transfer; refer to [Resolution Keys](generation.md#resolution-keys) |
 | `num_frames` | integer | `189` / `1` | Generation and Transfer; Action derives it and rejects the field |
 | `fps` | finite number in `[1.0,60.0]` | `24.0` | Video tasks; retained but not encoded for T2I |
 | `condition_frame_indexes_vision` | integer array or null | `[0, 1]` | V2V only |

@@ -9,16 +9,16 @@ model; `/v1/infer` is a Generator endpoint and is not used here. Refer to
 [Deployment](deployment.md) to select and launch a Reasoner model.
 
 The same clients work with `edge`, `nano`, and `super`; launch Edge with the
-[Edge experiments](deployment.md#edge-experiments) selectors.
+[Edge Experiments](deployment.md#edge-experiments) selectors.
 
 For stateful reasoning over successive video frames, refer to
-[Streaming video](streaming.md). Its [example client](streaming.md#example-client)
+[Streaming video](streaming.md). Its [Example Client](streaming.md#example-client)
 is bundled in this cookbook and uses the same pinned environment and `NIM_URL`
 setting, with a flag to choose WebSocket or REST.
 
 ## Prepare the Client and Verify Readiness
 
-Install the [client tooling](prerequisites.md#client-tooling). The runnable
+Install the [Client Tooling](prerequisites.md#client-tooling). The runnable
 examples use the pinned OpenAI Python client from the `uv` project in the
 cookbook directory:
 
@@ -231,8 +231,8 @@ tags, which appear in `message.content` as ordinary text.
 Nano and Super Reasoner use their bundled DFlash drafts by default; set
 `NIM_USE_DFLASH=0` to run target-only. Edge has no DFlash and rejects
 `NIM_USE_DFLASH=1`. Requests do not change. Refer to
-[Speculative decoding](configuration.md#speculative-decoding) and
-[Reasoner checkpoint](bring-your-own-checkpoint.md#reasoner-checkpoint).
+[Speculative Decoding](configuration.md#speculative-decoding) and
+[Reasoner Checkpoint](bring-your-own-checkpoint.md#reasoner-checkpoint).
 
 ## Advanced Sampling and Request Extensions
 
@@ -254,7 +254,7 @@ example requests 4 FPS. Video-token pruning is enabled by default at a rate of
 `0.6`, using `vidcom2` unless another method is selected; set
 `NIM_VIDEO_PRUNING_RATE=0` or `NIM_VIDEO_PRUNING_RATE=none` to disable it.
 Media limits and pruning settings are under
-[Reasoner configuration](configuration.md#reasoner-configuration).
+[Reasoner Configuration](configuration.md#reasoner-configuration).
 
 ### Text-Only Requests
 

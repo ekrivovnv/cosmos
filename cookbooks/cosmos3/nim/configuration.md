@@ -23,7 +23,7 @@ commands.
 | --- | --- | --- |
 | `NIM_MODEL_TYPE` | `generator` | Select `generator` or `reasoner` |
 | `NIM_MODEL_VARIANT` | `nano` preference | Select `nano` or `super` for either runtime; Reasoner also accepts `edge`, and Generator also accepts `edge-droid`, `nano-droid`, `super-t2i`, `super-t2i-4step`, `super-i2v`, and `super-i2v-4step` |
-| `NIM_PRECISION` | Generator: FP8 preference; Reasoner: GPU-derived preference | Optionally pin a precision available in the image; refer to [Precision selection](deployment.md#precision-selection) |
+| `NIM_PRECISION` | Generator: FP8 preference; Reasoner: GPU-derived preference | Optionally pin a precision available in the image; refer to [Precision Selection](deployment.md#precision-selection) |
 | `NIM_PERF_PROFILE` | `latency` | Generator only: choose `latency` or `throughput` |
 
 Reasoner rejects `NIM_PERF_PROFILE`, including `profile=` in
@@ -61,8 +61,7 @@ processes, so a passed value can place work outside the intended GPUs.
 | `NIM_DISABLE_MODEL_DOWNLOAD` | `false` | Disable profile download for a completely local Reasoner override; incompatible with Reasoner `hf://` and rejected for Generator |
 | `HF_TOKEN` | Empty | Authenticate to a private Hugging Face repository named by `NIM_MODEL_PATH` |
 
-To override the DFlash draft, refer to `NIM_DFLASH_MODEL_PATH` under [Speculative
-decoding](#speculative-decoding). Refer to [Bring your own
+To override the DFlash draft, refer to `NIM_DFLASH_MODEL_PATH` under [Speculative Decoding](#speculative-decoding). Refer to [Bring your own
 checkpoint](bring-your-own-checkpoint.md) for layouts, mounts, and
 compatibility checks.
 
@@ -113,7 +112,7 @@ floors and as the default Reasoner `NIM_GPU_MEMORY_UTILIZATION`.
 A shorthand variable that conflicts with `NIM_TAGS_SELECTOR` is a startup
 error; use the `model_variant` tag to filter by model. Exact tags and profile
 IDs are tied to an image release. For the offload, memory-headroom, and
-profile-pin variables, refer to [Advanced settings](#advanced-settings).
+profile-pin variables, refer to [Advanced Settings](#advanced-settings).
 
 ## Generator Configuration
 
@@ -124,8 +123,7 @@ profile-pin variables, refer to [Advanced settings](#advanced-settings).
 | `NIM_ALLOW_URL_INPUT` | `true` | Allow HTTP(S) image, video, and Transfer inputs; set `false` to require encoded input |
 | `NIM_TRITON_REQUEST_TIMEOUT` | 30 minutes (`1800000000` microseconds) | Set the queue-plus-execution timeout in microseconds |
 
-Client HTTP timeouts do not change this backend ceiling; refer to [Long-running
-requests](operations.md#long-running-requests).
+Client HTTP timeouts do not change this backend ceiling; refer to [Long-Running Requests](operations.md#long-running-requests).
 
 ### Startup and Execution
 
@@ -144,7 +142,7 @@ requests](operations.md#long-running-requests).
 
 The selected profile owns guardrail residency; choose it with the
 `text_guard_offload` and `video_guard_offload` selector keys under
-[Advanced profile controls](#advanced-profile-controls). Refer to
+[Advanced Profile Controls](#advanced-profile-controls). Refer to
 [Guardrails](operations.md#guardrails) for what each layer does.
 
 ### Diffusion Cache, Attention, and VAE Decode
@@ -163,7 +161,7 @@ If you notice a quality issue in a specific workload, try
   `sea_max_consecutive_cached=0` means no limit). Startup logs the effective
   settings.
 - **SageAttention 2.2** is the default on compute capability 8.0 through 9.x
-  unless the profile uses sequence parallelism; Blackwell GPUs and
+  unless the profile uses sequence parallelism; NVIDIA Blackwell GPUs and
   sequence-parallel profiles use automatic selection.
   `DIFFUSION_ATTENTION_BACKEND` overrides the default.
 - **VAE decode**: `NIM_VAE_FAST_PATH=channels_last` (default) is the fastest
@@ -215,7 +213,7 @@ Edge, set `NIM_USE_DFLASH=0` with `TPOT`.
 | Name | Default | Use |
 | --- | --- | --- |
 | `NIM_USE_DFLASH` | `true` for Nano/Super Reasoner; `false` for Edge | Use the bundled Nano or Super DFlash draft; set `false` to run the target model without speculative decoding |
-| `NIM_DFLASH_MODEL_PATH` | Empty | Nano or Super Reasoner: use an independent absolute local DFlash directory containing `config.json` and `model.safetensors`; refer to [Local directory](bring-your-own-checkpoint.md#local-directory) for the mount |
+| `NIM_DFLASH_MODEL_PATH` | Empty | Nano or Super Reasoner: use an independent absolute local DFlash directory containing `config.json` and `model.safetensors`; refer to [Local Directory](bring-your-own-checkpoint.md#local-directory) for the mount |
 
 DFlash is on by default for Nano and Super Reasoner and does not change the
 request API; set `NIM_USE_DFLASH=0` to disable it (Generator rejects an
@@ -317,7 +315,7 @@ Use the available NIM image `<nim-image-build>` and start
 `NIM_DYNAMO_WORKER=true`. Generator profiles do not support Dynamo worker mode.
 The NIM selects and loads the model, launches a Dynamo vLLM worker and a private
 frontend, and exposes the NIM HTTP API. Keep the usual model-selection,
-cache, and authentication settings from [Essential configuration](#essential-configuration).
+cache, and authentication settings from [Essential Configuration](#essential-configuration).
 The shared frontend is a separate service; it does not need worker enablement
 or a GPU.
 
@@ -387,7 +385,7 @@ Leave these at their defaults unless you have measured a need.
 | `NIM_MODEL_PROFILE` | Both | Empty | Pin an exact profile ID from the current image |
 | `NIM_VIDEO_SAVE_QUALITY` | Generator | `7` | VP9 output quality 1-9; affects encoding, not diffusion |
 | `NIM_ENABLE_TORCH_COMPILE` | Generator | `true` | Enable the compilation path |
-| `NIM_CACHE_BACKEND` | Generator | Edge-DROID: `none`; other variants: `sea_cache` | Diffusion cache: `sea_cache`, `cache_dit`, or `none`; refer to [Diffusion cache, attention, and VAE decode](#diffusion-cache-attention-and-vae-decode) |
+| `NIM_CACHE_BACKEND` | Generator | Edge-DROID: `none`; other variants: `sea_cache` | Diffusion cache: `sea_cache`, `cache_dit`, or `none`; refer to [Diffusion Cache, Attention, and VAE Decode](#diffusion-cache-attention-and-vae-decode) |
 | `NIM_CACHE_CONFIG` | Generator | Empty object | Override individual diffusion-cache settings as JSON; rejected when the backend is `none` |
 | `DIFFUSION_ATTENTION_BACKEND` | Generator | `SAGE_ATTN` on compute capability 8.0 through 9.x without sequence parallelism; otherwise automatic | Override the diffusion attention backend |
 | `NIM_VAE_FAST_PATH` | Generator | `channels_last` | VAE decode path: `channels_last`, `lossless`, or `off` |
@@ -397,7 +395,7 @@ Leave these at their defaults unless you have measured a need.
 | `NIM_TRITON_LOG_VERBOSE` | Generator | `0` | Backend log verbosity for diagnosis |
 | `NIM_MAX_SEQUENCE_LENGTH` | Generator | `5120` | Startup prompt-token sequence length |
 | `NIM_ALLOW_UNSAFE_TRANSFER` | Generator | `false` | Bypass Transfer's VRAM admission check for an approved diagnostic; can fail with OOM |
-| `NIM_DFLASH_BF16_KV_CACHE` | Reasoner | `false` on Hopper; `true` otherwise | BF16 DFlash KV cache; can improve acceptance but uses more memory |
+| `NIM_DFLASH_BF16_KV_CACHE` | Reasoner | `false` on NVIDIA Hopper; `true` otherwise | BF16 DFlash KV cache; can improve acceptance but uses more memory |
 | `NIM_DFLASH_CONFIG` | Reasoner | Empty object | Extra vLLM DFlash speculative-config fields as JSON |
 | `NIM_MAX_NUM_BATCHED_TOKENS` | Reasoner | `16384` with unchunked multimodal input; otherwise `8192` | Scheduler token budget; unchunked multimodal input enforces at least `16384` |
 | `NIM_MAX_NUM_SEQS` | Reasoner | `256` | Maximum scheduled sequences |

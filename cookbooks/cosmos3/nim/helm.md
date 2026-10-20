@@ -21,7 +21,7 @@ for regular Dynamo and Dynamo with streaming, and require the Dynamo operator.
   default namespace.
 - A storage class for the persistent model cache.
 - `NGC_API_KEY` exported as described in
-  [Network and NGC access](prerequisites.md#network-and-ngc-access).
+  [Network and NGC Access](prerequisites.md#network-and-ngc-access).
 
 ## Create Secrets
 
@@ -95,7 +95,7 @@ Adjust it for the chosen configuration:
 
 - **Model and GPUs:** Change `NIM_MODEL_VARIANT`, `NIM_PERF_PROFILE`, and
   `nvidia.com/gpu` together using the
-  [Generator configurations](support-matrix.md#generator-configurations). The
+  [Generator Configurations](support-matrix.md#generator-configurations). The
   GPU count does not select a GPU type; use `nodeSelector` or `affinity` to
   target eligible GPU nodes, and `tolerations` if those nodes are tainted. On
   nodes with MIG enabled, request the MIG resource instead of
@@ -131,7 +131,7 @@ on a host with the same GPUs and selectors.
 ### Reasoner
 
 For Reasoner, replace `env` with the Reasoner selectors and choose the GPU
-count from the [Reasoner configurations](support-matrix.md#reasoner-configurations).
+count from the [Reasoner Configurations](support-matrix.md#reasoner-configurations).
 Reasoner does not use `NIM_PERF_PROFILE`:
 
 ```yaml
@@ -187,7 +187,7 @@ The chart README documents these optional features; all are off by default:
   `metrics`. CPU and memory metrics are of limited use for scaling a NIM; use
   custom metrics, for example through `prometheus-adapter`. Each new replica
   must download or mount the model before it becomes ready; refer to
-  [Storage and scaling](#storage-and-scaling).
+  [Storage and Scaling](#storage-and-scaling).
 
 ## Install
 
@@ -224,7 +224,7 @@ curl -fsS "$NIM_URL/v1/metadata" | python3 -m json.tool
 
 Confirm that metadata reports `generator` and `/v1/infer`, or `reasoner` and
 `/v1/chat/completions`. Then run a first request from
-[Use an existing NIM endpoint](README.md#use-an-existing-nim-endpoint).
+[Use an Existing NIM Endpoint](README.md#use-an-existing-nim-endpoint).
 
 ## Storage and Scaling
 
@@ -255,7 +255,7 @@ start downloads the model again.
 | --- | --- |
 | Pod stays `Pending` | Run `kubectl describe pod <pod>` and check `Events` for insufficient GPUs, untolerated taints, or an unbound volume claim |
 | Pod restarts while preparing the model workspace | The startup probe ran out before the download finished; increase `startupProbe.failureThreshold` |
-| Scaling or upgrade fails with `statefulSet.enabled: false` | The cache volume is `ReadWriteOnce`; refer to [Storage and scaling](#storage-and-scaling) |
+| Scaling or upgrade fails with `statefulSet.enabled: false` | The cache volume is `ReadWriteOnce`; refer to [Storage and Scaling](#storage-and-scaling) |
 | Profile selection fails | Compare GPU type, count, free memory, and pod memory limit with the [Support matrix](support-matrix.md); refer to [Troubleshooting](operations.md#troubleshooting) |
 
 ## Remove the Deployment

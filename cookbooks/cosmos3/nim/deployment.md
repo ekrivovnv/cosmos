@@ -25,7 +25,7 @@ fall back to an equivalent lower-memory offload or tensor-parallel layout when
 current free GPU memory is short. On unified-memory systems, selection counts
 70% of the shared pool as GPU memory and uses only resident Generator profiles.
 If no profile fits, startup fails; free GPU memory and restart. Refer to
-[GPU architecture and topology](support-matrix.md#gpu-architecture-and-topology)
+[GPU Architecture and Topology](support-matrix.md#gpu-architecture-and-topology)
 for the memory rules.
 
 ### Select a Generator Model
@@ -77,7 +77,7 @@ Kubernetes deployment, follow [Deploy with Helm](helm.md).
 ## Authenticate to NGC
 
 Export `NGC_API_KEY` (not `NGC_TOKEN`) as described under
-[Network and NGC access](prerequisites.md#network-and-ngc-access); never put the
+[Network and NGC Access](prerequisites.md#network-and-ngc-access); never put the
 key in source control. Docker saves the registry login after `docker login`:
 Docker Desktop uses a native credential store, while standalone Docker Engine
 without a helper stores it base64-encoded in `$HOME/.docker/config.json` and
@@ -231,7 +231,7 @@ system memory for BF16 or 35 GiB for FP8; selection enforces these
 Change the model and objective as needed, expose every GPU a multi-GPU
 configuration requires, and add `-e NIM_PRECISION=fp8` only to pin precision.
 The Generator uses as many exposed GPUs as a compatible profile supports; refer to
-[Advanced profile controls](configuration.md#advanced-profile-controls).
+[Advanced Profile Controls](configuration.md#advanced-profile-controls).
 
 ## Launch Reasoner
 
@@ -267,7 +267,7 @@ docker run -d --name cosmos3-reasoner \
 This example launches Super FP8 Reasoner, which needs compute capability 8.9+,
 67 GiB of VRAM usable after the 4-GiB Reasoner reserve, and 43 GiB of system
 memory (refer to
-[Reasoner configurations](support-matrix.md#reasoner-configurations)):
+[Reasoner Configurations](support-matrix.md#reasoner-configurations)):
 
 ```bash
 docker run -d --name cosmos3-reasoner \
@@ -307,7 +307,7 @@ these selectors to the [Reasoner launch](#launch-reasoner), with `fp8` or
 The Responses API stays enabled by default (`NIM_DISABLE_RESPONSES_ROUTE=false`).
 For streaming, also set `NIM_ENABLE_STREAMING=true` and
 `NIM_STREAMING_SPEC_METHOD=none` (refer to
-[Advanced streaming controls](configuration.md#advanced-streaming-controls)).
+[Advanced Streaming Controls](configuration.md#advanced-streaming-controls)).
 
 For Edge-DROID, which is
 [experimental](support-matrix.md#choose-a-model), add these selectors to the
@@ -323,7 +323,7 @@ For Edge-DROID, which is
 
 Edge-DROID disables SeaCache by default; `NIM_CACHE_BACKEND=none` keeps that
 visible, so leave `NIM_CACHE_CONFIG` unset. Guardrails stay enabled. After
-readiness, [verify the selection](#verify-the-selection)
+readiness, follow [Verify the Selection](#verify-the-selection)
 and run the [Reasoner catalog](reasoning.md#run-the-task-catalog) or the
 [DROID policy client](action.md#edge-droid-and-nano-droid-policy). Edge-DROID
 serves policy only, not image/video generation or forward/inverse dynamics.
@@ -375,13 +375,13 @@ configuration you will run offline.
    Snapshot files are relative symbolic links into `blobs/`, so tools that
    dereference links break the cache. On the offline host,
    `find /path/to/offline-cache -xtype l` must print nothing. Apply the
-   ownership from [Prepare the model cache](#prepare-the-model-cache).
+   ownership from [Prepare the Model Cache](#prepare-the-model-cache).
 3. On the offline host, set `LOCAL_NIM_CACHE` to the copy and run the same
    launch command. Generator can omit `-e NGC_API_KEY`; keep it for Reasoner,
    whose keyless offline start has not been validated.
 4. For Generator, do not set `NIM_DISABLE_MODEL_DOWNLOAD=1`; startup rejects it
    because guardrail artifacts must be materialized from the cached files.
-5. [Wait for readiness](#wait-for-readiness). With a complete cache, every
+5. [Wait for Readiness](#wait-for-readiness). With a complete cache, every
    artifact logs `Skipping download, using cached copy of file`; the
    `Downloading manifest profile` line does not indicate network access.
 

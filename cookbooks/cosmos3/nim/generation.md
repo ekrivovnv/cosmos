@@ -20,9 +20,9 @@ curl -f "$NIM_URL/v1/health/ready"
 
 Requests are synchronous and can stay quiet until done; the examples allow 30
 minutes, so do not retry a quiet connection (refer to
-[long-running requests](operations.md#long-running-requests)).
+[Long-Running Requests](operations.md#long-running-requests)).
 
-Install the [client tooling](prerequisites.md#client-tooling), then run the
+Install the [Client Tooling](prerequisites.md#client-tooling), then run the
 examples from the cookbook directory. They use the included prompts and media
 and write output under `examples/outputs/`:
 
@@ -43,7 +43,7 @@ uv run python examples/t2i.py
 Standard scripts run on a general-purpose `nano` or `super` variant whose image
 includes the task; T2I and I2V also run on their full-step specialists.
 Four-step specialists need their own scripts (refer to
-[Specialist T2I and I2V variants](#specialist-t2i-and-i2v-variants)).
+[Specialist T2I and I2V Variants](#specialist-t2i-and-i2v-variants)).
 
 ## Text-to-Image
 
@@ -182,8 +182,8 @@ Use JPEG, PNG, or WebP; verify other formats on the deployed image.
 
 | Intent | `model_mode` | Distinguishing Input | Guide |
 | --- | --- | --- | --- |
-| Animate a still image | `image2video` | Image `input_reference` | [Image-to-video](#image-to-video) |
-| Continue or transform a source video | `video2video` | Video `input_reference` plus optional V2V conditioning fields | [Video-to-video](#video-to-video) |
+| Animate a still image | `image2video` | Image `input_reference` | [Image-to-Video](#image-to-video) |
+| Continue or transform a source video | `video2video` | Video `input_reference` plus optional V2V conditioning fields | [Video-to-Video](#video-to-video) |
 | Follow an edge, blur, depth, segmentation, or WSM control | `video2video` | Non-empty `transfer`; top-level video only for a derived control | [Transfer](transfer.md) |
 | Estimate actions from an observed video | `inverse_dynamics` | Video `input_reference` plus `action_params` | [Action](action.md#inverse-dynamics) |
 
@@ -218,7 +218,7 @@ empty list or a negative index returns HTTP 422. `condition_video_keep` takes
 frames from the `first` (default) or `last` part of the input.
 
 Decoded video is capped at 75 MB; data URLs add about one third to the JSON
-size. Refer to [media inputs](api-reference.md#media-inputs) for codecs.
+size. Refer to [Media Inputs](api-reference.md#media-inputs) for codecs.
 
 ## Specialist T2I and I2V Variants
 
@@ -288,7 +288,7 @@ model artifacts, precisions, or hardware layouts.
 Operators can enable prompt upsampling for T2I, T2V, and I2V (not V2V, Action,
 or Transfer); it keeps the request's resolution, aspect, duration, and FPS,
 and falls back to the original prompt on failure. Refer to
-[Prompt upsampling](configuration.md#prompt-upsampling).
+[Prompt Upsampling](configuration.md#prompt-upsampling).
 
 ## Output and Playback
 

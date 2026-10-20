@@ -65,8 +65,8 @@ Profile IDs and tags are image-specific; do not copy them to another image.
 ## Logging
 
 Set log level, JSON-line output, backend verbosity, and Reasoner request-body
-logging with the [Server and logging](configuration.md#server-and-logging) and
-[Advanced settings](configuration.md#advanced-settings) variables. At `INFO`,
+logging with the [Server and Logging](configuration.md#server-and-logging) and
+[Advanced Settings](configuration.md#advanced-settings) variables. At `INFO`,
 request prompts are redacted; at `DEBUG`, full prompts are logged, so use
 `DEBUG` only during diagnosis and treat its logs as sensitive. Never log
 secrets or raw media data URLs.
@@ -119,7 +119,7 @@ A blocked request returns HTTP 422 and no usable partial output. Text checks run
 on the prompt that reaches generation; when prompt upsampling is enabled, that
 is the upsampled prompt.
 
-Disabling controls can reduce safety/privacy protections and may violate
+Disabling controls can reduce safety/privacy protections and can violate
 deployment policy. Do so only for an approved, isolated diagnostic:
 
 ```bash
@@ -233,7 +233,7 @@ failures](transfer.md#validation-and-common-failures).
 | HTTP 422, frame or resolution | Request violates T2I/video cadence rules or supplies `num_frames` for Action | Recompute with the task tables; Action derives frames from its chunk size |
 | Content-policy 422 | Text or generated frames triggered guardrails | Rephrase and review content; disable only under approved diagnostic policy |
 | Backend 500/OOM | Profile fit or runtime workload exceeded available memory | Reduce workload/concurrency, choose Nano/offload, or use a larger supported GPU; retain logs |
-| Request/client timeout | Image or video generation exceeded client/backend timeout | Refer to [Long-running requests](#long-running-requests); inspect NIM logs and runtime metrics |
+| Request/client timeout | Image or video generation exceeded client/backend timeout | Refer to [Long-Running Requests](#long-running-requests); inspect NIM logs and runtime metrics |
 | MP4 will not play | Player lacks VP9-in-MP4 support | Use `mpv`/`ffplay` or re-encode to H.264 |
 
 ### Reasoner

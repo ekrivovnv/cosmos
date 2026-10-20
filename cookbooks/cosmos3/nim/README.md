@@ -32,7 +32,7 @@ the
 Choose a runtime, a model variant (`NIM_MODEL_VARIANT`), optionally a
 precision, and for Generator a latency or throughput objective; the NIM selects
 a compatible profile, as described in
-[How selection works](deployment.md#how-selection-works).
+[How Selection Works](deployment.md#how-selection-works).
 
 ## Choose a Task
 
@@ -60,7 +60,7 @@ active example container before launching the other runtime on the same port.
 ### Use an Existing NIM Endpoint
 
 If an administrator already deployed the NIM, install and initialize the
-[client tooling](prerequisites.md#client-tooling), then set the service URL:
+[Client Tooling](prerequisites.md#client-tooling), then set the service URL:
 
 ```bash
 cd cookbooks/cosmos3/nim
@@ -95,7 +95,7 @@ uv run python examples/reasoner.py --case image_caption
    Thor, the NIM applies a 70%
    [unified-memory share](deployment.md#set-the-reasoner-memory-share-on-unified-memory-systems)
    automatically.
-4. Return to [Use an existing NIM endpoint](#use-an-existing-nim-endpoint) to
+4. Return to [Use an Existing NIM Endpoint](#use-an-existing-nim-endpoint) to
    verify the service and run the first request.
 
 Specialist variants accept only their task: run
@@ -169,7 +169,7 @@ Want to learn more about NIMs? Join the
 to get free access to self-hosting NVIDIA NIMs and microservices on up to 16
 GPUs on any infrastructure: cloud, data center, or personal workstation.
 
-Once you join the free NVIDIA Developer Program, you can access NIMs through the
+After you join the free NVIDIA Developer Program, you can access NIMs through the
 [NVIDIA API Catalog](https://build.nvidia.com/explore/discover) at any time. For
 enterprise-grade security, support, and API stability, select the option to
 access NIM through our free 90-day NVIDIA AI Enterprise Trial with a business

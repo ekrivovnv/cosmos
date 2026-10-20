@@ -64,7 +64,7 @@ forbidden `resolution`.
 
 ## Run the Examples
 
-Install the [client tooling](prerequisites.md#client-tooling), then enter the
+Install the [Client Tooling](prerequisites.md#client-tooling), then enter the
 cookbook directory:
 
 ```bash
@@ -157,7 +157,7 @@ Policy predicts an action chunk instead of receiving one:
 `av_policy_left` and `av_policy_right` differ only in the language goal and
 return a `[60,9]` action and a 61-frame rollout. Judge direction from the
 video, not raw values; a plausible rollout does not establish traffic safety or
-physical suitability. Policy omits `action` and may add the policy-only state
+physical suitability. Policy omits `action` and can add the policy-only state
 fields in the [reference](#action-parameter-reference).
 
 ### Integrate a Policy Loop

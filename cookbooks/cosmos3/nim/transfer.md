@@ -13,7 +13,7 @@ world-space-map (WSM) video controls: send `POST /v1/infer` with
 Start a compatible Generator with [Deployment](deployment.md) and begin with
 one precomputed control. To choose between V2V, Transfer, and inverse
 dynamics, refer to
-[Choose a video-conditioned workflow](generation.md#choose-a-video-conditioned-workflow).
+[Choose a Video-Conditioned Workflow](generation.md#choose-a-video-conditioned-workflow).
 
 ## Control Types
 
@@ -36,14 +36,14 @@ geometry, and seeds; run one at a time, as each is an expensive generation.
 Transfer is compute-intensive: use a high-throughput discrete GPU such as an
 RTX PRO 6000 Blackwell 96 GB or H100 80 GB. DGX Spark can meet the memory
 floors but is much slower and not recommended. Check memory against
-[Transfer headroom](support-matrix.md#transfer-headroom).
+[Transfer Headroom](support-matrix.md#transfer-headroom).
 
 The client allows 60 minutes per request, but the backend defaults to 30. To
 match, add `-e NIM_TRITON_REQUEST_TIMEOUT=3600000000` (microseconds) to the
 Generator launch and restart; refer to
-[long-running requests](operations.md#long-running-requests).
+[Long-Running Requests](operations.md#long-running-requests).
 
-Install the [client tooling](prerequisites.md#client-tooling). Then, from the
+Install the [Client Tooling](prerequisites.md#client-tooling). Then, from the
 repository root, enter the cookbook directory before running a case:
 
 ```bash
@@ -147,7 +147,7 @@ precomputed control video.
 
 `num_first_chunk_conditional_frames > 0` requires `input_reference`.
 `control_weight` belongs inside a control object; refer to
-[Advanced multiple controls](#advanced-multiple-controls).
+[Advanced Multiple Controls](#advanced-multiple-controls).
 
 ### Control Guidance Behavior
 
@@ -201,13 +201,13 @@ are spatially and temporally aligned.
 
 A ready deployment can serve generation but reject Transfer when GPU headroom
 is too small; use a larger GPU or lower-VRAM configuration (refer to
-[Transfer headroom](support-matrix.md#transfer-headroom), including the
+[Transfer Headroom](support-matrix.md#transfer-headroom), including the
 `NIM_ALLOW_UNSAFE_TRANSFER` diagnostic override).
 
 ## Media and Output
 
 Control videos and video `input_reference` values accept up to 100,000,000
-encoded characters; refer to [media inputs](api-reference.md#media-inputs) for
+encoded characters; refer to [Media Inputs](api-reference.md#media-inputs) for
 formats, codecs, and URL rules.
 
 - The source video and each control video must have at least `num_frames`
