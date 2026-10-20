@@ -40,8 +40,6 @@ Image: `nvcr.io/nim/nvidia/cosmos3:2.1.0`.
   channels-last VAE decode path is the default. If you notice a quality issue
   in a specific workload, try `NIM_CACHE_BACKEND=none` or
   `NIM_VAE_FAST_PATH=lossless`; see [Configuration](configuration.md#diffusion-cache-attention-and-vae-decode).
-- **Multi-GPU Generator layouts**: latency profiles use guidance and sequence
-  parallelism, and throughput profiles run one engine replica per GPU.
 - **System-memory floors are enforced**: each profile carries its measured
   system-memory floor instead of a 16-GiB admission tag, and FP8 offload floors
   are lower; see the [Support matrix](support-matrix.md#generator-configurations).
