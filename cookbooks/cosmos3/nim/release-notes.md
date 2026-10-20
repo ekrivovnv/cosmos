@@ -37,9 +37,9 @@ Image: `nvcr.io/nim/nvidia/cosmos3:2.1.0`.
 - **Generator performance defaults**: SeaCache is on for every Generator
   variant except Edge-DROID, SageAttention 2.2 is the default on compute
   capability 8.0 through 9.x without sequence parallelism, and the
-  channels-last VAE decode path is the default. Set `NIM_CACHE_BACKEND=none` or
-  `NIM_VAE_FAST_PATH=lossless` for output closer to the 2.0.0 reference path;
-  see [Configuration](configuration.md#diffusion-cache-attention-and-vae-decode).
+  channels-last VAE decode path is the default. If you notice a quality issue
+  in a specific workload, try `NIM_CACHE_BACKEND=none` or
+  `NIM_VAE_FAST_PATH=lossless`; see [Configuration](configuration.md#diffusion-cache-attention-and-vae-decode).
 - **Multi-GPU Generator layouts**: latency profiles use guidance and sequence
   parallelism, and throughput profiles run one engine replica per GPU.
 - **System-memory floors are enforced**: each profile carries its measured

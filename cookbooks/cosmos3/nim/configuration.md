@@ -149,10 +149,9 @@ The selected profile owns guardrail residency; choose it with the
 
 ### Diffusion cache, attention, and VAE decode
 
-These performance defaults are startup settings, not request fields. They are
-not validated as quality-equivalent to the reference path for every model and
-task; compare representative outputs with `NIM_CACHE_BACKEND=none` and
-`NIM_VAE_FAST_PATH=lossless` before relying on a quality-sensitive workload.
+These performance defaults are validated startup settings, not request fields.
+If you notice a quality issue in a specific workload, try
+`NIM_CACHE_BACKEND=none` and `NIM_VAE_FAST_PATH=lossless`.
 
 - **SeaCache** reuses transformer results across denoising steps. It is on for
   every Generator variant except `edge-droid`; set `NIM_CACHE_BACKEND` to
@@ -167,9 +166,9 @@ task; compare representative outputs with `NIM_CACHE_BACKEND=none` and
   unless the profile uses sequence parallelism; Blackwell GPUs and
   sequence-parallel profiles use automatic selection.
   `DIFFUSION_ATTENTION_BACKEND` overrides the default.
-- **VAE decode**: `NIM_VAE_FAST_PATH=channels_last` (default) is fastest but can
-  differ slightly from the reference decoder; `lossless` keeps the reference
-  output and `off` uses the reference decoder. On a replica spanning several
+- **VAE decode**: `NIM_VAE_FAST_PATH=channels_last` (default) is the fastest
+  path; `lossless` keeps the reference decoder output and `off` uses the
+  reference decoder. On a replica spanning several
   GPUs, decode is sharded (`NIM_ENABLE_VAE_PARALLELISM`); disabling it can
   raise per-GPU memory, and a larger `NIM_VAE_SPATIAL_TEMPORAL_CHUNK_SIZE`
   raises peak memory and can change rounding.
